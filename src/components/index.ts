@@ -5,3 +5,4 @@ export * from './messages';
 export * from './Table';
 export * from './StyledComponents';
 export * from './SearchBar';
+export * from './PaginationBar'

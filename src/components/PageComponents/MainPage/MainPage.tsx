@@ -1,125 +1,145 @@
-import { Avatar } from '@material-ui/core';
-import { Add } from '@material-ui/icons';
-import { Button, Container, Modal } from '@paljs/ui';
-import { BasicTable, SearchBar } from 'components';
 import Layout from 'Layouts';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import React, { useState } from 'react';
-import styled from 'styled-components';
 import { useStore } from 'utils';
-import { delete_banner } from 'utils/api/REST/actions/banners';
+import { Button, Checkbox, InputGroup, Select } from '@paljs/ui';
+import React, { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import styled from 'styled-components';
 
-export const MainPage = () => {
-  const router = useRouter();
-
-  const { mainPageBanners } = useStore((state) => ({
-    mainPageBanners: state?.mainPageBanners,
-    cache: state?.cache,
-    setCache: state?.setCache,
+export const MainPage: React.FC = () => {
+  const { banner } = useStore((state: any) => ({
+    banner: state?.banner,
   }));
+  console.log(banner);
 
   const [loading, setLoading] = useState(false);
+  const [active, setActive] = useState(false);
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const { register, handleSubmit, control } = useForm({
+    defaultValues: {
+      ...(banner ?? {}),
+    },
+  });
 
-  const toggleModal = () => setItemToRemove(null);
+  const platformOptions = [
+    { label: 'دسکتاپ', value: 'desktop' },
+    { label: 'موبایل', value: 'mobile' },
+  ];
 
-  const removeItem = async (item: any) => {
+  const typeOptions = [
+    { label: 'اسلاید', value: 'slide' },
+    { label: 'ایستاده', value: 'stand' },
+  ];
+
+  const onSubmit = async (form: any) => {
     setLoading(true);
-    const response = await delete_banner(item?.id);
-    console.log(response);
+    console.log(form);
     setLoading(false);
   };
 
-  const columns = [
-    'شناسه بنر',
-    'تصویر',
-    'عنوان بنر',
-    'رنگ عنوان بنر',
-    'توضیحات',
-    'رنگ توضیحات',
-    'وضعیت',
-    <p style={{ margin: 0, textAlign: 'center' }}>فعالیت ها</p>,
-  ];
-
-  const data = mainPageBanners?.data?.data?.map((banner: any) => [
-    banner?.id,
-    <Avatar src={`${process.env.SRC}/${banner?.media ? banner?.media[0]?.u : null}`} />,
-    banner?.title,
-    banner?.title_color,
-    banner?.content,
-    banner?.content_color,
-    banner?.active,
-    <Container>
-      <Button style={{ marginLeft: '1rem' }} status="Info">
-        مشاهده
-      </Button>
-      <Button style={{ marginLeft: '1rem' }} status="Primary">
-        ویرایش
-      </Button>
-      <Button status="Danger" onClick={() => setItemToRemove(banner)}>
-        حذف
-      </Button>
-    </Container>,
-  ]);
-
   return (
-    <Layout title="بنر های صفحه اصلی">
-      <h1>بنر های صفحه اصلی سایت </h1>
+    <Layout title="بنر صفحه اصلی">
+      <h1 style={{ marginBottom: '3rem' }}>بنر شماره {banner?.id ?? '?'}</h1>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <InputGroup className="col">
+          <label>عنوان</label>
+          <InputGroup className="flex ali-end">
+            <input {...register('title', { required: true })} placeholder="عنوان" />
+            <input {...register('title_color', { required: true })} type="color" placeholder="عنوان" />
+            <label>رنگ عنوان</label>
+          </InputGroup>
+        </InputGroup>
 
-      <Link href="/main-page/create">
-        <Button
-          style={{
-            margin: '1rem 0 1rem 1rem',
-            display: 'flex',
-          }}
-          status="Success"
-          appearance="outline"
-        >
-          افزودن بنر
-          <Add />
-        </Button>
-      </Link>
+        <InputGroup className="col mt-4">
+          <label>محتوا</label>
+          <InputGroup className="flex ali-end">
+            <textarea className="w-100" {...register('content', { required: true })} placeholder="محتوا" />
 
-      <SearchBar
-        fields={mainPageBanners.fields}
-        entity="banners"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/main-page/search',
-            query: form,
-          })
-        }
-      />
+            <input {...register('content_color', { required: true })} type="color" placeholder="رنگ محتوا" />
+            <label>رنگ محتوا</label>
+          </InputGroup>
 
-      <BasicTable columns={columns} rows={data} />
+          <InputGroup className="mt-4">
+            <label>لینک</label>
+            <input {...register('link', { required: true })} placeholder="لینک" />
+          </InputGroup>
 
-      <Modal on={itemToRemove} toggle={toggleModal}>
-        <ModalBox fluid>
-          آیا از حذف بنر <span className="text-danger">{itemToRemove?.title}</span> اطمینان دارید؟
-          <ButtonGroup>
-            <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>
-              خیر، منصرم شدم
-            </Button>
-            <Button disabled={loading} status="Danger" onClick={() => removeItem(itemToRemove)}>
-              بله، حذف شود
-            </Button>
-          </ButtonGroup>
-        </ModalBox>
-      </Modal>
+          <InputGroup className="mt-5">
+            <label>پلتفرم بنر</label>
+
+            <Controller
+              name="platform"
+              rules={{
+                required: true,
+              }}
+              control={control}
+              render={({ field }) => (
+                <Select
+                  options={platformOptions}
+                  className="w-25"
+                  onChange={({ value }: any) => field.onChange(value)}
+                />
+              )}
+            />
+          </InputGroup>
+        </InputGroup>
+
+        <InputGroup className="mt-4">
+          <label>اولویت</label>
+          <input type="number" {...register('priority', { required: true })} placeholder="اولویت" />
+        </InputGroup>
+
+        <InputGroup className="mt-4">
+          <label>فعال بودن</label>
+          <Controller
+            name="active"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                checked={active}
+                {...register('priority', { required: true })}
+                onChange={(e: any) => {
+                  setActive(e);
+                  field.onChange(e);
+                }}
+              />
+            )}
+          />
+        </InputGroup>
+
+        <InputGroup className="col m-4">
+          <label>تصویر بنر</label>
+          <InputGroup>
+            <input type="file" {...register('image')} />
+          </InputGroup>
+
+          <InputGroup>
+            <label style={{ width: '6rem' }}>تگ آلت تصویر</label>
+            <input {...register('media.a')} placeholder="a" />
+          </InputGroup>
+
+          <InputGroup>
+            <label style={{ width: '6rem' }}>تگ تایتل تصویر</label>
+            <input {...register('media.t')} placeholder="t" />
+          </InputGroup>
+
+          <InputGroup>
+            <label style={{ width: '6rem' }}>اولویت تصویر</label>
+            <input {...register('media.p')} type="number" placeholder="p" />
+          </InputGroup>
+        </InputGroup>
+
+        <InputGroup status="Success">
+          <Button disabled={loading} status="Info" type="submit">
+            {loading ? '...' : 'بروزرسانی بنر'}
+          </Button>
+        </InputGroup>
+      </Form>
     </Layout>
   );
 };
 
-const ModalBox = styled(Container)`
-  padding: 2rem;
-  border-radius: 0.5rem;
-  background-color: #fff;
-`;
-
-const ButtonGroup = styled.div`
-  margin-top: 1rem;
+const Form = styled.form`
+  width: 100%;
   display: flex;
+  flex-direction: column;
 `;
