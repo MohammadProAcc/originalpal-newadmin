@@ -62,10 +62,12 @@ export const OrdersPage = () => {
     'در پاسخ درخواست از سرور برنمیگردد',
     'در پاسخ درخواست از سرور برنمیگردد',
     <Container>
-      <Button style={{ marginLeft: '1rem' }} status="Info">
-        مشاهده
-      </Button>
-      <Link href={`=====>> Editing Link <<=====`}>
+      <Link href={`/orders/${order?.id}`}>
+        <Button style={{ marginLeft: '1rem' }} status="Info">
+          مشاهده
+        </Button>
+      </Link>
+      <Link href={`====>> Editing Link <<====`}>
         <Button style={{ marginLeft: '1rem' }} status="Primary">
           ویرایش
         </Button>
@@ -79,20 +81,6 @@ export const OrdersPage = () => {
   return (
     <Layout title="سارشات">
       <h1>سفارشات</h1>
-
-      <Link href="/orders/create">
-        <Button
-          style={{
-            margin: '1rem 0 1rem 1rem',
-            display: 'flex',
-          }}
-          status="Success"
-          appearance="outline"
-        >
-          افزودن سفارش
-          <Add />
-        </Button>
-      </Link>
 
       <SearchBar
         fields={orders.fields}

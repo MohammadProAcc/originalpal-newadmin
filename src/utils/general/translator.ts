@@ -106,6 +106,13 @@ const dictionary = {
   point: 'امتیاز',
   key: 'کلید',
   value: 'مقدار',
+  city: 'شهر',
+  province: 'استان',
+  address: 'آدرس',
+  postalcode: 'کد پستی',
+  order_id: 'شناسه سفارش',
+  quantity: 'تعداد',
+  stock_id: 'شناسه انبار',
 };
 
 export const translator = (key) => {

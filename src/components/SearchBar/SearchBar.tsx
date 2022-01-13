@@ -74,7 +74,9 @@ export function SearchBar({
         />
       </InputGroup>
 
-      <Button type="submit">جستجو</Button>
+      <Button style={{ display: 'flex', alignItems: 'center' }} type="submit">
+        جستجو
+      </Button>
     </Component>
   );
 }
