@@ -65,10 +65,12 @@ export const MainPages = () => {
     </div>,
     banner?.active,
     <Container>
-      <Button style={{ marginLeft: '1rem' }} status="Info">
-        مشاهده
-      </Button>
       <Link href={`/main-page/${banner?.id}`}>
+        <Button style={{ marginLeft: '1rem' }} status="Info">
+          مشاهده
+        </Button>
+      </Link>
+      <Link href={`/main-page/edit/${banner?.id}`}>
         <Button style={{ marginLeft: '1rem' }} status="Primary">
           ویرایش
         </Button>
