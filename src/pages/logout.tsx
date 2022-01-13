@@ -1,7 +1,7 @@
 import { Button, Container } from '@paljs/ui';
 import Cookies from 'js-cookie';
 import Layout from 'Layouts';
-import { NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import Link from 'next/link';
 import router from 'next/router';
 import { useUserStore } from 'utils';
@@ -33,3 +33,18 @@ const Logout: NextPage = () => {
 };
 
 export default Logout;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  if (!context.req.cookies.token) {
+    return {
+      props: {},
+      redirect: {
+        destination: '/auth/login',
+      },
+    };
+  } else {
+    return {
+      props: {},
+    };
+  }
+};

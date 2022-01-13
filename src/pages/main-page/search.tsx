@@ -7,18 +7,27 @@ const Main: NextPage = () => <MainPages />;
 export default Main;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { fields } = await getMainPageBannersList(context.query, context.req.cookies.token);
-  const { data: result } = await search_in('banners', context.query, context.query, context.req.cookies.token);
-  result.data = result?.data.filter((banner: any) => banner?.type === 'slide');
+    if (context?.req?.cookies?.token) {
+        const { fields } = await getMainPageBannersList(context.query, context.req.cookies.token);
+        const { data: result } = await search_in('banners', context.query, context.query, context.req.cookies.token);
+        result.data = result?.data.filter((banner: any) => banner?.type === 'slide');
 
-  return {
-    props: {
-      initialState: {
-        mainPageBanners: {
-          data: result,
-          fields,
-        },
-      },
-    },
-  };
+        return {
+            props: {
+                initialState: {
+                    mainPageBanners: {
+                        data: result,
+                        fields,
+                    },
+                },
+            },
+        };
+    } else {
+        return {
+            props: {},
+            redirect: {
+                destination: "/auth/login"
+            }
+        }
+    }
 };

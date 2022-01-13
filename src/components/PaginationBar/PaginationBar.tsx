@@ -9,15 +9,33 @@ interface IProps {
 }
 export const PaginationBar: React.FC<IProps> = ({ totalPages, activePage, router }) => {
   console.log(activePage);
-  const pagesCount = [];
-  for (let i = 0; i < totalPages; i++) {
-    pagesCount.push(i + 1);
+  const pagesToRender = [];
+  if (totalPages > 2) {
+    for (let i = 1; i < totalPages - 1; i++) {
+      if (activePage - 4 < i && activePage + 4 > i) {
+        pagesToRender.push(i + 1);
+      }
+    }
   }
 
   return (
     <Component>
       <nav aria-label="Page navigation example">
         <ul className="pagination">
+          <li className={`page-item ${activePage === 1 && 'active'}`}>
+            <Link
+              href={{
+                query: {
+                  ...router.query,
+                  page: 1,
+                },
+              }}
+            >
+              <a className="page-link" href="#">
+                1
+              </a>
+            </Link>
+          </li>
           {activePage !== 1 && (
             <li className="page-item">
               <Link
@@ -35,7 +53,7 @@ export const PaginationBar: React.FC<IProps> = ({ totalPages, activePage, router
               </Link>
             </li>
           )}
-          {pagesCount?.map((page: number) => (
+          {pagesToRender?.map((page: number) => (
             <li className={`page-item ${activePage === page && 'active'}`}>
               <Link
                 href={{
@@ -64,6 +82,22 @@ export const PaginationBar: React.FC<IProps> = ({ totalPages, activePage, router
                 <a className="page-link" href="#" aria-label="Next">
                   <span aria-hidden="true">&raquo; </span>
                   <span className="sr-only">Next</span>
+                </a>
+              </Link>
+            </li>
+          )}
+          {totalPages > 1 && (
+            <li className={`page-item ${activePage === totalPages && 'active'}`}>
+              <Link
+                href={{
+                  query: {
+                    ...router.query,
+                    page: totalPages,
+                  },
+                }}
+              >
+                <a className="page-link" href="#">
+                  {totalPages}
                 </a>
               </Link>
             </li>

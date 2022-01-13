@@ -1,18 +1,16 @@
-import { MainPage } from 'components';
 import { GetServerSideProps, NextPage } from 'next';
-import { getSingleBanner } from 'utils/api/REST/actions/banners/getSingleBanner';
 
-const SingleMainPage: NextPage = () => <MainPage />;
-export default SingleMainPage;
+const PageName: NextPage = () => <div>......:::: Page Component ::::......</div>;
+export default PageName;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context?.req?.cookies?.token) {
-    const banner = await getSingleBanner(context.query.banner_id! as string, context?.req?.cookies?.token as string);
+    // const sample = await ......:::: Fetch Single Item ::::......
 
     return {
       props: {
         initialState: {
-          banner,
+          // sample ......:::: Passing Single Item ::::...... ,
         },
       },
     };

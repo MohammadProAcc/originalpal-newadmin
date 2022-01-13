@@ -14,17 +14,25 @@ const Home = () => {
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const products = await getProductsList(context.query, context.req.cookies.token);
-  const users = await getUsersList(context.query, context.req.cookies.token);
-  const orders = await getOrdersList(context.query, context.req.cookies.token);
-
-  return {
-    props: {
-      initialState: {
-        products,
-        users,
-        orders,
+  if (context.req.cookies.token) {
+    const products = await getProductsList(context.query, context.req.cookies.token);
+    const users = await getUsersList(context.query, context.req.cookies.token);
+    const orders = await getOrdersList(context.query, context.req.cookies.token);
+    return {
+      props: {
+        initialState: {
+          products,
+          users,
+          orders,
+        },
       },
-    },
-  };
+    };
+  } else {
+    return {
+      props: {},
+      redirect: {
+        destination: '/auth/login',
+      },
+    };
+  }
 };
