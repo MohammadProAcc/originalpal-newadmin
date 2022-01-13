@@ -115,9 +115,8 @@ const dictionary = {
   stock_id: 'شناسه انبار',
 };
 
-export const translator = (key) => {
-  for (let prop in dictionary) {
-    if (prop === key) return dictionary[prop];
+export const translator = (target: string) => {
+  for (const [key, value] of Object.entries(dictionary)) {
+    return key === target ? value : target;
   }
-  return key;
 };
