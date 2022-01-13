@@ -77,7 +77,7 @@ export const OrdersPage = () => {
   ]);
 
   return (
-    <Layout title="بنر های صفحه اصلی">
+    <Layout title="سارشات">
       <h1>سفارشات</h1>
 
       <Link href="/orders/create">
