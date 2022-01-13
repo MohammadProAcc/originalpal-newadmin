@@ -36,6 +36,11 @@ function initStore(preloadedState = initialState) {
         // --===>>> Cache System <<<===--
         setCache: (key: string, value: any) => set((state: any) => void (state.cache[key] = value)),
         restoreCache: (key: string) => get((state: any) => state?.cache[key]),
+        clearList: (entity: string, itemId: number) =>
+          set(
+            (state: any) =>
+              void (state[entity].data.data = state[entity]?.data.data.filter((item: any) => item?.id !== itemId)),
+          ),
       })),
     ),
   );

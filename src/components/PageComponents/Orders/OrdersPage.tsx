@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { translator, useStore } from 'utils';
+import { deleteOrder, translator, useStore } from 'utils';
 import Layout from 'Layouts';
 import { Button, Container, Modal } from '@paljs/ui';
 import { BasicTable, PaginationBar, SearchBar } from 'components';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Add } from '@material-ui/icons';
+import { toast } from 'react-toastify';
 
 export const OrdersPage = () => {
   const router = useRouter();
 
-  const { orders } = useStore((state) => ({
+  const { orders, clearList } = useStore((state) => ({
     orders: state?.orders,
+    clearList: state?.clearList,
   }));
 
   const [loading, setLoading] = useState(false);
@@ -24,7 +26,15 @@ export const OrdersPage = () => {
   const removeItem = async (item: any) => {
     setLoading(true);
     console.log(item);
-    // =====>> Removal Mechanism <<=====
+    const response = await deleteOrder(item?.id);
+    if (response?.status === 'success') {
+      clearList('orders', item?.id);
+      toggleModal();
+      toast.success('سفارش با موفقیت حذف شد');
+    } else {
+      toast.error('عملیات حذف موفقیت آمیز نبود');
+    }
+    console.log(response);
     setLoading(false);
   };
 
@@ -42,7 +52,6 @@ export const OrdersPage = () => {
   ];
 
   const data = orders?.data?.data?.map((order: any) => [
-    // =====>> Table Columns <<=====
     order?.id,
     translator(order?.status),
     `${order?.user?.name ?? '?'} ${order?.user?.lastnam ?? ''}`,
