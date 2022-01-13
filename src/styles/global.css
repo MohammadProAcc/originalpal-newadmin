@@ -3,9 +3,9 @@
     src: url(/public/fonts/IRANSansWeb_Light.woff) format(woff);
 }
 
-@font-face {
-  font-family: IRANSansWebLight;
-  src: url('/fonts/IRANSansWeb_Light.woff') format('woff');
+/* FIXME: remove the !important */
+* {
+    font-family: IRANSansWebLight !important;
 }
 
 body {
