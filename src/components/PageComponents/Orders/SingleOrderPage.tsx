@@ -27,7 +27,7 @@ export const SingleOrderPage: React.FC = () => {
       <Card>
         <CardHeader>کاربر</CardHeader>
         <CardBody>
-          {Object.keys(order?.user).map((field: any) => (
+          {Object.keys(order?.user)?.map((field: any) => (
             <p>
               <span>{translator(field)} :</span>
               <span>{order['user'][field] ?? ' - '}</span>
@@ -46,7 +46,7 @@ export const SingleOrderPage: React.FC = () => {
       <Card>
         <CardHeader>آدرس</CardHeader>
         <CardBody>
-          {Object.keys(order['address']).map((field: any) => (
+          {Object.keys(order['address'])?.map((field: any) => (
             <p>
               <span>{translator(field)} :</span>
               <span>{order['address'][field] ?? ' - '}</span>
@@ -77,7 +77,7 @@ export const SingleOrderPage: React.FC = () => {
       <Card>
         <CardHeader>سفارشات</CardHeader>
         <CardBody>
-          {order['order_items'].map((orderItem: any, orderItemIndex: number) => (
+          {order['order_items']?.map((orderItem: any, orderItemIndex: number) => (
             <Card>
               <CardHeader>
                 <h4>
@@ -102,8 +102,8 @@ export const SingleOrderPage: React.FC = () => {
             جمع کل :{' '}
             {numeralize(
               order['order_items']
-                .map((orderItem: any) => orderItem?.price)
-                .reduce((prev: number, curr: number) => curr + prev),
+                ?.map((orderItem: any) => orderItem?.price)
+                ?.reduce((prev: number, curr: number) => curr + prev),
             )}{' '}
             تومان
           </p>

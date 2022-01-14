@@ -38,18 +38,7 @@ export const OrdersPage = () => {
     setLoading(false);
   };
 
-  const columns: any[] = [
-    'شماره سفارش',
-    'وضعیت',
-    'کاربر',
-    'شماره پرداخت',
-    'آدرس',
-    'تاریخ',
-    'کد تخفیف',
-    'نحوه خرید',
-    'وضعیت نهایی',
-    'فعالیت ها',
-  ];
+  const columns: any[] = ['شماره سفارش', 'وضعیت', 'کاربر', 'شماره پرداخت', 'آدرس', 'فعالیت ها'];
 
   const data = orders?.data?.data?.map((order: any) => [
     order?.id,
@@ -57,17 +46,13 @@ export const OrdersPage = () => {
     `${order?.user?.name ?? '?'} ${order?.user?.lastnam ?? ''}`,
     'در پاسخ درخواست از سرور برنمیگردد',
     order?.address?.address,
-    'در پاسخ درخواست از سرور برنمیگردد',
-    'در پاسخ درخواست از سرور برنمیگردد',
-    'در پاسخ درخواست از سرور برنمیگردد',
-    'در پاسخ درخواست از سرور برنمیگردد',
     <Container>
       <Link href={`/orders/${order?.id}`}>
         <Button style={{ marginLeft: '1rem' }} status="Info">
           مشاهده
         </Button>
       </Link>
-      <Link href={`====>> Editing Link <<====`}>
+      <Link href={`/orders/edit/${order?.id}`}>
         <Button style={{ marginLeft: '1rem' }} status="Primary">
           ویرایش
         </Button>

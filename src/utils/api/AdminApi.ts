@@ -24,7 +24,7 @@ export const admin = (token?: string) => {
         Cookies.remove('token');
         router.push('/auth/login');
       }
-      console.log('<< >> Axios Api << >> Error >> ', error, error.response.data.message);
+      console.log('<< >> Axios Api << >> Error >> ', error, error?.response?.data?.message);
     },
   );
 

@@ -113,10 +113,16 @@ const dictionary = {
   order_id: 'شناسه سفارش',
   quantity: 'تعداد',
   stock_id: 'شناسه انبار',
+  post: 'پست شده',
+  waiting: 'در انتظار پرداخت',
+  process: 'در حال پردازش',
 };
 
 export const translator = (target: string) => {
   for (const [key, value] of Object.entries(dictionary)) {
-    return key === target ? value : target;
+    if (key === target) {
+      return value;
+    }
   }
+  return target;
 };

@@ -41,6 +41,14 @@ function initStore(preloadedState = initialState) {
             (state: any) =>
               void (state[entity].data.data = state[entity]?.data.data.filter((item: any) => item?.id !== itemId)),
           ),
+        // --===>>> Order <<<===--
+        clearOrderItems: (orderItemId: number) =>
+          set(
+            (state: any) =>
+              void (state.order.order_items = state?.order?.order_items?.filter(
+                (item: any) => item?.id !== orderItemId,
+              )),
+          ),
       })),
     ),
   );
