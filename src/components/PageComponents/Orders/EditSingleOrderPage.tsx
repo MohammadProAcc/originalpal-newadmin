@@ -1,5 +1,6 @@
+import { FormGroup } from '@material-ui/core';
 import { Add, Close } from '@material-ui/icons';
-import { Alert, Button, Card, CardBody, CardHeader, InputGroup, Modal, Select } from '@paljs/ui';
+import { Alert, Button, Card, CardBody, CardHeader, Container, InputGroup, Modal, Select } from '@paljs/ui';
 import { BasicEditor } from 'components';
 import Cookies from 'js-cookie';
 import Layout from 'Layouts';
@@ -7,7 +8,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { add_stock_option, admin, numeralize, removeOrderItem, translator, update_order_status, useStore } from 'utils';
 
 const statusOptions = [
@@ -92,6 +93,12 @@ export const EditSingleOrderPage: React.FC = () => {
       toast.error('بروزرسانی سفارش موفقیت آمیز نبود');
     }
     setLoading(false);
+  };
+
+  const { register: smsRegister, handleSubmit: smsHandleSubmit } = useForm();
+
+  const submitSmsForm = async (form: any) => {
+    console.log(form);
   };
 
   const removeStock = async (stock: any) => {
@@ -290,6 +297,87 @@ export const EditSingleOrderPage: React.FC = () => {
         </CardBody>
       </Card> */}
 
+      <Card>
+        <CardHeader>ارسال پیامک</CardHeader>
+        <CardBody>
+          <Form smsForm onSubmit={smsHandleSubmit(submitSmsForm)}>
+            <InputGroup className="mb-2">
+              <input {...smsRegister('delivery')} placeholder="نحوه ارسال" />
+            </InputGroup>
+
+            <InputGroup className="mb-2">
+              <input {...smsRegister('delivery_description')} placeholder="توضیحات ارسال" />
+            </InputGroup>
+
+            <InputGroup className="mb-2">
+              <input {...smsRegister('next_purchase_coupon')} placeholder="کد تخفیف خرید بعدی" />
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+              <input {...smsRegister('track_order_id')} placeholder="کد رهگیری سفارش" />
+            </InputGroup>
+
+            <Button status="Info" type="submit" appearance="outline">
+              ارسال پیامک
+            </Button>
+          </Form>
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>فاکتور ها</CardHeader>
+        <CardBody>
+          <Container>
+            <Button status="Info" appearance="hero" className="ml-1 mb-1">
+              پرینت فاکتور سفارش
+            </Button>
+
+            <Button status="Info" appearance="hero" className="ml-1 mb-1">
+              پرینت پشت فاکتور
+            </Button>
+          </Container>
+
+          <Container>
+            <Button status="Info" appearance="hero" className="ml-1 mb-1">
+              پرینت برگه ارسال ( A5 )
+            </Button>
+
+            <Button status="Info" appearance="hero" className="ml-1 mb-1">
+              پرینت برگه برگشت ( A5 )
+            </Button>
+
+            <Button status="Info" appearance="hero" className="ml-1 mb-1">
+              پرینت پشت برگه برگشت ( A5 )
+            </Button>
+          </Container>
+
+          <Container>
+            <h5 className="my-3">سیطره</h5>
+
+            <Button status="Info" appearance="hero" className="ml-1 mb-1">
+              پرینت برگه ارسال ( A5 ) سیطره
+            </Button>
+
+            <Button status="Info" appearance="hero" className="ml-1 mb-1">
+              پرینت برگه برگشت ( A5 ) سیطره
+            </Button>
+          </Container>
+
+          <Container>
+            <h5 className="my-3">تیپاکس</h5>
+
+            <Button status="Info" appearance="hero" className="ml-1 mb-1">
+              پرینت برگه ارسال تیپاکس ( A5 ) سیطره
+            </Button>
+
+            <Button status="Info" appearance="hero" className="ml-1 mb-1">
+              پرینت برگه برگشت تیپاکس ( A5 ) سیطره
+            </Button>
+          </Container>
+        </CardBody>
+      </Card>
+
+      {/* -==>>> Modals <<<==- */}
       <Modal on={stockToRemove} toggle={() => setStockToRemove(null)}>
         <Card>
           <CardHeader>
@@ -314,7 +402,17 @@ const AddStockSelect = styled(Select)`
   margin: 0 1rem;
 `;
 
-const Form = styled.form`
+interface IFormProps {
+  smsForm?: boolean;
+}
+const Form = styled.form<IFormProps>`
   display: flex;
   align-items: center;
+
+  ${(props) =>
+    props.smsForm &&
+    css`
+      flex-direction: column;
+      align-items: flex-start;
+    `}
 `;
