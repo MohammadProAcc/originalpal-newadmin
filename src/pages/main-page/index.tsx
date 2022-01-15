@@ -28,7 +28,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         initialState: {
           mainPageBanners: {
             data: result,
-            fields,
+            fields: [
+              'id',
+              'type',
+              'platform',
+              'media',
+              'content',
+              'content_color',
+              'title_color',
+              'title',
+              'link',
+              'priority',
+              'active',
+              'created_at',
+              'updated_at',
+            ],
           },
         },
       },

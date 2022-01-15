@@ -6,6 +6,7 @@ import Layout from 'Layouts';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { useStore } from 'utils';
 import { delete_banner } from 'utils/api/REST/actions/banners';
@@ -13,10 +14,11 @@ import { delete_banner } from 'utils/api/REST/actions/banners';
 export const MainPages = () => {
   const router = useRouter();
 
-  const { mainPageBanners } = useStore((state) => ({
+  const { mainPageBanners, clearList } = useStore((state) => ({
     mainPageBanners: state?.mainPageBanners,
     cache: state?.cache,
     setCache: state?.setCache,
+    clearList: state?.clearList,
   }));
 
   const [loading, setLoading] = useState(false);
@@ -28,7 +30,13 @@ export const MainPages = () => {
   const removeItem = async (item: any) => {
     setLoading(true);
     const response = await delete_banner(item?.id);
-    console.log(response);
+    if (response?.status === 'success') {
+      clearList('mainPageBanners', item?.id);
+      setItemToRemove(null);
+      toast.success('بنر صفحه اصلی با موفیت حذف شد');
+    } else {
+      toast.error('حذف محصول موفقیت آمیز نبود');
+    }
     setLoading(false);
   };
 
@@ -47,7 +55,20 @@ export const MainPages = () => {
     banner?.id,
     <Avatar src={`${process.env.SRC}/${banner?.media ? banner?.media[0]?.u : null}`} />,
     banner?.title,
-    banner?.title_color,
+    <div
+      style={{
+        backgroundColor: banner?.title_color,
+        color: '#212121',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        direction: 'ltr',
+        borderRadius: '0.5rem',
+        padding: '.5rem 1rem',
+      }}
+    >
+      {banner?.title_color}
+    </div>,
     banner?.content,
     <div
       style={{

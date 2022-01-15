@@ -1,9 +1,9 @@
-import { MainPage } from 'components';
+import { EditMainPage, MainPage } from 'components';
 import { GetServerSideProps, NextPage } from 'next';
 import { getSingleBanner } from 'utils/api/REST/actions/banners/getSingleBanner';
 
-const SingleMainPage: NextPage = () => <MainPage />;
-export default SingleMainPage;
+const EditSingleMainPage: NextPage = () => <EditMainPage />;
+export default EditSingleMainPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context?.req?.cookies?.token) {

@@ -6,17 +6,34 @@ import styled from 'styled-components';
 import Cookies from 'js-cookie';
 import { create_banner } from 'utils/api/REST/actions/banners';
 import { toast } from 'react-toastify';
+import { useStore } from 'utils';
+import { updateBanner } from 'utils/api/REST/actions/banners/updateBanner';
+import { useRouter } from 'next/router';
 
-export function CreateMainPage() {
+export function EditMainPage() {
+  const router = useRouter();
+
+  const { banner } = useStore((state: any) => ({
+    banner: state?.banner,
+  }));
+
   const platformOptions = [
     { label: 'دسکتاپ', value: 'desktop' },
     { label: 'موبایل', value: 'mobile' },
   ];
 
-  const [loading, setLoading] = useState(false);
-  const [active, setActive] = useState(false);
+  const [platform, setPlatform] = useState<any>(
+    platformOptions.find((option: any) => option?.value === banner?.platform),
+  );
 
-  const { register, handleSubmit, control } = useForm();
+  const [loading, setLoading] = useState(false);
+  const [active, setActive] = useState(!!banner?.active);
+
+  const { register, handleSubmit, control } = useForm({
+    defaultValues: {
+      ...(banner ?? null),
+    },
+  });
 
   const onSubmit = async (form: any) => {
     setLoading(true);
@@ -25,20 +42,24 @@ export function CreateMainPage() {
     delete form.image;
     const finalForm = {
       ...form,
+      platform: platform?.value,
+      active,
       type: 'slide',
       // formData
     };
-    console.log(finalForm);
-    const response = await create_banner(finalForm, Cookies.get('token'));
-    console.log(response);
-    toast.success('بنر با موفقیت ساخته شد');
+    const response = await updateBanner(router?.query?.banner_id as string, finalForm, Cookies.get('token') ?? '');
+    if (response?.status === 'success') {
+      toast.info('بنر با موفقیت بروزرسانی شد');
+    } else {
+      toast.error('بروزرسانی بنر موفقیت آمیز نبود');
+    }
     setLoading(false);
   };
 
   return (
     <Layout title="ساخت بنر صفحه اصلی">
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <h1>ساخت بنر صفحه اصلی</h1>
+        <h1>بروزرسانی بنر صفحه اصلی (شناسه: {banner?.id})</h1>
 
         <InputGroup className="col">
           <label>عنوان</label>
@@ -66,20 +87,7 @@ export function CreateMainPage() {
           <InputGroup className="mt-5">
             <label>پلتفرم بنر</label>
 
-            <Controller
-              name="platform"
-              rules={{
-                required: true,
-              }}
-              control={control}
-              render={({ field }) => (
-                <Select
-                  options={platformOptions}
-                  className="w-25"
-                  onChange={({ value }: any) => field.onChange(value)}
-                />
-              )}
-            />
+            <Select options={platformOptions} className="w-25" value={platform} onChange={(v) => setPlatform(v)} />
           </InputGroup>
         </InputGroup>
 
@@ -90,20 +98,7 @@ export function CreateMainPage() {
 
         <InputGroup className="mt-4">
           <label>فعال بودن</label>
-          <Controller
-            name="active"
-            control={control}
-            render={({ field }) => (
-              <Checkbox
-                checked={active}
-                {...register('priority', { required: true })}
-                onChange={(e: any) => {
-                  setActive(e);
-                  field.onChange(e);
-                }}
-              />
-            )}
-          />
+          <Checkbox checked={active} onChange={(e: any) => setActive(e)} />
         </InputGroup>
 
         <InputGroup className="col m-4">
@@ -129,8 +124,8 @@ export function CreateMainPage() {
         </InputGroup>
 
         <InputGroup status="Success">
-          <Button disabled={loading} status="Success" type="submit">
-            {loading ? '...' : 'افزودن بنر'}
+          <Button disabled={loading} status="Info" appearance="outline" className="mt-5" type="submit">
+            {loading ? '...' : 'بروزرسانی بنر'}
           </Button>
         </InputGroup>
       </Form>

@@ -17,6 +17,7 @@ export const getMainPageBannersList: any = async (params: any, token: any) => {
     // const { data: banners } = await admin(token ?? null).get(`/banners`, {
     //   params,
     // });
+    console.log(banners);
     return banners.data;
   } catch (err) {
     return null;

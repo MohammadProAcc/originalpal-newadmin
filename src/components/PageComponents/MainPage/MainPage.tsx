@@ -1,9 +1,11 @@
 import Layout from 'Layouts';
-import { useStore } from 'utils';
-import { Button, Checkbox, InputGroup, Select } from '@paljs/ui';
+import { translator, useStore } from 'utils';
+import { Alert, Button, Card, CardBody, CardHeader, Checkbox, InputGroup, Select } from '@paljs/ui';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import styled from 'styled-components';
+import { Dot } from 'components';
+import Image from 'next/image';
 
 export const MainPage: React.FC = () => {
   const { banner } = useStore((state: any) => ({
@@ -39,101 +41,75 @@ export const MainPage: React.FC = () => {
   return (
     <Layout title="بنر صفحه اصلی">
       <h1 style={{ marginBottom: '3rem' }}>بنر شماره {banner?.id ?? '?'}</h1>
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <InputGroup className="col">
-          <label>عنوان</label>
-          <InputGroup className="flex ali-end">
-            <input {...register('title', { required: true })} placeholder="عنوان" />
-            <input {...register('title_color', { required: true })} type="color" placeholder="عنوان" />
-            <label>رنگ عنوان</label>
-          </InputGroup>
-        </InputGroup>
 
-        <InputGroup className="col mt-4">
-          <label>محتوا</label>
-          <InputGroup className="flex ali-end">
-            <textarea className="w-100" {...register('content', { required: true })} placeholder="محتوا" />
+      <Card>
+        <CardHeader>عنوان</CardHeader>
+        <CardBody>{banner?.title}</CardBody>
+      </Card>
 
-            <input {...register('content_color', { required: true })} type="color" placeholder="رنگ محتوا" />
-            <label>رنگ محتوا</label>
-          </InputGroup>
+      <Card>
+        <CardHeader>رنگ عنوان</CardHeader>
+        <CardBody>
+          {
+            <span>
+              <Dot color={banner?.title_color} /> {banner?.title_color}{' '}
+            </span>
+          }
+        </CardBody>
+      </Card>
 
-          <InputGroup className="mt-4">
-            <label>لینک</label>
-            <input {...register('link', { required: true })} placeholder="لینک" />
-          </InputGroup>
+      <Card>
+        <CardHeader>محتوا</CardHeader>
+        <CardBody>{banner?.content}</CardBody>
+      </Card>
 
-          <InputGroup className="mt-5">
-            <label>پلتفرم بنر</label>
+      <Card>
+        <CardHeader>رنگ محتوا</CardHeader>
+        <CardBody>
+          {
+            <span>
+              <Dot color={banner?.content_color} /> {banner?.content_color}{' '}
+            </span>
+          }
+        </CardBody>
+      </Card>
 
-            <Controller
-              name="platform"
-              rules={{
-                required: true,
-              }}
-              control={control}
-              render={({ field }) => (
-                <Select
-                  options={platformOptions}
-                  className="w-25"
-                  onChange={({ value }: any) => field.onChange(value)}
-                />
-              )}
-            />
-          </InputGroup>
-        </InputGroup>
+      <Card>
+        <CardHeader>لینک</CardHeader>
+        <CardBody>{banner?.link}</CardBody>
+      </Card>
 
-        <InputGroup className="mt-4">
-          <label>اولویت</label>
-          <input type="number" {...register('priority', { required: true })} placeholder="اولویت" />
-        </InputGroup>
+      <Card>
+        <CardHeader>پلتفرم</CardHeader>
+        <CardBody>{translator(banner?.platform)}</CardBody>
+      </Card>
 
-        <InputGroup className="mt-4">
-          <label>فعال بودن</label>
-          <Controller
-            name="active"
-            control={control}
-            render={({ field }) => (
-              <Checkbox
-                checked={active}
-                {...register('priority', { required: true })}
-                onChange={(e: any) => {
-                  setActive(e);
-                  field.onChange(e);
-                }}
-              />
-            )}
-          />
-        </InputGroup>
+      <Card>
+        <CardHeader>اولویت</CardHeader>
+        <CardBody>{banner?.priority}</CardBody>
+      </Card>
 
-        <InputGroup className="col m-4">
-          <label>تصویر بنر</label>
-          <InputGroup>
-            <input type="file" {...register('image')} />
-          </InputGroup>
+      <Card>
+        <CardHeader>فعال بودن بنر</CardHeader>
+        <CardBody>
+          {banner?.active ? <Alert status="Success">فعال</Alert> : <Alert status="Danger">غیرفعال</Alert>}
+        </CardBody>
+      </Card>
 
-          <InputGroup>
-            <label style={{ width: '6rem' }}>تگ آلت تصویر</label>
-            <input {...register('media.a')} placeholder="a" />
-          </InputGroup>
+      <Card>
+        <CardHeader>تصویر بنر</CardHeader>
+        <CardBody>
+          <Image layout="fill" src={`${process?.env.SRC}/${banner?.media?.u ?? ''}`} />
+        </CardBody>
+      </Card>
 
-          <InputGroup>
-            <label style={{ width: '6rem' }}>تگ تایتل تصویر</label>
-            <input {...register('media.t')} placeholder="t" />
-          </InputGroup>
-
-          <InputGroup>
-            <label style={{ width: '6rem' }}>اولویت تصویر</label>
-            <input {...register('media.p')} type="number" placeholder="p" />
-          </InputGroup>
-        </InputGroup>
-
-        <InputGroup status="Success">
-          <Button disabled={loading} status="Info" type="submit">
-            {loading ? '...' : 'بروزرسانی بنر'}
-          </Button>
-        </InputGroup>
-      </Form>
+      <Card>
+        <CardHeader>تگ های تصویر</CardHeader>
+        <CardBody style={{ display: 'flex', flexDirection: 'column' }}>
+          <span>تگ alt : {banner?.media?.a}</span>
+          <span>تگ title : {banner?.media?.t}</span>
+        </CardBody>
+      </Card>
     </Layout>
   );
 };
