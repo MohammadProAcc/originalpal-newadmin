@@ -17,8 +17,8 @@ const Logout: NextPage = () => {
 
   return (
     <Layout title="خروج">
-      <h1>آیا از خروج خود اطمینان دارید؟</h1>
-      <Container fluid>
+      <h1 className="text-center">آیا از خروج خود اطمینان دارید؟</h1>
+      <div className="m-5 flex js-center">
         <Link href="/">
           <Button style={{ margin: '0 0 0 1rem' }} status="Basic">
             خیر
@@ -27,7 +27,7 @@ const Logout: NextPage = () => {
         <Button onClick={logout} status="Danger">
           بله
         </Button>
-      </Container>
+      </div>
     </Layout>
   );
 };
