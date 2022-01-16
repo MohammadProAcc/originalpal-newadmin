@@ -6,7 +6,6 @@ const PageName: NextPage = () => <BrandsPage />;
 export default PageName;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context?.req?.cookies?.token) {
-    const { fields } = await getBrandsList(context?.query, context?.req?.cookies?.token);
     const { data: result } = await search_in('brands', context.query, context.query, context.req.cookies.token);
 
     return {
@@ -14,7 +13,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         initialState: {
           brands: {
             data: result,
-            fields,
+            fields: [
+              'id',
+              'name',
+              'created_at',
+              'updated_at',
+              'meta_title',
+              'meta_keywords',
+              'meta_description',
+              'title_page',
+              'tagtext',
+            ],
           },
         },
       },

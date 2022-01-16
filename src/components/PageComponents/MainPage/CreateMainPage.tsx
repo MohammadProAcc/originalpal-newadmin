@@ -26,7 +26,7 @@ export function CreateMainPage() {
     const finalForm = {
       ...form,
       type: 'slide',
-      // formData
+      formData,
     };
     console.log(finalForm);
     const response = await create_banner(finalForm, Cookies.get('token'));

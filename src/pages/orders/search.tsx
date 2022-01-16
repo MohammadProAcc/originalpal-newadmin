@@ -6,7 +6,6 @@ const SearchOrders: NextPage = () => <OrdersPage />;
 export default SearchOrders;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context?.req?.cookies?.token) {
-    const { fields } = await getOrdersList(context?.query, context?.req?.cookies?.token);
     const { data: orders } = await search_in(
       'orders',
       {
@@ -23,7 +22,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         initialState: {
           orders: {
             data: orders,
-            fields,
+            fields: [
+              'id',
+              'number',
+              'status',
+              'user_id',
+              'payment_id',
+              'address_id',
+              'notes',
+              'price',
+              'post_fee',
+              'payable',
+              'newprice',
+              'Events',
+              'created_at',
+              'updated_at',
+              'deleted_at',
+              'delivery',
+              'admin_check',
+              'coupon_id',
+              'typesell',
+            ],
           },
         },
       },

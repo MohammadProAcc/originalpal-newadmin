@@ -17,6 +17,10 @@ const items: MenuItemType[] = [
     title: 'برند ها',
     link: { href: '/brands' },
   },
+  {
+    title: 'برچسب ها',
+    link: { href: '/tags' },
+  },
   // {
   //   title: 'FEATURES',
   //   group: true,

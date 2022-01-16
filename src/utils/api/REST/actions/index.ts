@@ -8,3 +8,4 @@ export * from './coupons';
 export * from './stock';
 export * from './brands';
 export * from './search_in';
+export * from './tags';
