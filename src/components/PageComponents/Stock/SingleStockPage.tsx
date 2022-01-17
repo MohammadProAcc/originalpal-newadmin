@@ -4,7 +4,7 @@ import { Card, CardBody, CardHeader } from '@paljs/ui';
 import { Stock } from 'types';
 
 export const SingleStockPage: React.FC = () => {
-  const { stock }: { stock: Stock } = useStore((state: any) => ({
+  const { stock } = useStore((state: any) => ({
     stock: state?.stock,
   }));
 

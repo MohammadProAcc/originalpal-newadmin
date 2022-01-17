@@ -4,8 +4,10 @@ import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import Cookies from 'js-cookie';
-import { create_banner } from 'utils/api/REST/actions/banners';
+import { create_banner, uploadBannerImage } from 'utils/api/REST/actions/banners';
 import { toast } from 'react-toastify';
+import router from 'next/router';
+import { search_in } from 'utils';
 
 export function CreateMainPage() {
   const platformOptions = [
@@ -20,18 +22,26 @@ export function CreateMainPage() {
 
   const onSubmit = async (form: any) => {
     setLoading(true);
-    const formData = new FormData();
-    formData.append('media[]', form.image);
-    delete form.image;
+
+    // const imageResponse = await uploadBannerImage('33', { image: form?.image });
+    // console.log(imageResponse);
+
+    const image = form?.image;
+
+    delete form?.image;
     const finalForm = {
       ...form,
       type: 'slide',
-      formData,
     };
-    console.log(finalForm);
     const response = await create_banner(finalForm, Cookies.get('token'));
     console.log(response);
-    toast.success('بنر با موفقیت ساخته شد');
+    if (response?.status === 'success') {
+      const result = search_in('banners', { key: 'title', type: '=', value: form?.title }, router?.query);
+      console.log(result);
+      toast.success('بنر با موفقیت ساخته شد');
+    } else {
+      toast.error('ساخت محصول موفقیت آمیز نبود');
+    }
     setLoading(false);
   };
 
