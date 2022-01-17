@@ -1,6 +1,8 @@
 import { admin, deleteProductMedia, editProduct, search_in, useStore } from 'utils';
 import Layout from 'Layouts';
 import {
+  Accordion,
+  AccordionItem,
   Card as _Card,
   CardBody as _CardBody,
   CardHeader as _CardHeader,
@@ -9,7 +11,7 @@ import {
   Modal,
   Select as _Select,
 } from '@paljs/ui';
-import { BasicEditor, Button, ProductImageCard, SearchBar } from 'components';
+import { BasicEditor, Button, ProductImageCard, SearchBar, StockItem } from 'components';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { Media, Product, ProductBrand, SearchForm } from 'types';
@@ -36,6 +38,24 @@ export const EditProductPage: React.FC = () => {
     label: brand?.name,
     value: brand,
   }));
+
+  const activationOptions = [
+    { label: 'فعال', value: '1' },
+    { label: 'غیرفعال', value: '0' },
+  ];
+
+  const onesizeOptions = [
+    { label: 'تک سایز', value: '1' },
+    { label: 'غیر تک سایز', value: '0' },
+  ];
+
+  const typeOptions = [
+    { label: 'جدید', value: 'new' },
+    { label: 'دوباره موجود شده در انبار', value: 'restock' },
+    { label: 'بزودی', value: 'comingsoon' },
+  ];
+
+  const categoryOptions = [{ label: 'کفش', value: 'shoe' }];
 
   // const searchBrand = async (form: SearchForm) => {
   // const result = await search_in('brands', form, router.query, Cookies.get('token'));
@@ -103,10 +123,19 @@ export const EditProductPage: React.FC = () => {
       <h1 style={{ marginBottom: '4rem' }}>محصول {product?.name}</h1>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Card>
-          <CardHeader>نام</CardHeader>
+          <CardHeader>َUrl منحصر به فرد</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('name', { required: true })} />
+              <input {...register('url', { required: true })} />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>H1 صفحه</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input {...register('title')} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -127,8 +156,240 @@ export const EditProductPage: React.FC = () => {
               <Controller
                 name="brand"
                 control={control}
-                render={({ field }) => <Select options={brandsOptions} {...field} />}
+                render={({ field }) => (
+                  <Select options={brandsOptions} {...field} onChange={(e: any) => field.onChange(e?.value)} />
+                )}
               />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>نام</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input {...register('name', { required: true })} />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>قیمت</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input placeholder="قیمت" type="number" {...register('price')} />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>قیمت با تخفیف</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input placeholder="قیمت با تخفیف" type="number" {...register('discount_price')} />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>فعال یا غیرفعال کردن محصول</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <Controller
+                control={control}
+                name="Enable"
+                render={({ field }) => <Select options={activationOptions} {...field} />}
+              />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>وضعیت</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input {...register('state')} />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>رنگ</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input {...register('color')} placeholder="رنگ" />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>SEO</CardHeader>
+          <CardBody>
+            <Card>
+              <CardHeader>عنوان صفحه</CardHeader>
+              <CardBody>
+                <InputGroup>
+                  <input {...register('title_page')} />
+                </InputGroup>
+              </CardBody>
+            </Card>
+
+            <Card>
+              <CardHeader>عنوان سئو (tag title)</CardHeader>
+              <CardBody>
+                <InputGroup>
+                  <input {...register('meta_title')} placeholder="عنوان سئو (tag title)" />
+                </InputGroup>
+              </CardBody>
+            </Card>
+
+            <Card>
+              <CardHeader>مترادف ها (meta_keywords)</CardHeader>
+              <CardBody>
+                <InputGroup>
+                  <textarea style={{ minWidth: '100%', height: '8rem' }} {...register('meta_keywords')} />
+                </InputGroup>
+              </CardBody>
+            </Card>
+
+            <Card>
+              <CardHeader>توضیح متا (meta_description)</CardHeader>
+              <CardBody>
+                <InputGroup>
+                  <textarea style={{ minWidth: '100%', height: '8rem' }} {...register('meta_keywords')} />
+                </InputGroup>
+              </CardBody>
+            </Card>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>نوع</CardHeader>
+          <CardBody style={{ overflow: 'initial' }}>
+            <InputGroup>
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    options={typeOptions}
+                    {...field}
+                    onChange={(e: any) => field.onChange(e?.value)}
+                    placeholder="در صورتی که قصد تغییر دادن دارید کلیک کنید..."
+                  />
+                )}
+              />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>دسته بندی</CardHeader>
+          <CardBody style={{ overflow: 'initial' }}>
+            <InputGroup>
+              <Controller
+                name="category"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    options={categoryOptions}
+                    {...field}
+                    onChange={(e: any) => field.onChange(e?.value)}
+                    placeholder="در صورتی که قصد تغییر دادن دارید کلیک کنید..."
+                  />
+                )}
+              />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>خلاصه</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <textarea style={{ minWidth: '100%', height: '8rem' }} {...register('summary')} />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Controller
+          control={control}
+          name="description"
+          render={({ field: { onChange } }) => (
+            <BasicEditor initialValue={product?.description} callback={onChange} title="توضیحات محصول" />
+          )}
+        />
+
+        <Card>
+          <CardHeader>ترند</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input {...register('trend')} placeholder="ترند" />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>میزان فروش</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input type="number" {...register('sold')} placeholder="میزان فروش" />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>زمان ایجاد</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input {...register('created_at')} placeholder="زمان ایجاد" />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>تک سایز : {product?.onesize ? 'بله' : 'خیر'}</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <Controller
+                name="onesize"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    options={onesizeOptions}
+                    {...field}
+                    onChange={(e: any) => field.onChange(e?.value)}
+                    placeholder="در صورتی که قصد تغییر دادن دارید کلیک کنید..."
+                  />
+                )}
+              />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>پایان تخفیف</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input type="date" {...register('discount_exp')} />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>اسلاگ</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input {...register('slug')} />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>ترند</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input type="number" {...register('trend')} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -158,43 +419,16 @@ export const EditProductPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>لینک محصول</CardHeader>
+          <CardHeader>انبار</CardHeader>
           <CardBody>
-            <InputGroup>
-              <input {...register('url', { required: true })} />
-            </InputGroup>
+            <Accordion>
+              {product?.stock?.map((stock: any) => (
+                <AccordionItem uniqueKey={stock?.id} title={`سایز :${stock?.size}`}>
+                  <StockItem stock={stock} />
+                </AccordionItem>
+              ))}
+            </Accordion>
           </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>عنوان</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input {...register('title')} />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>قیمت</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input type="number" {...register('price')} />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Controller
-          control={control}
-          name="description"
-          render={({ field: { onChange } }) => (
-            <BasicEditor initialValue={product?.description} callback={onChange} title="توضیحات محصول" />
-          )}
-        />
-
-        <Card>
-          <CardHeader>SEO</CardHeader>
-          <CardBody></CardBody>
         </Card>
 
         <Button status="Info" type="submit" appearance="outline">
@@ -243,7 +477,6 @@ const Card = styled(_Card)<CardFamilyProps>`
 `;
 
 const CardBody = styled(_CardBody)<CardFamilyProps>`
-  overflow: ${(props) => props.overflow && 'initial'};
   overflow: initial;
 `;
 
