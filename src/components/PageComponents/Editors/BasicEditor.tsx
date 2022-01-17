@@ -12,7 +12,6 @@ export function BasicEditor({
   title?: string;
 }) {
   const handleEditorChange = (content: any, _editor: any) => {
-    console.log('Content was updated:', content);
     callback(content);
   };
   return (

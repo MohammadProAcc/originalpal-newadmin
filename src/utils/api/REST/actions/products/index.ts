@@ -6,3 +6,4 @@ export * from './editProdcutMainImage';
 export * from './editProductImage';
 export * from './deleteProduct';
 export * from './sendNotifyOnStock';
+export * from './deleteProductMedia';

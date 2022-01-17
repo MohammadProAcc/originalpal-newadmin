@@ -1,6 +1,6 @@
 import produce from 'immer';
 import { useMemo } from 'react';
-import { initialLoginResponseUser, LoginResponseUser, UserSlice } from 'types';
+import { initialLoginResponseUser, LoginResponseUser, Media, UserSlice } from 'types';
 import create from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { userActions } from './slices';
@@ -48,6 +48,12 @@ function initStore(preloadedState = initialState) {
               void (state.order.order_items = state?.order?.order_items?.filter(
                 (item: any) => item?.id !== orderItemId,
               )),
+          ),
+        // -===>>> Product <<<===-
+        updateProductAfterMediaRemoval: (removedMedia: Media) =>
+          set(
+            (state: any) =>
+              void (state.product.media = state.product.media.filter((media: Media) => media.u !== removedMedia.u)),
           ),
       })),
     ),
