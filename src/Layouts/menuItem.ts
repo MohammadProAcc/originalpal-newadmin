@@ -25,6 +25,10 @@ const items: MenuItemType[] = [
     title: 'محصولات',
     link: { href: '/products' },
   },
+  {
+    title: 'انبار',
+    link: { href: '/stock' },
+  },
   // {
   //   title: 'FEATURES',
   //   group: true,

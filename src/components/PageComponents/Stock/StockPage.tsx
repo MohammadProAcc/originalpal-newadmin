@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useStore, deleteStock } from 'utils';
+import { useStore, deleteStock, numeralize } from 'utils';
 import Layout from 'Layouts';
 import { Button, Container, Modal } from '@paljs/ui';
 import { BasicTable, PaginationBar, SearchBar } from 'components';
@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import { Add } from '@material-ui/icons';
 import { toast } from 'react-toastify';
 
-export const StocksPage = () => {
+export const StockPage = () => {
   const router = useRouter();
 
   const { stocks, clearList } = useStore((state) => ({
@@ -44,15 +44,15 @@ export const StocksPage = () => {
     stock?.product_id,
     stock?.size,
     stock?.count,
-    stock?.price,
-    stock?.priceAfterDiscount,
+    `${numeralize(stock?.price)} تومان`,
+    `${numeralize(stock?.priceAfterDiscount)} تومان`,
     <Container>
-      <Link href={`/stocks/${stock?.id}`}>
+      <Link href={`/stock/${stock?.id}`}>
         <Button style={{ marginLeft: '1rem' }} status="Info">
           مشاهده
         </Button>
       </Link>
-      <Link href={`/stocks/edit/${stock?.id}`}>
+      <Link href={`/stock/edit/${stock?.id}`}>
         <Button style={{ marginLeft: '1rem' }} status="Primary">
           ویرایش
         </Button>
@@ -67,7 +67,7 @@ export const StocksPage = () => {
     <Layout title="بنر های صفحه اصلی">
       <h1>برچسب ها</h1>
 
-      <Link href="/stocks/create">
+      <Link href="/stock/create">
         <Button
           style={{
             margin: '1rem 0 1rem 1rem',
@@ -87,7 +87,7 @@ export const StocksPage = () => {
         params={router.query}
         callback={(form: any) =>
           router.push({
-            pathname: '/stocks/search',
+            pathname: '/stock/search',
             query: form,
           })
         }

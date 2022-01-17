@@ -1,19 +1,33 @@
 import { Button, InputGroup } from '@paljs/ui';
+import Cookies from 'js-cookie';
+import router from 'next/router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { ProductStock } from 'types';
+import { editStock } from 'utils';
 
 interface IStockItemProps {
   stock: ProductStock;
 }
 export const StockItem: React.FC<IStockItemProps> = ({ stock }) => {
   // -==>>> Stock Form <<<==-
-  const { register, handleSubmit } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { dirtyFields },
+  } = useForm({
     defaultValues: stock,
   });
+  type StockForm = Required<typeof dirtyFields>;
 
-  const onSubmit = async (form: any) => {
-    console.log(form);
+  const onSubmit = async (form: StockForm) => {
+    for (let key in form) {
+      if (!dirtyFields[key as keyof StockForm]) {
+        delete form[key as keyof StockForm];
+      }
+    }
+    const response = await editStock(router?.query?.stock_id, form, Cookies.get('token'));
+    console.log(response);
   };
 
   return (

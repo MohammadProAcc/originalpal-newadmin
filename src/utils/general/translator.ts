@@ -116,6 +116,7 @@ const dictionary = {
   post: 'پست شده',
   waiting: 'در انتظار پرداخت',
   process: 'در حال پردازش',
+  discount_amout: 'مقدار تخفسف',
 };
 
 export const translator = (target: string) => {

@@ -2,7 +2,7 @@ export * from './getProductsList';
 export * from './getSingleProduct';
 export * from './createProduct';
 export * from './editProduct';
-export * from './editProdcutMainImage';
+export * from './editProductMainImage';
 export * from './editProductImage';
 export * from './deleteProduct';
 export * from './sendNotifyOnStock';

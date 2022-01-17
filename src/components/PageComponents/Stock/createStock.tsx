@@ -7,7 +7,7 @@ import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 import { createStock } from 'utils';
 
-export function Createstock() {
+export function CreateStock() {
   const [loading, setLoading] = useState(false);
 
   const { register, handleSubmit } = useForm();
@@ -28,24 +28,64 @@ export function Createstock() {
       <Form onSubmit={handleSubmit(onSubmit)}>
         <h1>ساخت انبار</h1>
 
-        <InputGroup className="col">
+        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
           <label>شناسه محصول</label>
           <input {...register('product_id', { required: true })} placeholder="شناسه محصول" />
         </InputGroup>
 
-        <InputGroup className="col">
+        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
+          <label>سایز</label>
+          <input {...register('size', { required: true })} placeholder="سایز" />
+        </InputGroup>
+
+        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
+          <label>قیمت</label>
+          <input {...register('price', { required: true })} placeholder="قیمت" />
+        </InputGroup>
+
+        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
           <label>تعداد</label>
           <input {...register('count', { required: true })} placeholder="تعداد" />
         </InputGroup>
 
-        <InputGroup className="col">
-          <label>سایز</label>
-          <input {...register('product_id', { required: true })} placeholder="سایز" />
+        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
+          <label>کد</label>
+          <input {...register('code')} placeholder="کد" />
         </InputGroup>
 
-        <InputGroup className="col">
-          <label>قیمت</label>
-          <input {...register('price', { required: true })} type="number" placeholder="قیمت" />
+        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
+          <label>قیمت بعد از تخفیف</label>
+          <input {...register('priceAfterDiscount')} placeholder="قیمت بعد از تخفیف" />
+        </InputGroup>
+
+        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
+          <label>نوع تخفیف</label>
+          <input {...register('discount_type')} placeholder="نوع تخفیف" />
+        </InputGroup>
+
+        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
+          <label>مقدار تخفیف</label>
+          <input {...register('discount_amout')} placeholder="مقدار تخفیف" />
+        </InputGroup>
+
+        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
+          <label>شروع تخفیف</label>
+          <input {...register('discount_start')} placeholder="شروع تخفیف" />
+        </InputGroup>
+
+        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
+          <label>پایان تخفیف</label>
+          <input {...register('discount_end')} placeholder="پایان تخفیف" />
+        </InputGroup>
+
+        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
+          <label>قیمت بعد از تخفیف</label>
+          <input {...register('priceAfterDiscount')} placeholder="قیمت بعد از تخفیف" />
+        </InputGroup>
+
+        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
+          <label>توضیحات سایز</label>
+          <input {...register('disc')} placeholder="توضیحات سایز" />
         </InputGroup>
 
         <Button disabled={loading} style={{ width: '10rem', marginTop: '3rem' }} status="Success" appearance="outline">
