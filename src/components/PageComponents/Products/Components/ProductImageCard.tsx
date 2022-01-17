@@ -67,9 +67,9 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({ media, index
             </Button>
           </Form>
         </Container>
-        <Container>
+        <InputGroup style={{ width: '100%', marginLeft: '3rem', display: 'flex', justifyContent: 'flex-end' }}>
           <Image width="264px" height="264px" src={`${process.env.SRC}/${media?.u}`} />
-        </Container>
+        </InputGroup>
       </CardBody>
     </Card>
   );
