@@ -33,6 +33,10 @@ const items: MenuItemType[] = [
     title: 'کاربران',
     link: { href: '/users' },
   },
+  {
+    title: 'نظرات',
+    link: { href: '/comments' },
+  },
   // {
   //   title: 'FEATURES',
   //   group: true,
