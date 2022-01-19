@@ -99,7 +99,7 @@ export const TagsPage = () => {
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
-          آیا از حذف بنر برچسب <span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{' '}
+          آیا از حذف برچسب <span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{' '}
           <span className="text-danger">{`${itemToRemove?.name}`}</span> اطمینان دارید؟
           <ButtonGroup>
             <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>

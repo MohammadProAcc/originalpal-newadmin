@@ -102,8 +102,8 @@ export const UsersPage = () => {
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
-          آیا از حذف بنر کاربر <span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{' '}
-          <span className="text-danger">{`${itemToRemove?.name}`}</span> اطمینان دارید؟
+          آیا از حذف کاربر <span className="text-danger">{`${itemToRemove?.id}`}</span> با نام{' '}
+          <span className="text-danger">{`${itemToRemove?.name} ${itemToRemove?.lastname ?? ''}`}</span> اطمینان دارید؟
           <ButtonGroup>
             <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>
               خیر، منصرم شدم

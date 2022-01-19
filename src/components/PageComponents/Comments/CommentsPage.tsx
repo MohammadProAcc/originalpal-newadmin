@@ -96,8 +96,8 @@ export const CommentsPage = () => {
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
-          آیا از حذف بنر نظر <span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{' '}
-          <span className="text-danger">{`${itemToRemove?.name}`}</span> اطمینان دارید؟
+          آیا از حذف نظر <span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{' '}
+          <span className="text-danger">{`${itemToRemove?.title}`}</span> اطمینان دارید؟
           <ButtonGroup>
             <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>
               خیر، منصرم شدم
