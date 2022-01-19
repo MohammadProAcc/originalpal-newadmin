@@ -8,3 +8,4 @@ export * from './Products';
 export * from './Stock';
 export * from './Users';
 export * from './Comments';
+export * from './Coupons';

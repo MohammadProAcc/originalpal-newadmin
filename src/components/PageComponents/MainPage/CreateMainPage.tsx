@@ -7,7 +7,8 @@ import Cookies from 'js-cookie';
 import { create_banner, uploadBannerImage } from 'utils/api/REST/actions/banners';
 import { toast } from 'react-toastify';
 import router from 'next/router';
-import { search_in } from 'utils';
+import { admin, search_in } from 'utils';
+import Dropzone from 'react-dropzone-uploader';
 
 export function CreateMainPage() {
   const platformOptions = [
@@ -18,30 +19,58 @@ export function CreateMainPage() {
   const [loading, setLoading] = useState(false);
   const [active, setActive] = useState(false);
 
+  const [image, setImage] = useState<any>(null);
+  // called every time a file's `status` changes
+  const handleChangeStatus = ({ meta, file }: any, status: any) => {
+    Array.prototype.forEach(file, (file: any) => {
+      console.log(file);
+    });
+    // if (status === 'done') {
+    //   const formData = new FormData();
+    //   formData.append('media[]', file);
+    //   admin()
+    //     .post(`${process.env.API}/admin/banners/${bannerId}/image`, formData, {
+    //       headers: {
+    //         Authorization: `Bearer ${Cookies.get('token')}`,
+    //       },
+    //     })
+    //     .then(() => {
+    //       toast.success('تصویر با موفقیت آپلود شد');
+    //     })
+    //     .catch((error) => console.warn(error?.response?.data));
+    // }
+  };
+
   const { register, handleSubmit, control } = useForm();
 
   const onSubmit = async (form: any) => {
     setLoading(true);
 
-    // const imageResponse = await uploadBannerImage('33', { image: form?.image });
-    // console.log(imageResponse);
+    const image = form?.image[0];
 
-    const image = form?.image;
+    const { data: response } = await admin().post(`/banners/image/${41}`, {
+      image,
+    });
 
-    delete form?.image;
-    const finalForm = {
-      ...form,
-      type: 'slide',
-    };
-    const response = await create_banner(finalForm, Cookies.get('token'));
     console.log(response);
-    if (response?.status === 'success') {
-      const result = search_in('banners', { key: 'title', type: '=', value: form?.title }, router?.query);
-      console.log(result);
-      toast.success('بنر با موفقیت ساخته شد');
-    } else {
-      toast.error('ساخت محصول موفقیت آمیز نبود');
-    }
+    // const formData = new FormData();
+    // formData.append('media[]', form?.image[0]);
+    // delete form?.image;
+
+    // const finalForm = {
+    //   ...form,
+    //   type: 'slide',
+    // };
+
+    // try {
+    //   await create_banner(finalForm, Cookies.get('token'));
+    //   const result = await search_in('banners', { key: 'content', type: '=', value: form?.content }, router?.query);
+    //   await uploadBannerImage(result?.data?.data[0]?.id, formData)
+    //   toast.success('بنر با موفقیت ساخته شد');
+    // } catch (err) {
+    //   toast.error('بنر با موفقیت ساخته شد');
+    // }
+
     setLoading(false);
   };
 
@@ -118,22 +147,22 @@ export function CreateMainPage() {
 
         <InputGroup className="col m-4">
           <label>تصویر بنر</label>
-          <InputGroup>
+          <InputGroup style={{ marginBottom: '1rem' }}>
             <input type="file" {...register('image')} />
           </InputGroup>
 
+          <label style={{ width: '100%' }}>تگ alt تصویر</label>
           <InputGroup>
-            <label style={{ width: '6rem' }}>تگ آلت تصویر</label>
             <input {...register('media.a')} placeholder="a" />
           </InputGroup>
 
+          <label style={{ width: '100%' }}>تگ title تصویر</label>
           <InputGroup>
-            <label style={{ width: '6rem' }}>تگ تایتل تصویر</label>
             <input {...register('media.t')} placeholder="t" />
           </InputGroup>
 
+          <label style={{ width: '100%' }}>اولویت تصویر</label>
           <InputGroup>
-            <label style={{ width: '6rem' }}>اولویت تصویر</label>
             <input {...register('media.p')} type="number" placeholder="p" />
           </InputGroup>
         </InputGroup>
