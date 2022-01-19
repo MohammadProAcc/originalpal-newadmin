@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useStore, deleteComment } from 'utils';
+import { useStore, deleteComment, editComment } from 'utils';
 import Layout from 'Layouts';
 import { Button, Container, Modal } from '@paljs/ui';
 import { BasicTable, PaginationBar, SearchBar } from 'components';
@@ -12,9 +12,10 @@ import { toast } from 'react-toastify';
 export const CommentsPage = () => {
   const router = useRouter();
 
-  const { comments, clearList } = useStore((state) => ({
+  const { comments, clearList, updateCommentCheck } = useStore((state) => ({
     comments: state?.comments,
     clearList: state?.clearList,
+    updateCommentCheck: state?.updateCommentCheck,
   }));
 
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,18 @@ export const CommentsPage = () => {
       toast.success('نظر با موفقیت حذف شد');
     } else {
       toast.error('حذف نظر موفقیت آمیز نبود');
+    }
+    setLoading(false);
+  };
+
+  const checkToggle = async (commentId: number, admin_check: 1 | 0) => {
+    setLoading(true);
+    const response = await editComment(commentId, { admin_check });
+    if (response?.status === 'success') {
+      updateCommentCheck(commentId, admin_check);
+      toast.success(`نظر ${commentId} ${admin_check ? 'تایید' : 'سلب تایید'} شد`);
+    } else {
+      toast.error('بررسی وضعیت نظر موفیت آمیز نبود');
     }
     setLoading(false);
   };
@@ -55,6 +68,25 @@ export const CommentsPage = () => {
     comment?.created_at ?? '-',
     comment?.updated_at ?? '-',
     <Container>
+      {comment?.admin_check ? (
+        <Button
+          style={{ marginLeft: '1rem' }}
+          status="Warning"
+          appearance="outline"
+          onClick={() => checkToggle(comment?.id, 0)}
+        >
+          سلب تایید از نظر
+        </Button>
+      ) : (
+        <Button
+          style={{ marginLeft: '1rem' }}
+          status="Success"
+          appearance="outline"
+          onClick={() => checkToggle(comment?.id, 1)}
+        >
+          تایید نظر
+        </Button>
+      )}
       <Link href={`/comments/${comment?.id}`}>
         <Button style={{ marginLeft: '1rem' }} status="Info">
           مشاهده

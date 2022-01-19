@@ -41,6 +41,10 @@ const items: MenuItemType[] = [
     title: 'کوپن ها',
     link: { href: '/coupons' },
   },
+  {
+    title: 'وبلاگ',
+    link: { href: '/blog' },
+  },
   // {
   //   title: 'FEATURES',
   //   group: true,

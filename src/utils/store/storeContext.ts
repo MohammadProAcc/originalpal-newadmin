@@ -55,6 +55,14 @@ function initStore(preloadedState = initialState) {
             (state: any) =>
               void (state.product.media = state.product.media.filter((media: Media) => media.u !== removedMedia.u)),
           ),
+        // -==>>> comments <<<==-
+        updateCommentCheck: (commentId: number, adminCheck: 0 | 1) =>
+          set(
+            (state: any) =>
+              void (state.comments.data.data = state?.comments?.data?.data?.map((comment: any) =>
+                comment?.id === commentId ? { ...comment, admin_check: adminCheck } : comment,
+              )),
+          ),
       })),
     ),
   );

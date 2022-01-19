@@ -9,3 +9,4 @@ export * from './Stock';
 export * from './Users';
 export * from './Comments';
 export * from './Coupons';
+export * from './Blog';

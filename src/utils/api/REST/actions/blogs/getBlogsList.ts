@@ -1,8 +1,8 @@
 import { admin } from 'utils';
 
-export const getBlogsList: any = async (params: any, token: any) => {
+export const getBlogList: any = async (params: any, token: any) => {
   try {
-    const { data: blogs } = await admin(token ?? null).get(`/blogs`, {
+    const { data: blogs } = await admin(token ?? null).get(`/blog`, {
       params,
     });
     return blogs.data;
