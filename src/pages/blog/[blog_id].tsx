@@ -1,4 +1,4 @@
-import { SingleBlogPage } from 'components/PageComponents/Blogs/SingleBlogPage';
+import { SingleBlogPage } from 'components';
 import { GetServerSideProps, NextPage } from 'next';
 import { getSingleBlog } from 'utils';
 

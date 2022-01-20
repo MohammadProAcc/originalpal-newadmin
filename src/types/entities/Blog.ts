@@ -4,8 +4,8 @@ export interface Blog {
   slug: string;
   desc: string;
   writer: string;
-  show_categories: string;
-  labels: string;
+  show_categories: string[];
+  labels: string[];
   comments: string;
   created_at: string;
   updated_at: string;
