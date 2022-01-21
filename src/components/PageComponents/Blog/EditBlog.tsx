@@ -18,15 +18,27 @@ export const EditBlogPage: React.FC = () => {
   });
 
   const onSubmit = async (form: any) => {
+    setLoading(true);
     delete form.id;
     delete form.created_at;
     delete form.updated_at;
-    const response = await editBlog(blog?.id, form);
+
+    const endimage = new FormData();
+    endimage.append('media[]', form?.endimage[0]);
+
+    const finalForm = {
+      ...form,
+      endimage,
+    };
+
+    const response = await editBlog(blog?.id, finalForm);
+
     if (response?.status === 'success') {
       toast.success('برچسب بروز شد');
     } else {
       toast.error('بروزرسانی برچسب موفقیت آمیز نبود');
     }
+    setLoading(false);
   };
 
   return (
@@ -209,8 +221,8 @@ export const EditBlogPage: React.FC = () => {
           <input {...register('trend')} placeholder="ترند" />
         </InputGroup>
 
-        <Button disabled={loading} style={{ width: '10rem', marginTop: '3rem' }} status="Success" appearance="outline">
-          {loading ? '...' : 'ساخت وبلاگ'}
+        <Button disabled={loading} style={{ width: '10rem', marginTop: '3rem' }} status="Info" appearance="outline">
+          {loading ? '...' : 'بروزرسانی وبلاگ'}
         </Button>
       </form>
     </Layout>
