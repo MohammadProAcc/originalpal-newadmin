@@ -79,7 +79,8 @@ export const OrdersPage = () => {
         }
       />
 
-      <BasicTable columns={columns} rows={data} />
+      <BasicTable isOrder columns={columns} rows={data} />
+
       <PaginationBar
         totalPages={orders?.data?.last_page}
         activePage={router.query.page ? Number(router.query.page) : 1}

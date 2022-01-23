@@ -7,6 +7,8 @@ import {
     TableRow,
     Paper
 } from "@material-ui/core"
+import { Popover } from "@paljs/ui";
+import { OrderDetails } from "components/PageComponents/Orders/components/OrderDetails";
 
 function createData(number, item, qty, price) {
     return { number, item, qty, price };
@@ -20,33 +22,53 @@ const rows = [
     createData(5, "Mango", 1.5, 4)
 ];
 
-export function BasicTable({ columns, rows }) {
+export function BasicTable({ columns, rows, isOrder = false }) {
     return (
         <TableContainer component={Paper}>
             <Table aria-label="simple table">
-                <TableHead style={{backgroundColor: "#bdbdbd"}}>
+                <TableHead style={{ backgroundColor: "#bdbdbd" }}>
                     <TableRow>
                         {
-                            columns?.map(column => <TableCell style={{fontSize: "1.125rem"}} align="right">{column}</TableCell>)
+                            columns?.map(column => <TableCell style={{ fontSize: "1.125rem" }} align="right">{column}</TableCell>)
                         }
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {rows.map((row, index) => (
-                        <TableRow key={row.number}>
+                        <>
                             {
-                                row.map(item => <TableCell align="right">{item}</TableCell>)
-                                // index === 0
-                                //     ? <TableCell align="right" component="th" scope="row">
-                                //         {row}
-                                //     </TableCell>
-                                // : <TableCell align="right">{row}</TableCell>
-
+                                <TableRow key={row.number}>
+                                    {
+                                        row.map((item, index) => index === 0
+                                            ? (
+                                                <TableCell align="right" component="th" scope="row">
+                                                    {
+                                                        isOrder
+                                                            ? (
+                                                                <Popover
+                                                                    placement="bottom"
+                                                                    trigger="hover"
+                                                                    overlay={<OrderDetails orderId={row[0]} />}
+                                                                >
+                                                                    {item}
+                                                                </Popover>
+                                                            )
+                                                            : (item)
+                                                    }
+                                                </TableCell>
+                                            )
+                                            : (
+                                                <TableCell align="right">{item}</TableCell>
+                                            )
+                                        )
+                                    }
+                                </TableRow>
                             }
-                        </TableRow>
+
+                        </>
                     ))}
                 </TableBody>
             </Table>
-        </TableContainer>
+        </TableContainer >
     );
 }
