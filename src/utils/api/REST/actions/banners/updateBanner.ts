@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from 'axios'
 
 export const updateBanner = async (bannerId: string, form: any, token: string) => {
   try {
@@ -6,9 +6,10 @@ export const updateBanner = async (bannerId: string, form: any, token: string) =
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    });
-    return data;
+    })
+    return data
   } catch (err) {
-    return false;
+    console.warn(err)
+    return false
   }
-};
+}

@@ -1,44 +1,44 @@
-import { Avatar } from '@material-ui/core';
-import { Add } from '@material-ui/icons';
-import { Button, Container, Modal } from '@paljs/ui';
-import { BasicTable, PaginationBar, SearchBar } from 'components';
-import Layout from 'Layouts';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import React, { useState } from 'react';
-import { toast } from 'react-toastify';
-import styled from 'styled-components';
-import { useStore } from 'utils';
-import { delete_banner } from 'utils/api/REST/actions/banners';
+import { Avatar } from '@material-ui/core'
+import { Add } from '@material-ui/icons'
+import { Button, Container, Modal } from '@paljs/ui'
+import { BasicTable, PaginationBar, SearchBar } from 'components'
+import Layout from 'Layouts'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React, { useState } from 'react'
+import { toast } from 'react-toastify'
+import styled from 'styled-components'
+import { useStore } from 'utils'
+import { delete_banner } from 'utils/api/REST/actions/banners'
 
 export const MainPages = () => {
-  const router = useRouter();
+  const router = useRouter()
 
   const { mainPageBanners, clearList } = useStore((state) => ({
     mainPageBanners: state?.mainPageBanners,
     cache: state?.cache,
     setCache: state?.setCache,
     clearList: state?.clearList,
-  }));
+  }))
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
 
-  const toggleModal = () => setItemToRemove(null);
+  const toggleModal = () => setItemToRemove(null)
 
   const removeItem = async (item: any) => {
-    setLoading(true);
-    const response = await delete_banner(item?.id);
+    setLoading(true)
+    const response = await delete_banner(item?.id)
     if (response?.status === 'success') {
-      clearList('mainPageBanners', item?.id);
-      setItemToRemove(null);
-      toast.success('بنر صفحه اصلی با موفیت حذف شد');
+      clearList('mainPageBanners', item?.id)
+      setItemToRemove(null)
+      toast.success('بنر صفحه اصلی با موفیت حذف شد')
     } else {
-      toast.error('حذف محصول موفقیت آمیز نبود');
+      toast.error('حذف محصول موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   const columns = [
     'شناسه بنر',
@@ -49,7 +49,9 @@ export const MainPages = () => {
     'رنگ توضیحات',
     'وضعیت',
     <p style={{ margin: 0, textAlign: 'center' }}>فعالیت ها</p>,
-  ];
+  ]
+
+  console.log('Banners >>', mainPageBanners?.data?.data)
 
   const data = mainPageBanners?.data?.data?.map((banner: any) => [
     banner?.id,
@@ -100,7 +102,7 @@ export const MainPages = () => {
         حذف
       </Button>
     </Container>,
-  ]);
+  ])
 
   return (
     <Layout title="بنر های صفحه اصلی">
@@ -154,16 +156,16 @@ export const MainPages = () => {
         </ModalBox>
       </Modal>
     </Layout>
-  );
-};
+  )
+}
 
 const ModalBox = styled(Container)`
   padding: 2rem;
   border-radius: 0.5rem;
   background-color: #fff;
-`;
+`
 
 const ButtonGroup = styled.div`
   margin-top: 1rem;
   display: flex;
-`;
+`

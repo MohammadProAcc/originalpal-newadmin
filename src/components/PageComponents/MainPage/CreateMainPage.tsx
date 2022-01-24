@@ -1,78 +1,55 @@
-import { Button, Checkbox, InputGroup, Select } from '@paljs/ui';
-import Layout from 'Layouts';
-import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import styled from 'styled-components';
-import Cookies from 'js-cookie';
-import { create_banner, uploadBannerImage } from 'utils/api/REST/actions/banners';
-import { toast } from 'react-toastify';
-import router from 'next/router';
-import { admin, search_in } from 'utils';
-import Dropzone from 'react-dropzone-uploader';
+import { Button, Checkbox, InputGroup, Select } from '@paljs/ui'
+import Cookies from 'js-cookie'
+import Layout from 'Layouts'
+import router from 'next/router'
+import React, { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import styled from 'styled-components'
+import { admin, search_in } from 'utils'
+import { create_banner, uploadBannerImage } from 'utils/api/REST/actions/banners'
 
 export function CreateMainPage() {
   const platformOptions = [
     { label: 'دسکتاپ', value: 'desktop' },
     { label: 'موبایل', value: 'mobile' },
-  ];
+  ]
 
-  const [loading, setLoading] = useState(false);
-  const [active, setActive] = useState(false);
+  const [loading, setLoading] = useState(false)
+  const [active, setActive] = useState(false)
 
-  const [image, setImage] = useState<any>(null);
-  // called every time a file's `status` changes
-  const handleChangeStatus = ({ meta, file }: any, status: any) => {
-    Array.prototype.forEach(file, (file: any) => {
-      console.log(file);
-    });
-    // if (status === 'done') {
-    //   const formData = new FormData();
-    //   formData.append('media[]', file);
-    //   admin()
-    //     .post(`${process.env.API}/admin/banners/${bannerId}/image`, formData, {
-    //       headers: {
-    //         Authorization: `Bearer ${Cookies.get('token')}`,
-    //       },
-    //     })
-    //     .then(() => {
-    //       toast.success('تصویر با موفقیت آپلود شد');
-    //     })
-    //     .catch((error) => console.warn(error?.response?.data));
-    // }
-  };
-
-  const { register, handleSubmit, control } = useForm();
+  const { register, handleSubmit, control } = useForm()
 
   const onSubmit = async (form: any) => {
-    setLoading(true);
+    setLoading(true)
 
-    const image = form?.image[0];
+    const finalForm = {
+      ...form,
+      type: 'slide',
+    }
+    delete finalForm?.image
 
-    const { data: response } = await admin().post(`/banners/image/${41}`, {
-      image,
-    });
+    try {
+      await create_banner(finalForm, Cookies.get('token'))
+      const result = await search_in('banners', { key: 'content', type: '=', value: form?.content }, router?.query)
+      const bannerId = result?.data?.data[0]?.id
 
-    console.log(response);
-    // const formData = new FormData();
-    // formData.append('media[]', form?.image[0]);
-    // delete form?.image;
+      const formData = new FormData()
+      formData.append('image', form?.image[0])
 
-    // const finalForm = {
-    //   ...form,
-    //   type: 'slide',
-    // };
+      const uploadResponse = await uploadBannerImage(bannerId, formData)
+      console.log('Upload Response >>>', uploadResponse)
 
-    // try {
-    //   await create_banner(finalForm, Cookies.get('token'));
-    //   const result = await search_in('banners', { key: 'content', type: '=', value: form?.content }, router?.query);
-    //   await uploadBannerImage(result?.data?.data[0]?.id, formData)
-    //   toast.success('بنر با موفقیت ساخته شد');
-    // } catch (err) {
-    //   toast.error('بنر با موفقیت ساخته شد');
-    // }
+      const { data: response } = await admin().post(`/banners/image/${bannerId}`, formData)
+      console.log(response)
 
-    setLoading(false);
-  };
+      toast.success('بنر با موفقیت ساخته شد')
+    } catch (err) {
+      toast.error('بنر با موفقیت ساخته شد')
+    }
+
+    setLoading(false)
+  }
 
   return (
     <Layout title="ساخت بنر صفحه اصلی">
@@ -137,8 +114,8 @@ export function CreateMainPage() {
                 checked={active}
                 {...register('priority', { required: true })}
                 onChange={(e: any) => {
-                  setActive(e);
-                  field.onChange(e);
+                  setActive(e)
+                  field.onChange(e)
                 }}
               />
             )}
@@ -174,11 +151,11 @@ export function CreateMainPage() {
         </InputGroup>
       </Form>
     </Layout>
-  );
+  )
 }
 
 const Form = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
-`;
+`

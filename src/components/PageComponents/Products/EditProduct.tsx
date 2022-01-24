@@ -1,5 +1,5 @@
-import { admin, deleteProductMedia, editProduct, search_in, useStore } from 'utils';
-import Layout from 'Layouts';
+import { admin, deleteProductMedia, editProduct, search_in, useStore } from 'utils'
+import Layout from 'Layouts'
 import {
   Accordion,
   AccordionItem,
@@ -10,52 +10,52 @@ import {
   InputGroup,
   Modal,
   Select as _Select,
-} from '@paljs/ui';
-import { BasicEditor, Button, ProductImageCard, SearchBar, StockItem } from 'components';
-import { Controller, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import { Media, Product, ProductBrand, SearchForm } from 'types';
-import styled from 'styled-components';
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/router';
-import Image from 'next/image';
-import { useState } from 'react';
-import Dropzone from 'react-dropzone-uploader';
-import axios from 'axios';
+} from '@paljs/ui'
+import { BasicEditor, Button, ProductImageCard, SearchBar, StockItem } from 'components'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import { Media, Product, ProductBrand, SearchForm } from 'types'
+import styled from 'styled-components'
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/router'
+import Image from 'next/image'
+import { useState } from 'react'
+import Dropzone from 'react-dropzone-uploader'
+import axios from 'axios'
 
 // TODO: add search brand mechanism
 
 export const EditProductPage: React.FC = () => {
-  const router = useRouter();
+  const router = useRouter()
 
   const { product, brands, updateProductAfterMediaRemoval } = useStore((state: any) => ({
     product: state?.product,
     brands: state?.brands,
     updateProductAfterMediaRemoval: state?.updateProductAfterMediaRemoval,
-  }));
+  }))
 
   const brandsOptions = brands?.data?.data?.map((brand: ProductBrand) => ({
     label: brand?.name,
     value: brand,
-  }));
+  }))
 
   const activationOptions = [
     { label: 'فعال', value: '1' },
     { label: 'غیرفعال', value: '0' },
-  ];
+  ]
 
   const onesizeOptions = [
     { label: 'تک سایز', value: '1' },
     { label: 'غیر تک سایز', value: '0' },
-  ];
+  ]
 
   const typeOptions = [
     { label: 'جدید', value: 'new' },
     { label: 'دوباره موجود شده در انبار', value: 'restock' },
     { label: 'بزودی', value: 'comingsoon' },
-  ];
+  ]
 
-  const categoryOptions = [{ label: 'کفش', value: 'shoe' }];
+  const categoryOptions = [{ label: 'کفش', value: 'shoe' }]
 
   // const searchBrand = async (form: SearchForm) => {
   // const result = await search_in('brands', form, router.query, Cookies.get('token'));
@@ -64,29 +64,36 @@ export const EditProductPage: React.FC = () => {
 
   const { register, handleSubmit, control } = useForm({
     defaultValues: product,
-  });
+  })
 
   const onSubmit = async (form: any) => {
-    delete form?.brand;
-    console.log({
+    delete form?.brand
+    delete form?.url
+    delete form?.collection
+    delete form?.category
+    delete form?.stock
+    delete form?.color
+
+    const finalForm = {
       ...form,
       brand_id: form?.brand?.value.id,
-    });
-    // const response = await editProduct(product?.id, form);
-    // if (response?.status === 'success') {
-    //   toast.success('محصول بروز شد');
-    // } else {
-    //   toast.error('بروزرسانی محصول موفقیت آمیز نبود');
-    // }
-  };
+    }
+
+    const response = await editProduct(product?.id, finalForm)
+    if (response === null) {
+      toast.success('محصول بروز شد')
+    } else {
+      toast.error('بروزرسانی محصول موفقیت آمیز نبود')
+    }
+  }
 
   // called every time a file's `status` changes
   const handleChangeStatus = ({ meta, file }: any, status: any) => {
-    console.log(file);
+    console.log(file)
     if (status === 'done') {
-      const formData = new FormData();
-      formData.append('media[]', file);
-      console.log(formData);
+      const formData = new FormData()
+      formData.append('media[]', file)
+      console.log(formData)
       axios
         .post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
           headers: {
@@ -94,29 +101,25 @@ export const EditProductPage: React.FC = () => {
           },
         })
         .then((response) => {
-          console.log(response);
-          toast.success('تصویر با موفقیت آپلود شد');
+          console.log(response)
+          toast.success('تصویر با موفقیت آپلود شد')
         })
-        .catch((error) => console.warn(error?.response?.data));
+        .catch((error) => console.warn(error?.response?.data))
     }
-  };
+  }
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
 
   const removeProductMedia = async (media: Media) => {
-    const response = await deleteProductMedia(
-      router?.query?.product_id as string,
-      media?.u,
-      Cookies.get('token') ?? '',
-    );
+    const response = await deleteProductMedia(router?.query?.product_id as string, media?.u, Cookies.get('token') ?? '')
     if (response?.includes('operation done successfully')) {
-      updateProductAfterMediaRemoval(media);
-      setItemToRemove(null);
-      toast.success('تصویر با موفقیت حذف شد');
+      updateProductAfterMediaRemoval(media)
+      setItemToRemove(null)
+      toast.success('تصویر با موفقیت حذف شد')
     } else {
-      toast.error('حذف تصویر موفیت آمیز نبود');
+      toast.error('حذف تصویر موفیت آمیز نبود')
     }
-  };
+  }
 
   return (
     <Layout title={`${product?.id}`}>
@@ -454,39 +457,39 @@ export const EditProductPage: React.FC = () => {
         </Card>
       </Modal>
     </Layout>
-  );
-};
+  )
+}
 
 const Form = styled.form`
   input {
     min-width: 100%;
   }
-`;
+`
 
 const Select = styled(_Select)`
   width: 100%;
-`;
+`
 
 interface CardFamilyProps {
-  overflow?: boolean;
+  overflow?: boolean
 }
 
 const Card = styled(_Card)<CardFamilyProps>`
   overflow: ${(props) => props.overflow && 'initial'};
   overflow: initial;
-`;
+`
 
 const CardBody = styled(_CardBody)<CardFamilyProps>`
   overflow: initial;
-`;
+`
 
 const CardHeader = styled(_CardHeader)<CardFamilyProps>`
   overflow: ${(props) => props.overflow && 'initial'};
   overflow: initial;
-`;
+`
 
 const DropZoneWrapper = styled.div`
   img {
     display: none;
   }
-`;
+`

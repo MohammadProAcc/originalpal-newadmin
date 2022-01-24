@@ -1,60 +1,102 @@
-import { Button, Checkbox, InputGroup, Select } from '@paljs/ui';
-import Layout from 'Layouts';
-import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import styled from 'styled-components';
-import Cookies from 'js-cookie';
-import { create_banner } from 'utils/api/REST/actions/banners';
-import { toast } from 'react-toastify';
-import { useStore } from 'utils';
-import { updateBanner } from 'utils/api/REST/actions/banners/updateBanner';
-import { useRouter } from 'next/router';
+import { Button, Checkbox, InputGroup, Select } from '@paljs/ui'
+import axios from 'axios'
+import Cookies from 'js-cookie'
+import Layout from 'Layouts'
+import { useRouter } from 'next/router'
+import React, { useState } from 'react'
+import Dropzone from 'react-dropzone-uploader'
+import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import styled from 'styled-components'
+import { admin, useStore } from 'utils'
+import { uploadBannerImage } from 'utils/api/REST/actions/banners'
+import { updateBanner } from 'utils/api/REST/actions/banners/updateBanner'
 
 export function EditMainPage() {
-  const router = useRouter();
+  const router = useRouter()
 
   const { banner } = useStore((state: any) => ({
     banner: state?.banner,
-  }));
+  }))
 
   const platformOptions = [
     { label: 'دسکتاپ', value: 'desktop' },
     { label: 'موبایل', value: 'mobile' },
-  ];
+  ]
 
   const [platform, setPlatform] = useState<any>(
     platformOptions.find((option: any) => option?.value === banner?.platform),
-  );
+  )
 
-  const [loading, setLoading] = useState(false);
-  const [active, setActive] = useState(!!banner?.active);
+  const [loading, setLoading] = useState(false)
+  const [active, setActive] = useState(!!banner?.active)
 
   const { register, handleSubmit, control } = useForm({
     defaultValues: {
       ...(banner ?? null),
     },
-  });
+  })
+
+  const updateImage = async (image: File) => {
+    const formData = new FormData()
+    formData.append('media[]', image)
+
+    const { data: response } = await admin().post(`/banners/image/${banner?.id}`, {
+      image: formData,
+    })
+    console.log(response)
+  }
+
+  // called every time a file's `status` changes
+  // const handleChangeStatus = ({ meta, file }: any, status: any) => {
+  //   if (status === 'done') {
+  //     const formData = new FormData();
+  //     formData.append('media[]', file);
+
+  //     axios.post(`${process.env.API}/admin/banners/image/${banner?.id}`,
+  //       formData,
+  //       {
+  //         headers: {
+  //           'Content-Type': 'multipart/form-data',
+  //           Authorization: `Bearer 693|4ESmFZNsaQbSt8eNPV9CQwqcl1rGjOQVgaeI1swF`
+  //         }
+  //       }
+  //     ).then(result => console.log(result))
+  //   }
+  // };
 
   const onSubmit = async (form: any) => {
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('media[]', form.image);
-    delete form.image;
+    setLoading(true)
+
+    const image = form?.image
+    delete form.image
+
     const finalForm = {
       ...form,
       platform: platform?.value,
       active,
       type: 'slide',
-      // formData
-    };
-    const response = await updateBanner(router?.query?.banner_id as string, finalForm, Cookies.get('token') ?? '');
-    if (response?.status === 'success') {
-      toast.info('بنر با موفقیت بروزرسانی شد');
-    } else {
-      toast.error('بروزرسانی بنر موفقیت آمیز نبود');
     }
-    setLoading(false);
-  };
+
+    const updatBannerResponse = await updateBanner(
+      router?.query?.banner_id as string,
+      finalForm,
+      Cookies.get('token') ?? '',
+    )
+
+    if (updatBannerResponse?.status === 'success') {
+      const formData = new FormData()
+      formData.append('image', image[0])
+
+      const uploadResponse = await uploadBannerImage(banner?.id, formData)
+      console.log('Upload Response >>>', uploadResponse)
+
+      toast.info('بنر با موفقیت بروزرسانی شد')
+    } else {
+      toast.error('بروزرسانی بنر موفقیت آمیز نبود')
+    }
+    setLoading(false)
+  }
 
   return (
     <Layout title="ساخت بنر صفحه اصلی">
@@ -104,6 +146,13 @@ export function EditMainPage() {
         <InputGroup className="col m-4">
           <label>تصویر بنر</label>
           <InputGroup>
+            {/* <DropZoneWrapper>
+              <Dropzone
+                onChangeStatus={handleChangeStatus}
+                accept="image/*,audio/*,video/*"
+                inputContent=""
+              />
+            </DropZoneWrapper> */}
             <input type="file" {...register('image')} />
           </InputGroup>
 
@@ -130,11 +179,17 @@ export function EditMainPage() {
         </InputGroup>
       </Form>
     </Layout>
-  );
+  )
 }
 
 const Form = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
-`;
+`
+
+const DropZoneWrapper = styled.div`
+  img {
+    display: none;
+  }
+`

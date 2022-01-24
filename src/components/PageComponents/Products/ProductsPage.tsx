@@ -1,43 +1,43 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { useStore, deleteProduct, numeralize } from 'utils';
-import Layout from 'Layouts';
-import { Button, Container, Modal } from '@paljs/ui';
-import { BasicTable, PaginationBar, SearchBar } from 'components';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { Add } from '@material-ui/icons';
-import { toast } from 'react-toastify';
-import { Avatar } from '@material-ui/core';
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import { useStore, deleteProduct, numeralize } from 'utils'
+import Layout from 'Layouts'
+import { Button, Container, Modal } from '@paljs/ui'
+import { BasicTable, PaginationBar, SearchBar } from 'components'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { Add } from '@material-ui/icons'
+import { toast } from 'react-toastify'
+import { Avatar } from '@material-ui/core'
 
 export const ProductsPage = () => {
-  const router = useRouter();
+  const router = useRouter()
 
   const { products, clearList } = useStore((state) => ({
     products: state?.products,
     clearList: state?.clearList,
-  }));
+  }))
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
 
-  const toggleModal = () => setItemToRemove(null);
+  const toggleModal = () => setItemToRemove(null)
 
   const removeItem = async (item: any) => {
-    setLoading(true);
-    const response = await deleteProduct(item?.id);
+    setLoading(true)
+    const response = await deleteProduct(item?.id)
     if (response?.status === 'success') {
-      clearList('products', item?.id);
-      setItemToRemove(null);
-      toast.success('محصول با موفقیت حذف شد');
+      clearList('products', item?.id)
+      setItemToRemove(null)
+      toast.success('محصول با موفقیت حذف شد')
     } else {
-      toast.error('حذف محصول موفقیت آمیز نبود');
+      toast.error('حذف محصول موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
-  const columns: any[] = ['شناسه', 'قیمت', 'تصویر محصول', 'نام', 'کد', 'برند', 'وضعیت', 'فعالیت ها'];
+  const columns: any[] = ['شناسه', 'قیمت', 'تصویر محصول', 'نام', 'کد', 'برند', 'وضعیت', 'فعالیت ها']
 
   const data = products?.data?.data?.map((product: any) => [
     // =====>> Table Columns <<=====
@@ -45,7 +45,7 @@ export const ProductsPage = () => {
     <Avatar
       variant="rounded"
       style={{ width: '5rem', height: '3rem' }}
-      src={`${process.env.SRC}/${product?.media && product?.media[0]?.u}`}
+      src={`${process.env.SRC}/${product?.site_main_picture?.u}`}
     />,
     <span>
       <strong>{numeralize(product?.price)}</strong> تومان
@@ -69,7 +69,7 @@ export const ProductsPage = () => {
         حذف
       </Button>
     </Container>,
-  ]);
+  ])
 
   return (
     <Layout title="بنر های صفحه اصلی">
@@ -123,16 +123,16 @@ export const ProductsPage = () => {
         </ModalBox>
       </Modal>
     </Layout>
-  );
-};
+  )
+}
 
 const ModalBox = styled(Container)`
   padding: 2rem;
   border-radius: 0.5rem;
   background-color: #fff;
-`;
+`
 
 const ButtonGroup = styled.div`
   margin-top: 1rem;
   display: flex;
-`;
+`
