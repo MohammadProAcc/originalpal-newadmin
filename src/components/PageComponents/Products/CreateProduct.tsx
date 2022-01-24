@@ -1,31 +1,43 @@
-import { Button, Checkbox, InputGroup, Select } from '@paljs/ui';
-import Layout from 'Layouts';
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import styled from 'styled-components';
-import Cookies from 'js-cookie';
-import { toast } from 'react-toastify';
-import { createProduct } from 'utils';
-import router from 'next/router';
+import { Button, Checkbox, InputGroup, Select } from '@paljs/ui'
+import Layout from 'Layouts'
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import styled from 'styled-components'
+import Cookies from 'js-cookie'
+import { toast } from 'react-toastify'
+import { createProduct, search_in } from 'utils'
+import router from 'next/router'
 
 export function CreateProduct() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm()
 
   const onSubmit = async (form: any) => {
-    setLoading(true);
-    const response = await createProduct(form, Cookies.get('token'));
-    console.log(response);
+    setLoading(true)
+    const response = await createProduct(form, Cookies.get('token'))
+    console.log(response)
     if (response?.status === 'success') {
-      toast.success('محصول با موفقیت ساخته شد');
-      reset();
-      router.back();
+      toast.success('محصول با موفقیت ساخته شد')
+      const {
+        data: { data },
+      } = await search_in(
+        'products',
+        {
+          key: 'code',
+          type: '=',
+          value: form?.code,
+        },
+        router.query,
+      )
+
+      reset()
+      router.push(`/products/edit/${data[0]?.id}`)
     } else {
-      toast.error('ساخت محصول موفقیت آمیز نبود');
+      toast.error('ساخت محصول موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   return (
     <Layout title="ساخت محصول صفحه اصلی">
@@ -52,11 +64,11 @@ export function CreateProduct() {
         </Button>
       </Form>
     </Layout>
-  );
+  )
 }
 
 const Form = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
-`;
+`

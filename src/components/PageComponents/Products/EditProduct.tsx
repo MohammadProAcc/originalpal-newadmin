@@ -93,7 +93,6 @@ export const EditProductPage: React.FC = () => {
     if (status === 'done') {
       const formData = new FormData()
       formData.append('media[]', file)
-      console.log(formData)
       axios
         .post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
           headers: {
@@ -101,7 +100,6 @@ export const EditProductPage: React.FC = () => {
           },
         })
         .then((response) => {
-          console.log(response)
           toast.success('تصویر با موفقیت آپلود شد')
         })
         .catch((error) => console.warn(error?.response?.data))
@@ -120,6 +118,8 @@ export const EditProductPage: React.FC = () => {
       toast.error('حذف تصویر موفیت آمیز نبود')
     }
   }
+
+  console.log(product?.site_main_picture)
 
   return (
     <Layout title={`${product?.id}`}>
@@ -389,15 +389,6 @@ export const EditProductPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>ترند</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input type="number" {...register('trend')} />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
           <CardHeader>
             <h3 style={{ marginBottom: '1rem' }}>
               تصاویر
@@ -415,7 +406,10 @@ export const EditProductPage: React.FC = () => {
               overflow: 'scroll',
             }}
           >
-            {[product?.site_main_picture, ...product?.media]?.map((media: Media, index: number) => (
+            {[
+              product?.site_main_picture !== null && product?.site_main_picture,
+              ...(product?.media?.length > 0 ? product?.media : []),
+            ]?.map((media: Media, index: number) => (
               <ProductImageCard index={index} media={media} removalCallback={setItemToRemove} />
             ))}
           </CardBody>

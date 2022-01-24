@@ -9,6 +9,8 @@ import { useRouter } from 'next/router'
 import { Add } from '@material-ui/icons'
 import { toast } from 'react-toastify'
 import { Avatar } from '@material-ui/core'
+import axios from 'axios'
+import Cookies from 'js-cookie'
 
 export const ProductsPage = () => {
   const router = useRouter()
@@ -26,7 +28,12 @@ export const ProductsPage = () => {
 
   const removeItem = async (item: any) => {
     setLoading(true)
-    const response = await deleteProduct(item?.id)
+    // const response = await deleteProduct(item?.id)
+    const { data: response } = await axios.delete(`${process.env.API}/admin/products/${item?.id})`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('token') ?? ''}`,
+      },
+    })
     if (response?.status === 'success') {
       clearList('products', item?.id)
       setItemToRemove(null)
@@ -37,7 +44,7 @@ export const ProductsPage = () => {
     setLoading(false)
   }
 
-  const columns: any[] = ['شناسه', 'قیمت', 'تصویر محصول', 'نام', 'کد', 'برند', 'وضعیت', 'فعالیت ها']
+  const columns: any[] = ['شناسه', 'تصویر محصول', 'قیمت', 'قیمت با تخفیف', 'نام', 'کد', 'برند', 'وضعیت', 'فعالیت ها']
 
   const data = products?.data?.data?.map((product: any) => [
     // =====>> Table Columns <<=====
@@ -49,6 +56,9 @@ export const ProductsPage = () => {
     />,
     <span>
       <strong>{numeralize(product?.price)}</strong> تومان
+    </span>,
+    <span>
+      <strong>{numeralize(product?.discount_price)}</strong> تومان
     </span>,
     product?.name,
     product?.code,

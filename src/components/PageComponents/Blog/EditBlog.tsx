@@ -1,45 +1,46 @@
-import { editBlog, useStore } from 'utils';
-import Layout from 'Layouts';
-import { Card, CardBody, CardHeader, Checkbox, InputGroup } from '@paljs/ui';
-import { BasicEditor, Button } from 'components';
-import { Controller, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import React, { useState, useLayoutEffect } from 'react';
+import { editBlog, useStore } from 'utils'
+import Layout from 'Layouts'
+import { Card, CardBody, CardHeader, Checkbox, InputGroup } from '@paljs/ui'
+import { BasicEditor, Button } from 'components'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import React, { useState, useLayoutEffect } from 'react'
+import styled from 'styled-components'
 
 export const EditBlogPage: React.FC = () => {
   const { blog } = useStore((state: any) => ({
     blog: state?.blog,
-  }));
+  }))
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const { register, handleSubmit, control } = useForm({
     defaultValues: blog,
-  });
+  })
 
   const onSubmit = async (form: any) => {
-    setLoading(true);
-    delete form.id;
-    delete form.created_at;
-    delete form.updated_at;
+    setLoading(true)
+    delete form.id
+    delete form.created_at
+    delete form.updated_at
 
-    const endimage = new FormData();
-    endimage.append('media[]', form?.endimage[0]);
+    const endimage = new FormData()
+    endimage.append('media[]', form?.endimage[0])
 
     const finalForm = {
       ...form,
       endimage,
-    };
+    }
 
-    const response = await editBlog(blog?.id, finalForm);
+    const response = await editBlog(blog?.id, finalForm)
 
     if (response?.status === 'success') {
-      toast.success('برچسب بروز شد');
+      toast.success('برچسب بروز شد')
     } else {
-      toast.error('بروزرسانی برچسب موفقیت آمیز نبود');
+      toast.error('بروزرسانی برچسب موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   return (
     <Layout title={`${blog?.id}`}>
@@ -52,9 +53,11 @@ export const EditBlogPage: React.FC = () => {
             control={control}
             render={({ field }) => (
               // <Checkbox checked={field.value} onChange={(e: any) => field.onChange(e ? 1 : 0)}>
-              <Checkbox checked={field.value} onChange={(e: any) => field.onChange(e ? 1 : 0)}>
-                اخبار
-              </Checkbox>
+              <span style={{ color: 'transparent', fontSize: '0' }}>
+                <Checkbox checked={field.value} onChange={(e: any) => field.onChange(e ? 1 : 0)}>
+                  اخبار
+                </Checkbox>
+              </span>
             )}
           />
         </h1>
@@ -166,7 +169,11 @@ export const EditBlogPage: React.FC = () => {
           <Controller
             control={control}
             name="isboard"
-            render={({ field }) => <Checkbox checked={field?.value} {...field} />}
+            render={({ field }) => (
+              <CheckBoxWrapper>
+                <Checkbox checked={field?.value} {...field} />
+              </CheckBoxWrapper>
+            )}
           />
         </InputGroup>
 
@@ -175,7 +182,11 @@ export const EditBlogPage: React.FC = () => {
           <Controller
             control={control}
             name="ishighlight"
-            render={({ field }) => <Checkbox checked={field?.value} {...field} />}
+            render={({ field }) => (
+              <CheckBoxWrapper>
+                <Checkbox checked={field?.value} {...field} />
+              </CheckBoxWrapper>
+            )}
           />
         </InputGroup>
 
@@ -184,7 +195,11 @@ export const EditBlogPage: React.FC = () => {
           <Controller
             control={control}
             name="istop"
-            render={({ field }) => <Checkbox checked={field?.value} {...field} />}
+            render={({ field }) => (
+              <CheckBoxWrapper>
+                <Checkbox checked={field?.value} {...field} />
+              </CheckBoxWrapper>
+            )}
           />
         </InputGroup>
 
@@ -193,7 +208,11 @@ export const EditBlogPage: React.FC = () => {
           <Controller
             control={control}
             name="iscast"
-            render={({ field }) => <Checkbox checked={field?.value} {...field} />}
+            render={({ field }) => (
+              <CheckBoxWrapper>
+                <Checkbox checked={field?.value} {...field} />
+              </CheckBoxWrapper>
+            )}
           />
         </InputGroup>
 
@@ -202,7 +221,11 @@ export const EditBlogPage: React.FC = () => {
           <Controller
             control={control}
             name="isvideo"
-            render={({ field }) => <Checkbox checked={field?.value} {...field} />}
+            render={({ field }) => (
+              <CheckBoxWrapper>
+                <Checkbox checked={field?.value} {...field} />
+              </CheckBoxWrapper>
+            )}
           />
         </InputGroup>
 
@@ -226,5 +249,10 @@ export const EditBlogPage: React.FC = () => {
         </Button>
       </form>
     </Layout>
-  );
-};
+  )
+}
+
+const CheckBoxWrapper = styled.div`
+  color: transparent;
+  font-size: 0;
+`
