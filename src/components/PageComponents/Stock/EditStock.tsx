@@ -41,12 +41,7 @@ export const EditStockPage: React.FC = () => {
       <Modal on={itemToRemove} toggle={closeRemovalModal}>
         <ModalBox>
           آیا از حذف انبار {itemToRemove?.id} اطمینان دارید؟
-          <FlexContainer
-            jc="space-between"
-            css={css`
-              margin-top: 1rem;
-            `}
-          >
+          <FlexContainer jc="space-between">
             <Button onClick={closeRemovalModal}>انصراف</Button>
             <Button onClick={() => remove(itemToRemove?.id)} status="Danger">
               حذف

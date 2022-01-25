@@ -1,27 +1,28 @@
-import { Button, Checkbox, InputGroup, Select } from '@paljs/ui';
-import Layout from 'Layouts';
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import styled from 'styled-components';
-import Cookies from 'js-cookie';
-import { toast } from 'react-toastify';
-import { createTag } from 'utils';
+import { Button, Checkbox, InputGroup, Select } from '@paljs/ui'
+import Layout from 'Layouts'
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import styled from 'styled-components'
+import Cookies from 'js-cookie'
+import { toast } from 'react-toastify'
+import { createTag } from 'utils'
 
 export function CreateTag() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, control } = useForm();
+  const { register, handleSubmit, reset } = useForm()
 
   const onSubmit = async (form: any) => {
-    setLoading(true);
-    const response = await createTag(form, Cookies.get('token'));
+    setLoading(true)
+    const response = await createTag(form, Cookies.get('token'))
     if (response?.status === 'success') {
-      toast.success('برچسب با موفقیت ساخته شد');
+      toast.success('برچسب با موفقیت ساخته شد')
+      reset()
     } else {
-      toast.error('ساخت برچسب موفقیت آمیز نبود');
+      toast.error('ساخت برچسب موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   return (
     <Layout title="ساخت برچسب صفحه اصلی">
@@ -68,11 +69,11 @@ export function CreateTag() {
         </Button>
       </Form>
     </Layout>
-  );
+  )
 }
 
 const Form = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
-`;
+`

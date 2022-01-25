@@ -20,10 +20,12 @@ export const StockPage = () => {
   const [loading, setLoading] = useState(false)
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const [itemsToRemove, setItemsToRemove] = useState<any>(null)
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([])
 
   const toggleModal = () => setItemToRemove(null)
+  const togglePluralRemoveModal = () => setItemsToRemove(null)
 
   const removeItem = async (item: any) => {
     setLoading(true)
@@ -38,7 +40,7 @@ export const StockPage = () => {
     setLoading(false)
   }
 
-  const pluralRemove = async (selections: any[]) => {
+  const pluralRemoveTrigger = async (selections: any[]) => {
     setLoading(true)
 
     if (selections?.length > 0) {
@@ -54,6 +56,7 @@ export const StockPage = () => {
       })
 
       await setTableSelections([])
+      await setItemsToRemove(null)
     }
 
     setLoading(false)
@@ -105,7 +108,7 @@ export const StockPage = () => {
           </Button>
         </Link>
         {tableSelections?.length > 0 && (
-          <HeaderButton status="Danger" appearance="outline" onClick={() => pluralRemove(tableSelections)}>
+          <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
@@ -141,6 +144,22 @@ export const StockPage = () => {
             </Button>
             <Button onClick={() => removeItem(itemToRemove)} disabled={loading} status="Danger">
               بله، حذف شود
+            </Button>
+          </ButtonGroup>
+        </ModalBox>
+      </Modal>
+
+      <Modal on={itemsToRemove} toggle={togglePluralRemoveModal}>
+        <ModalBox fluid>
+          آیا از حذف موارد
+          <span className="text-danger mx-1">{itemsToRemove?.join(' , ')}</span>
+          اطمینان دارید؟
+          <ButtonGroup>
+            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: '1rem' }}>
+              خیر، منصرم شدم
+            </Button>
+            <Button onClick={() => pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
+              بله، حذف شوند
             </Button>
           </ButtonGroup>
         </ModalBox>

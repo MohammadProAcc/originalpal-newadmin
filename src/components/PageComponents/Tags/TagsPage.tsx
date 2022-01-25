@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useStore, deleteTag } from 'utils'
+import { useStore, deleteTag, pluralRemove } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
-import { BasicTable, PaginationBar, SearchBar } from 'components'
+import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Add } from '@material-ui/icons'
@@ -20,10 +20,12 @@ export const TagsPage = () => {
   const [loading, setLoading] = useState(false)
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const [itemsToRemove, setItemsToRemove] = useState<any>(null)
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([])
 
   const toggleModal = () => setItemToRemove(null)
+  const togglePluralRemoveModal = () => setItemsToRemove(null)
 
   const removeItem = async (item: any) => {
     setLoading(true)
@@ -36,6 +38,22 @@ export const TagsPage = () => {
       toast.error('حذف برچسب موفقیت آمیز نبود')
     }
     setLoading(false)
+  }
+
+  const pluralRemoveTrigger = async (selections: any[]) => {
+    await pluralRemove(
+      'tags',
+      selections,
+      deleteTag,
+      (entity: string, id: any) => {
+        clearList(entity, id)
+        toast.success(`مورد با شناسه ${id} حذف شد`)
+      },
+      async () => {
+        await setTableSelections([])
+        setItemsToRemove(null)
+      },
+    )
   }
 
   const columns: any[] = ['شناسه برچسب', 'نام برچسب', 'نوع برچسب', 'فعالیت ها']
@@ -66,19 +84,26 @@ export const TagsPage = () => {
     <Layout title="بنر های صفحه اصلی">
       <h1>برچسب ها</h1>
 
-      <Link href="/tags/create">
-        <Button
-          style={{
-            margin: '1rem 0 1rem 1rem',
-            display: 'flex',
-          }}
-          status="Success"
-          appearance="outline"
-        >
-          افزودن برچسب
-          <Add />
-        </Button>
-      </Link>
+      <FlexContainer>
+        <Link href="/tags/create">
+          <Button
+            style={{
+              margin: '1rem 0 1rem 1rem',
+              display: 'flex',
+            }}
+            status="Success"
+            appearance="outline"
+          >
+            افزودن برچسب
+            <Add />
+          </Button>
+        </Link>
+        {tableSelections?.length > 0 && (
+          <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
+            حذف موارد انتخاب شده
+          </HeaderButton>
+        )}
+      </FlexContainer>
 
       <SearchBar
         fields={tags.fields}
@@ -109,6 +134,22 @@ export const TagsPage = () => {
             </Button>
             <Button onClick={() => removeItem(itemToRemove)} disabled={loading} status="Danger">
               بله، حذف شود
+            </Button>
+          </ButtonGroup>
+        </ModalBox>
+      </Modal>
+
+      <Modal on={itemsToRemove} toggle={togglePluralRemoveModal}>
+        <ModalBox fluid>
+          آیا از حذف موارد
+          <span className="text-danger mx-1">{itemsToRemove?.join(' , ')}</span>
+          اطمینان دارید؟
+          <ButtonGroup>
+            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: '1rem' }}>
+              خیر، منصرم شدم
+            </Button>
+            <Button onClick={() => pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
+              بله، حذف شوند
             </Button>
           </ButtonGroup>
         </ModalBox>
