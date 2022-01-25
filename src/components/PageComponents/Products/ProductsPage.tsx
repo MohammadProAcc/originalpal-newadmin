@@ -24,6 +24,8 @@ export const ProductsPage = () => {
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
 
+  const [tableSelections, setTableSelections] = useState<number[] | []>([])
+
   const toggleModal = () => setItemToRemove(null)
 
   const removeItem = async (item: any) => {
@@ -111,7 +113,7 @@ export const ProductsPage = () => {
         }
       />
 
-      <BasicTable columns={columns} rows={data} />
+      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
       <PaginationBar
         totalPages={products?.data?.last_page}
         activePage={router.query.page ? Number(router.query.page) : 1}
@@ -120,7 +122,7 @@ export const ProductsPage = () => {
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
-          آیا از حذف بنر محصول <span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{' '}
+          آیا از حذف محصول <span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{' '}
           <span className="text-danger">{`${itemToRemove?.name}`}</span> اطمینان دارید؟
           <ButtonGroup>
             <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>

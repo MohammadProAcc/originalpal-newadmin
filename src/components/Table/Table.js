@@ -1,14 +1,18 @@
 import {
     Table,
     TableBody,
-    TableCell,
+    TableCell as _TableCell,
     TableContainer,
     TableHead,
-    TableRow,
+    TableRow as _TableRow,
     Paper
 } from "@material-ui/core"
+import styledEngine from "@mui/styled-engine-sc"
 import { Popover } from "@paljs/ui";
 import { OrderDetails } from "components/PageComponents/Orders/components/OrderDetails";
+import { useNonInitialEffect } from "hooks";
+import { useState } from "react";
+import { css } from "styled-components"
 
 function createData(number, item, qty, price) {
     return { number, item, qty, price };
@@ -22,7 +26,23 @@ const rows = [
     createData(5, "Mango", 1.5, 4)
 ];
 
-export function BasicTable({ columns, rows, isOrder = false }) {
+export function BasicTable({ columns, rows, getSelections, isOrder = false }) {
+
+    const [selectedIds, setSelectedIds] = useState([])
+    const handleSelection = (id) => {
+        selectedIds?.length > 0
+            ? selectedIds?.includes(id)
+                ? setSelectedIds(selectedIds?.filter(item => item !== id))
+                : setSelectedIds([...selectedIds, id])
+            : setSelectedIds([id])
+
+    }
+
+    useNonInitialEffect(() => {
+        getSelections(selectedIds)
+    },
+        [selectedIds])
+
     return (
         <TableContainer component={Paper}>
             <Table aria-label="simple table">
@@ -34,14 +54,23 @@ export function BasicTable({ columns, rows, isOrder = false }) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.map((row, index) => (
+                    {rows.map((row) => (
                         <>
                             {
-                                <TableRow key={row.number}>
+                                <TableRow
+                                    selected={selectedIds?.includes(row[0])}
+                                    key={row.number}
+                                >
                                     {
                                         row.map((item, index) => index === 0
                                             ? (
-                                                <TableCell align="right" component="th" scope="row">
+                                                <TableCell
+                                                    primary
+                                                    align="right"
+                                                    component="th"
+                                                    scope="row"
+                                                    onClick={() => handleSelection(row[0])}
+                                                >
                                                     {
                                                         isOrder
                                                             ? (
@@ -72,3 +101,24 @@ export function BasicTable({ columns, rows, isOrder = false }) {
         </TableContainer >
     );
 }
+
+const TableRow = styledEngine(_TableRow)`
+    transition: 150ms;
+
+    background-color ${p => p.selected && 'rgba(0,149,255,0.25)'};
+
+    &:hover {
+        background-color: rgba(0,149,255,0.2);
+    }
+`
+
+const TableCell = styledEngine(_TableCell)`
+    transition: 50ms;
+
+    ${p => p.primary && css`
+        &:hover {
+            cursor: pointer;
+            background-color: rgba(0,149,255,0.3);
+        }
+ `}   
+`

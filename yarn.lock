@@ -664,6 +664,13 @@
     prop-types "^15.7.2"
     react-is "^16.8.0 || ^17.0.0"
 
+"@mui/styled-engine-sc@^5.3.0":
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/@mui/styled-engine-sc/-/styled-engine-sc-5.3.0.tgz#4e63e1d2b1a74ea5b422f8b1e12140d8f9356ce9"
+  integrity sha512-dASXl3Xn56tGtDBJC61G4dxsfkkgYaVsqEBqNfmi3NxUjXT7Tlz/wr4FVFJARZ7Fef0NYWNE8sb+exfGecjXyA==
+  dependencies:
+    prop-types "^15.7.2"
+
 "@napi-rs/triples@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@napi-rs/triples/-/triples-1.0.3.tgz#76d6d0c3f4d16013c61e45dfca5ff1e6c31ae53c"

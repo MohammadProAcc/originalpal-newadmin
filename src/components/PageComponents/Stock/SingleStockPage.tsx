@@ -1,16 +1,51 @@
-import { useStore } from 'utils';
-import Layout from 'Layouts';
-import { Card, CardBody, CardHeader } from '@paljs/ui';
-import { Stock } from 'types';
+import { Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
+import { HeaderButton, ModalBox } from 'components'
+import { FlexContainer } from 'components/Container/FlexContainer'
+import Layout from 'Layouts'
+import router from 'next/router'
+import { useState } from 'react'
+import styled, { css } from 'styled-components'
+import { deleteStock, removeItem, toLocalDate, useStore } from 'utils'
 
 export const SingleStockPage: React.FC = () => {
   const { stock } = useStore((state: any) => ({
     stock: state?.stock,
-  }));
+  }))
+
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const closeRemovalModal = () => setItemToRemove(false)
+
+  const remove = async (removeId: any) => {
+    await removeItem('stock', removeId, deleteStock, () => router.push('/stock'), [
+      `انبار ${removeId} با موفقیت حذف شد`,
+      'حذف انبار موفقیت آمیز نبود',
+    ])
+  }
 
   return (
     <Layout title={`${stock?.id}`}>
-      <h1 style={{ marginBottom: '4rem' }}>انبار {stock?.id}</h1>
+      <h1 style={{ marginBottom: '4rem' }}>
+        مشاهده انبار {stock?.id}
+        <HeaderButton status="Info" href={`/stock/edit/${stock?.id}`}>
+          ویرایش
+        </HeaderButton>
+        <HeaderButton status="Danger" onClick={() => setItemToRemove(stock)}>
+          حذف
+        </HeaderButton>
+      </h1>
+
+      {/* ....:::::: Modals :::::.... */}
+      <Modal on={itemToRemove} toggle={closeRemovalModal}>
+        <ModalBox>
+          <div style={{ marginBottom: '1rem' }}>آیا از حذف انبار {itemToRemove?.id} اطمینان دارید؟</div>
+          <FlexContainer jc="space-between">
+            <Button onClick={closeRemovalModal}>انصراف</Button>
+            <Button onClick={() => remove(itemToRemove?.id)} status="Danger">
+              حذف
+            </Button>
+          </FlexContainer>
+        </ModalBox>
+      </Modal>
 
       <Card>
         <CardHeader>شناسه انبار</CardHeader>
@@ -25,6 +60,11 @@ export const SingleStockPage: React.FC = () => {
       <Card>
         <CardHeader>شناسه محصول انبار</CardHeader>
         <CardBody>{stock?.product_id ?? '-'}</CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>نام محصول</CardHeader>
+        <CardBody>{stock?.product?.name ?? '-'}</CardBody>
       </Card>
 
       <Card>
@@ -71,18 +111,13 @@ export const SingleStockPage: React.FC = () => {
         <CardHeader>تاریخ ها</CardHeader>
         <Card>
           <CardHeader>ساخته شده در :</CardHeader>
-          <CardBody>{stock?.created_at ?? '-'}</CardBody>
+          <CardBody>{toLocalDate(stock?.created_at) ?? '-'}</CardBody>
         </Card>
         <Card>
           <CardHeader>بروز شده شده در :</CardHeader>
-          <CardBody>{stock?.updated_at ?? '-'}</CardBody>
+          <CardBody>{toLocalDate(stock?.updated_at) ?? '-'}</CardBody>
         </Card>
       </Card>
-
-      <Card>
-        <CardHeader>محصول</CardHeader>
-        <CardBody>{stock?.product ?? '-'}</CardBody>
-      </Card>
     </Layout>
-  );
-};
+  )
+}

@@ -1,19 +1,18 @@
-import styled from 'styled-components';
-import Link from 'next/link';
-import { NextRouter } from 'next/router';
+import styled from 'styled-components'
+import Link from 'next/link'
+import { NextRouter } from 'next/router'
 
 interface IProps {
-  totalPages: number;
-  activePage: number;
-  router: NextRouter;
+  totalPages: number
+  activePage: number
+  router: NextRouter
 }
 export const PaginationBar: React.FC<IProps> = ({ totalPages, activePage, router }) => {
-  console.log(activePage);
-  const pagesToRender = [];
+  const pagesToRender = []
   if (totalPages > 2) {
     for (let i = 1; i < totalPages - 1; i++) {
       if (activePage - 4 < i && activePage + 4 > i) {
-        pagesToRender.push(i + 1);
+        pagesToRender.push(i + 1)
       }
     }
   }
@@ -105,9 +104,9 @@ export const PaginationBar: React.FC<IProps> = ({ totalPages, activePage, router
         </ul>
       </nav>
     </Component>
-  );
-};
+  )
+}
 
 const Component = styled.div`
   margin: 1rem 0;
-`;
+`

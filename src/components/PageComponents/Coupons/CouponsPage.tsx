@@ -1,42 +1,44 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { useStore, deleteCoupon } from 'utils';
-import Layout from 'Layouts';
-import { Button, Container, Modal } from '@paljs/ui';
-import { BasicTable, PaginationBar, SearchBar } from 'components';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { Add } from '@material-ui/icons';
-import { toast } from 'react-toastify';
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import { useStore, deleteCoupon } from 'utils'
+import Layout from 'Layouts'
+import { Button, Container, Modal } from '@paljs/ui'
+import { BasicTable, PaginationBar, SearchBar } from 'components'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { Add } from '@material-ui/icons'
+import { toast } from 'react-toastify'
 
 export const CouponsPage = () => {
-  const router = useRouter();
+  const router = useRouter()
 
   const { coupons, clearList } = useStore((state) => ({
     coupons: state?.coupons,
     clearList: state?.clearList,
-  }));
+  }))
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
 
-  const toggleModal = () => setItemToRemove(null);
+  const [tableSelections, setTableSelections] = useState<number[] | []>([])
+
+  const toggleModal = () => setItemToRemove(null)
 
   const removeItem = async (item: any) => {
-    setLoading(true);
-    const response = await deleteCoupon(item?.id);
+    setLoading(true)
+    const response = await deleteCoupon(item?.id)
     if (response?.status === 'success') {
-      clearList('coupons', item?.id);
-      setItemToRemove(null);
-      toast.success('کوپن با موفقیت حذف شد');
+      clearList('coupons', item?.id)
+      setItemToRemove(null)
+      toast.success('کوپن با موفقیت حذف شد')
     } else {
-      toast.error('حذف کوپن موفقیت آمیز نبود');
+      toast.error('حذف کوپن موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
-  const columns: any[] = ['شناسه کوپن', 'کد', 'نوع', 'مقدار', 'توضیحات', 'فعالیت ها'];
+  const columns: any[] = ['شناسه کوپن', 'کد', 'نوع', 'مقدار', 'توضیحات', 'فعالیت ها']
 
   const data = coupons?.data?.data?.map((coupon: any) => [
     // =====>> Table Columns <<=====
@@ -61,7 +63,7 @@ export const CouponsPage = () => {
         حذف
       </Button>
     </Container>,
-  ]);
+  ])
 
   return (
     <Layout title="بنر های صفحه اصلی">
@@ -93,7 +95,7 @@ export const CouponsPage = () => {
         }
       />
 
-      <BasicTable columns={columns} rows={data} />
+      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
       <PaginationBar
         totalPages={coupons?.data?.last_page}
         activePage={router.query.page ? Number(router.query.page) : 1}
@@ -115,16 +117,16 @@ export const CouponsPage = () => {
         </ModalBox>
       </Modal>
     </Layout>
-  );
-};
+  )
+}
 
 const ModalBox = styled(Container)`
   padding: 2rem;
   border-radius: 0.5rem;
   background-color: #fff;
-`;
+`
 
 const ButtonGroup = styled.div`
   margin-top: 1rem;
   display: flex;
-`;
+`

@@ -1,13 +1,19 @@
-import { Button, InputGroup } from '@paljs/ui';
-import Cookies from 'js-cookie';
-import router from 'next/router';
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { ProductStock } from 'types';
-import { editStock } from 'utils';
+import { Button, InputGroup, Select } from '@paljs/ui'
+import Cookies from 'js-cookie'
+import router from 'next/router'
+import React from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import { ProductStock } from 'types'
+import { editStock, translator } from 'utils'
+
+const discoutTypeOptions = [
+  { label: 'نقدی', value: 'cash' },
+  { label: 'درصدی', value: 'percent' },
+]
 
 interface IStockItemProps {
-  stock: ProductStock;
+  stock: ProductStock
 }
 export const StockItem: React.FC<IStockItemProps> = ({ stock }) => {
   // -==>>> Stock Form <<<==-
@@ -15,20 +21,25 @@ export const StockItem: React.FC<IStockItemProps> = ({ stock }) => {
     register,
     handleSubmit,
     formState: { dirtyFields },
+    control,
   } = useForm({
     defaultValues: stock,
-  });
-  type StockForm = Required<typeof dirtyFields>;
+  })
+  type StockForm = Required<typeof dirtyFields>
 
   const onSubmit = async (form: StockForm) => {
     for (let key in form) {
       if (!dirtyFields[key as keyof StockForm]) {
-        delete form[key as keyof StockForm];
+        delete form[key as keyof StockForm]
       }
     }
-    const response = await editStock(router?.query?.stock_id, form, Cookies.get('token'));
-    console.log(response);
-  };
+    const response = await editStock(router?.query?.stock_id, form, Cookies.get('token'))
+    if (response === null) {
+      toast.success('انبار با موفقیت بروز شد')
+    } else {
+      toast.error('بروزرسانی انبار موفقیت آمیز نبود')
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -63,13 +74,18 @@ export const StockItem: React.FC<IStockItemProps> = ({ stock }) => {
       </InputGroup>
 
       <InputGroup fullWidth style={{ flexDirection: 'column' }}>
-        <label>قیمت بعد از تخفیف</label>
-        <input {...register('priceAfterDiscount')} placeholder="قیمت بعد از تخفیف" />
-      </InputGroup>
-
-      <InputGroup fullWidth style={{ flexDirection: 'column' }}>
-        <label>نوع تخفیف</label>
-        <input {...register('discount_type')} placeholder="نوع تخفیف" />
+        <label>نوع تخفیف : {translator(stock.discount_type) ?? 'بدون تخفیف'}</label>
+        <Controller
+          control={control}
+          name="discount_type"
+          render={({ field }) => (
+            <Select
+              options={discoutTypeOptions}
+              onChange={(e) => field?.onChange(e?.value)}
+              placeholder="برای بروزرسانی نوع تخفیف کلیک کنید"
+            />
+          )}
+        />
       </InputGroup>
 
       <InputGroup fullWidth style={{ flexDirection: 'column' }}>
@@ -79,17 +95,17 @@ export const StockItem: React.FC<IStockItemProps> = ({ stock }) => {
 
       <InputGroup fullWidth style={{ flexDirection: 'column' }}>
         <label>شروع تخفیف</label>
-        <input {...register('discount_start')} placeholder="شروع تخفیف" />
+        <input type="date" {...register('discount_start')} placeholder="شروع تخفیف" />
       </InputGroup>
 
       <InputGroup fullWidth style={{ flexDirection: 'column' }}>
         <label>پایان تخفیف</label>
-        <input {...register('discount_end')} placeholder="پایان تخفیف" />
+        <input type="date" {...register('discount_end')} placeholder="پایان تخفیف" />
       </InputGroup>
 
       <InputGroup fullWidth style={{ flexDirection: 'column' }}>
         <label>قیمت بعد از تخفیف</label>
-        <input {...register('priceAfterDiscount')} placeholder="قیمت بعد از تخفیف" />
+        <input disabled {...register('priceAfterDiscount')} placeholder="قیمت بعد از تخفیف" />
       </InputGroup>
 
       <InputGroup fullWidth style={{ flexDirection: 'column' }}>
@@ -97,9 +113,9 @@ export const StockItem: React.FC<IStockItemProps> = ({ stock }) => {
         <input {...register('disc')} placeholder="توضیحات سایز" />
       </InputGroup>
 
-      <Button status="Info" appearance="hero" className="my-3">
+      <Button type="submit" status="Info" appearance="hero" className="my-3">
         بروزرسانی انبار
       </Button>
     </form>
-  );
-};
+  )
+}

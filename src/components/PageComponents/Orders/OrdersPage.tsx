@@ -1,44 +1,46 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { deleteOrder, translator, useStore } from 'utils';
-import Layout from 'Layouts';
-import { Button, Container, Modal } from '@paljs/ui';
-import { BasicTable, PaginationBar, SearchBar } from 'components';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { Add } from '@material-ui/icons';
-import { toast } from 'react-toastify';
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import { deleteOrder, translator, useStore } from 'utils'
+import Layout from 'Layouts'
+import { Button, Container, Modal } from '@paljs/ui'
+import { BasicTable, PaginationBar, SearchBar } from 'components'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { Add } from '@material-ui/icons'
+import { toast } from 'react-toastify'
 
 export const OrdersPage = () => {
-  const router = useRouter();
+  const router = useRouter()
 
   const { orders, clearList } = useStore((state) => ({
     orders: state?.orders,
     clearList: state?.clearList,
-  }));
+  }))
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
 
-  const toggleModal = () => setItemToRemove(null);
+  const [tableSelections, setTableSelections] = useState<number[] | []>([])
+
+  const toggleModal = () => setItemToRemove(null)
 
   const removeItem = async (item: any) => {
-    setLoading(true);
-    console.log(item);
-    const response = await deleteOrder(item?.id);
+    setLoading(true)
+    console.log(item)
+    const response = await deleteOrder(item?.id)
     if (response?.status === 'success') {
-      clearList('orders', item?.id);
-      toggleModal();
-      toast.success('سفارش با موفقیت حذف شد');
+      clearList('orders', item?.id)
+      toggleModal()
+      toast.success('سفارش با موفقیت حذف شد')
     } else {
-      toast.error('عملیات حذف موفقیت آمیز نبود');
+      toast.error('عملیات حذف موفقیت آمیز نبود')
     }
-    console.log(response);
-    setLoading(false);
-  };
+    console.log(response)
+    setLoading(false)
+  }
 
-  const columns: any[] = ['شماره سفارش', 'وضعیت', 'کاربر', 'شماره پرداخت', 'آدرس', 'فعالیت ها'];
+  const columns: any[] = ['شماره سفارش', 'وضعیت', 'کاربر', 'شماره پرداخت', 'آدرس', 'فعالیت ها']
 
   const data = orders?.data?.data?.map((order: any) => [
     order?.id,
@@ -61,7 +63,7 @@ export const OrdersPage = () => {
         حذف
       </Button>
     </Container>,
-  ]);
+  ])
 
   return (
     <Layout title="سارشات">
@@ -79,7 +81,7 @@ export const OrdersPage = () => {
         }
       />
 
-      <BasicTable isOrder columns={columns} rows={data} />
+      <BasicTable getSelections={setTableSelections} isOrder columns={columns} rows={data} />
 
       <PaginationBar
         totalPages={orders?.data?.last_page}
@@ -102,16 +104,16 @@ export const OrdersPage = () => {
         </ModalBox>
       </Modal>
     </Layout>
-  );
-};
+  )
+}
 
 const ModalBox = styled(Container)`
   padding: 2rem;
   border-radius: 0.5rem;
   background-color: #fff;
-`;
+`
 
 const ButtonGroup = styled.div`
   margin-top: 1rem;
   display: flex;
-`;
+`

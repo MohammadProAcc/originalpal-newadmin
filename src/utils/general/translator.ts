@@ -117,13 +117,15 @@ const dictionary = {
   waiting: 'در انتظار پرداخت',
   process: 'در حال پردازش',
   discount_amout: 'مقدار تخفسف',
-};
+  cash: 'نقدی',
+  percent: 'درصدی',
+}
 
 export const translator = (target: string) => {
   for (const [key, value] of Object.entries(dictionary)) {
     if (key === target) {
-      return value;
+      return value
     }
   }
-  return target;
-};
+  return target
+}

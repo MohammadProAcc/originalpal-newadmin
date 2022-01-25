@@ -1,27 +1,32 @@
-import { Button, InputGroup } from '@paljs/ui';
-import Layout from 'Layouts';
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import styled from 'styled-components';
-import Cookies from 'js-cookie';
-import { toast } from 'react-toastify';
-import { createStock } from 'utils';
+import { Button, InputGroup, Select } from '@paljs/ui'
+import Layout from 'Layouts'
+import React, { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import styled from 'styled-components'
+import Cookies from 'js-cookie'
+import { toast } from 'react-toastify'
+import { createStock, translator } from 'utils'
+
+const discoutTypeOptions = [
+  { label: 'نقدی', value: 'cash' },
+  { label: 'درصدی', value: 'percent' },
+]
 
 export function CreateStock() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, control } = useForm()
 
   const onSubmit = async (form: any) => {
-    setLoading(true);
-    const response = await createStock(form, Cookies.get('token'));
+    setLoading(true)
+    const response = await createStock(form, Cookies.get('token'))
     if (response?.status === 'success') {
-      toast.success('انبار با موفقیت ساخته شد');
+      toast.success('انبار با موفقیت ساخته شد')
     } else {
-      toast.error('ساخت انبار موفقیت آمیز نبود');
+      toast.error('ساخت انبار موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   return (
     <Layout title="ساخت انبار صفحه اصلی">
@@ -53,14 +58,24 @@ export function CreateStock() {
           <input {...register('code')} placeholder="کد" />
         </InputGroup>
 
-        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
+        {/* <InputGroup fullWidth style={{ flexDirection: 'column' }}>
           <label>قیمت بعد از تخفیف</label>
           <input {...register('priceAfterDiscount')} placeholder="قیمت بعد از تخفیف" />
-        </InputGroup>
+        </InputGroup> */}
 
         <InputGroup fullWidth style={{ flexDirection: 'column' }}>
           <label>نوع تخفیف</label>
-          <input {...register('discount_type')} placeholder="نوع تخفیف" />
+          <Controller
+            control={control}
+            name="discount_type"
+            render={({ field }) => (
+              <Select
+                options={discoutTypeOptions}
+                onChange={(e) => field?.onChange(e?.value)}
+                placeholder="نوع تخفیف"
+              />
+            )}
+          />
         </InputGroup>
 
         <InputGroup fullWidth style={{ flexDirection: 'column' }}>
@@ -70,17 +85,12 @@ export function CreateStock() {
 
         <InputGroup fullWidth style={{ flexDirection: 'column' }}>
           <label>شروع تخفیف</label>
-          <input {...register('discount_start')} placeholder="شروع تخفیف" />
+          <input type="date" {...register('discount_start')} placeholder="شروع تخفیف" />
         </InputGroup>
 
         <InputGroup fullWidth style={{ flexDirection: 'column' }}>
           <label>پایان تخفیف</label>
-          <input {...register('discount_end')} placeholder="پایان تخفیف" />
-        </InputGroup>
-
-        <InputGroup fullWidth style={{ flexDirection: 'column' }}>
-          <label>قیمت بعد از تخفیف</label>
-          <input {...register('priceAfterDiscount')} placeholder="قیمت بعد از تخفیف" />
+          <input type="date" {...register('discount_end')} placeholder="پایان تخفیف" />
         </InputGroup>
 
         <InputGroup fullWidth style={{ flexDirection: 'column' }}>
@@ -93,11 +103,11 @@ export function CreateStock() {
         </Button>
       </Form>
     </Layout>
-  );
+  )
 }
 
 const Form = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
-`;
+`

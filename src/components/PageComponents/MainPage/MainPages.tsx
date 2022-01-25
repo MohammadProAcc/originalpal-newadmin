@@ -25,6 +25,8 @@ export const MainPages = () => {
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
 
+  const [tableSelections, setTableSelections] = useState<number[] | []>([])
+
   const toggleModal = () => setItemToRemove(null)
 
   const removeItem = async (item: any) => {
@@ -134,7 +136,7 @@ export const MainPages = () => {
         }
       />
 
-      <BasicTable columns={columns} rows={data} />
+      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
       <PaginationBar
         totalPages={mainPageBanners?.data?.last_page}
         activePage={router.query.page ? Number(router.query.page) : 1}

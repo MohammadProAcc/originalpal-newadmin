@@ -1,53 +1,55 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { useStore, deleteComment, editComment } from 'utils';
-import Layout from 'Layouts';
-import { Button, Container, Modal } from '@paljs/ui';
-import { BasicTable, PaginationBar, SearchBar } from 'components';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { Add } from '@material-ui/icons';
-import { toast } from 'react-toastify';
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import { useStore, deleteComment, editComment } from 'utils'
+import Layout from 'Layouts'
+import { Button, Container, Modal } from '@paljs/ui'
+import { BasicTable, PaginationBar, SearchBar } from 'components'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { Add } from '@material-ui/icons'
+import { toast } from 'react-toastify'
 
 export const CommentsPage = () => {
-  const router = useRouter();
+  const router = useRouter()
 
   const { comments, clearList, updateCommentCheck } = useStore((state) => ({
     comments: state?.comments,
     clearList: state?.clearList,
     updateCommentCheck: state?.updateCommentCheck,
-  }));
+  }))
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
 
-  const toggleModal = () => setItemToRemove(null);
+  const [tableSelections, setTableSelections] = useState<number[] | []>([])
+
+  const toggleModal = () => setItemToRemove(null)
 
   const removeItem = async (item: any) => {
-    setLoading(true);
-    const response = await deleteComment(item?.id);
+    setLoading(true)
+    const response = await deleteComment(item?.id)
     if (response?.status === 'success') {
-      clearList('comments', item?.id);
-      setItemToRemove(null);
-      toast.success('نظر با موفقیت حذف شد');
+      clearList('comments', item?.id)
+      setItemToRemove(null)
+      toast.success('نظر با موفقیت حذف شد')
     } else {
-      toast.error('حذف نظر موفقیت آمیز نبود');
+      toast.error('حذف نظر موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   const checkToggle = async (commentId: number, admin_check: 1 | 0) => {
-    setLoading(true);
-    const response = await editComment(commentId, { admin_check });
+    setLoading(true)
+    const response = await editComment(commentId, { admin_check })
     if (response?.status === 'success') {
-      updateCommentCheck(commentId, admin_check);
-      toast.success(`نظر ${commentId} ${admin_check ? 'تایید' : 'سلب تایید'} شد`);
+      updateCommentCheck(commentId, admin_check)
+      toast.success(`نظر ${commentId} ${admin_check ? 'تایید' : 'سلب تایید'} شد`)
     } else {
-      toast.error('بررسی وضعیت نظر موفیت آمیز نبود');
+      toast.error('بررسی وضعیت نظر موفیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   const columns: any[] = [
     'شناسه نظر',
@@ -57,7 +59,7 @@ export const CommentsPage = () => {
     'تاریخ ایجاد',
     'تاریخ بروزسانی',
     'بروزشده در',
-  ];
+  ]
 
   const data = comments?.data?.data?.map((comment: any) => [
     // =====>> Table Columns <<=====
@@ -101,7 +103,7 @@ export const CommentsPage = () => {
         حذف
       </Button>
     </Container>,
-  ]);
+  ])
 
   return (
     <Layout title="بنر های صفحه اصلی">
@@ -119,7 +121,7 @@ export const CommentsPage = () => {
         }
       />
 
-      <BasicTable columns={columns} rows={data} />
+      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
       <PaginationBar
         totalPages={comments?.data?.last_page}
         activePage={router.query.page ? Number(router.query.page) : 1}
@@ -141,16 +143,16 @@ export const CommentsPage = () => {
         </ModalBox>
       </Modal>
     </Layout>
-  );
-};
+  )
+}
 
 const ModalBox = styled(Container)`
   padding: 2rem;
   border-radius: 0.5rem;
   background-color: #fff;
-`;
+`
 
 const ButtonGroup = styled.div`
   margin-top: 1rem;
   display: flex;
-`;
+`
