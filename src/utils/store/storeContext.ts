@@ -76,6 +76,11 @@ function initStore(preloadedState = initialState) {
           set((state: any) => {
             state.user = user
           }),
+        // -==>>> coupon <<<==-
+        updateCoupon: (coupon: any) =>
+          set((state: any) => {
+            state.coupon = coupon
+          }),
       })),
     ),
   )

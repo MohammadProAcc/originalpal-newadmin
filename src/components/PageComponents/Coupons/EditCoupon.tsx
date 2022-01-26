@@ -1,14 +1,17 @@
-import { editCoupon, useStore } from 'utils';
-import Layout from 'Layouts';
-import { Card, CardBody, CardHeader, InputGroup } from '@paljs/ui';
-import { Button } from 'components';
-import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { deleteCoupon, editCoupon, getSingleCoupon, removeItem, toLocalDate, useStore } from 'utils'
+import Layout from 'Layouts'
+import { Card, CardBody, CardHeader, InputGroup, Modal } from '@paljs/ui'
+import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
+import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import React, { useState } from 'react'
+import router from 'next/router'
 
 export const EditCouponPage: React.FC = () => {
-  const { coupon } = useStore((state: any) => ({
+  const { coupon, updateCoupon } = useStore((state: any) => ({
     coupon: state?.coupon,
-  }));
+    updateCoupon: state?.updateCoupon,
+  }))
 
   const {
     register,
@@ -16,20 +19,56 @@ export const EditCouponPage: React.FC = () => {
     formState: { dirtyFields },
   } = useForm({
     defaultValues: coupon,
-  });
+  })
 
   const onSubmit = async (form: any) => {
-    const response = await editCoupon(coupon?.id, form);
+    const response = await editCoupon(coupon?.id, form)
     if (response?.status === 'success') {
-      toast.success('کوپن بروز شد');
+      toast.success('کوپن بروز شد')
     } else {
-      toast.error('بروزرسانی کوپن موفقیت آمیز نبود');
+      toast.error('بروزرسانی کوپن موفقیت آمیز نبود')
     }
-  };
+  }
+
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const closeRemovalModal = () => setItemToRemove(false)
+
+  const remove = async (removeId: any) => {
+    await removeItem('coupons', removeId, deleteCoupon, () => router.push('/coupons'), [
+      `کوپن ${removeId} با موفقیت حذف شد`,
+      'حذف کوپن موفقیت آمیز نبود',
+    ])
+  }
 
   return (
-    <Layout title={`${coupon?.id}`}>
-      <h1 style={{ marginBottom: '4rem' }}>کوپن {coupon?.name}</h1>
+    <Layout title={`ویراریش کوپن ${coupon?.id}`}>
+      <h1 style={{ marginBottom: '4rem' }}>
+        ویرایش کوپن {coupon?.code}
+        <HeaderButton status="Info" href={`/coupons/${coupon?.id}`}>
+          مشاهده
+        </HeaderButton>
+        <HeaderButton status="Danger" onClick={() => setItemToRemove(coupon)}>
+          حذف
+        </HeaderButton>
+      </h1>
+
+      {/* ....:::::: Modals :::::.... */}
+      <Modal on={itemToRemove} toggle={closeRemovalModal}>
+        <ModalBox>
+          <div style={{ marginBottom: '1rem' }}>
+            آیا از حذف برچسب
+            <span className="mx-1">{itemToRemove?.id}</span>
+            اطمینان دارید؟
+          </div>
+          <FlexContainer jc="space-between">
+            <Button onClick={closeRemovalModal}>انصراف</Button>
+            <Button onClick={() => remove(itemToRemove?.id)} status="Danger">
+              حذف
+            </Button>
+          </FlexContainer>
+        </ModalBox>
+      </Modal>
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card>
           <CardHeader>کد کوپن</CardHeader>
@@ -68,7 +107,7 @@ export const EditCouponPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>شروع : {coupon?.start}</CardHeader>
+          <CardHeader>شروع : {toLocalDate(coupon?.start)}</CardHeader>
           <CardBody>
             <InputGroup>
               <input type="date" {...register('start', { required: true })} placeholder="شروع" />
@@ -77,7 +116,7 @@ export const EditCouponPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>انقضاء : {coupon?.expiration}</CardHeader>
+          <CardHeader>انقضاء : {toLocalDate(coupon?.expiration)}</CardHeader>
           <CardBody>
             <InputGroup>
               <input type="date" {...register('expiration', { required: true })} placeholder="انقضاء" />
@@ -126,5 +165,5 @@ export const EditCouponPage: React.FC = () => {
         </Button>
       </form>
     </Layout>
-  );
-};
+  )
+}

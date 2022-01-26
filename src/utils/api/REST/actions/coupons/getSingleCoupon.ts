@@ -1,10 +1,10 @@
-import { admin } from 'utils';
+import { admin } from 'utils'
 
-export const getSingleCoupon = async (couponId: string, token: string) => {
+export const getSingleCoupon = async (couponId: string, token?: string) => {
   try {
-    const { data: coupon } = await admin(token).get(`/coupons/${couponId}`);
-    return coupon;
+    const { data: coupon } = await admin(token).get(`/coupons/${couponId}`)
+    return coupon
   } catch (err) {
-    return null;
+    return null
   }
-};
+}

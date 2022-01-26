@@ -1,15 +1,16 @@
-import { Actions } from '@paljs/ui/Actions';
-import { breakpointDown } from '@paljs/ui/breakpoints';
-import ContextMenu from '@paljs/ui/ContextMenu';
-import { EvaIcon } from '@paljs/ui/Icon';
-import { LayoutHeader } from '@paljs/ui/Layout';
-import Select from '@paljs/ui/Select';
-import User from '@paljs/ui/User';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import React from 'react';
-import styled, { DefaultTheme } from 'styled-components';
-import { translator, useUserStore } from 'utils';
+import { Button } from '@paljs/ui'
+import { Actions } from '@paljs/ui/Actions'
+import { breakpointDown } from '@paljs/ui/breakpoints'
+import ContextMenu from '@paljs/ui/ContextMenu'
+import { EvaIcon } from '@paljs/ui/Icon'
+import { LayoutHeader } from '@paljs/ui/Layout'
+import Select from '@paljs/ui/Select'
+import User from '@paljs/ui/User'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React from 'react'
+import styled, { DefaultTheme } from 'styled-components'
+import { translator, useUserStore } from 'utils'
 
 const HeaderStyle = styled.div`
   display: flex;
@@ -38,31 +39,31 @@ const HeaderStyle = styled.div`
       margin-right: 5px;
     }
   }
-`;
+`
 
 const Label = styled.span`
   display: flex;
   align-items: center;
-`;
+`
 
 const SelectStyled = styled(Select)`
   min-width: 150px;
-`;
+`
 
 interface HeaderProps {
-  toggleSidebar: () => void;
+  toggleSidebar: () => void
   theme: {
-    set: (value: DefaultTheme['name']) => void;
-    value: DefaultTheme['name'];
-  };
-  changeDir: () => void;
-  dir: 'rtl' | 'ltr';
+    set: (value: DefaultTheme['name']) => void
+    value: DefaultTheme['name']
+  }
+  changeDir: () => void
+  dir: 'rtl' | 'ltr'
 }
 
 const Header: React.FC<HeaderProps> = (props) => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const { user } = useUserStore((state) => ({ user: state?.user }));
+  const { user } = useUserStore((state) => ({ user: state?.user }))
 
   const themeOptions = () => [
     {
@@ -102,7 +103,7 @@ const Header: React.FC<HeaderProps> = (props) => {
       ),
       selected: true,
     },
-  ];
+  ]
   return (
     <LayoutHeader fixed>
       <HeaderStyle>
@@ -122,25 +123,25 @@ const Header: React.FC<HeaderProps> = (props) => {
                 </Link>
               ),
             },
+            {
+              content: (
+                <SelectStyled
+                  instanceId="react-select-input"
+                  isSearchable={false}
+                  shape="SemiRound"
+                  placeholder="Themes"
+                  value={themeOptions().find((item) => item.value === props.theme.value)}
+                  options={themeOptions()}
+                  onChange={({ value }: { value: DefaultTheme['name'] }) => props.theme.set(value)}
+                />
+              ),
+            },
             // {
-            //   content: (
-            //     <SelectStyled
-            //       instanceId="react-select-input"
-            //       isSearchable={false}
-            //       shape="SemiRound"
-            //       placeholder="Themes"
-            //       value={themeOptions().find((item) => item.value === props.theme.value)}
-            //       options={themeOptions()}
-            //       onChange={({ value }: { value: DefaultTheme['name'] }) => props.theme.set(value)}
-            //     />
-            //   ),
-            // },
-            // {
-            //   content: (
-            // <Button size="Small" onClick={() => props.changeDir()}>
-            //       {props.dir}
-            //     </Button>
-            //   ),
+            //     content: (
+            //         <Button size="Small" onClick={() => props.changeDir()}>
+            //             {props.dir}
+            //         </Button>
+            //     ),
             // },
           ]}
         />
@@ -198,6 +199,6 @@ const Header: React.FC<HeaderProps> = (props) => {
         />
       </HeaderStyle>
     </LayoutHeader>
-  );
-};
-export default Header;
+  )
+}
+export default Header

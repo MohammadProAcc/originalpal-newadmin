@@ -1,27 +1,30 @@
-import { Button, Card, CardBody, CardHeader, InputGroup } from '@paljs/ui';
-import Cookies from 'js-cookie';
-import Layout from 'Layouts';
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import styled from 'styled-components';
-import { createCoupon } from 'utils';
+import { Button, Card, CardBody, CardHeader, InputGroup } from '@paljs/ui'
+import Cookies from 'js-cookie'
+import Layout from 'Layouts'
+import router from 'next/router'
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import styled from 'styled-components'
+import { createCoupon } from 'utils'
 
 export function CreateCoupon() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, control } = useForm();
+  const { register, handleSubmit, reset } = useForm()
 
   const onSubmit = async (form: any) => {
-    setLoading(true);
-    const response = await createCoupon(form, Cookies.get('token'));
+    setLoading(true)
+    const response = await createCoupon(form, Cookies.get('token'))
     if (response?.status === 'success') {
-      toast.success('کوپن با موفقیت ساخته شد');
+      reset()
+      toast.success('کوپن با موفقیت ساخته شد')
+      router.push('/coupons')
     } else {
-      toast.error('ساخت کوپن موفقیت آمیز نبود');
+      toast.error('ساخت کوپن موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   return (
     <Layout title="ساخت کوپن صفحه اصلی">
@@ -123,11 +126,11 @@ export function CreateCoupon() {
         </Button>
       </Form>
     </Layout>
-  );
+  )
 }
 
 const Form = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
-`;
+`
