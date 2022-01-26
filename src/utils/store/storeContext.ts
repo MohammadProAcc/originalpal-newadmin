@@ -67,7 +67,11 @@ function initStore(preloadedState = initialState) {
                 comment?.id === commentId ? { ...comment, admin_check: adminCheck } : comment,
               )),
           ),
-        // -==>>> comments <<<==-
+        updateComment: (comment: Comment) =>
+          set((state: any) => {
+            state.comment = comment
+          }),
+        // -==>>> users <<<==-
         updateUser: (user: User) =>
           set((state: any) => {
             state.user = user

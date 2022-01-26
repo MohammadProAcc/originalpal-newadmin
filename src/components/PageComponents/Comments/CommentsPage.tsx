@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useStore, deleteComment, editComment } from 'utils'
+import { useStore, deleteComment, editComment, toLocalDate, pluralRemove } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
-import { BasicTable, PaginationBar, SearchBar } from 'components'
+import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Add } from '@material-ui/icons'
@@ -51,6 +51,25 @@ export const CommentsPage = () => {
     setLoading(false)
   }
 
+  const [itemsToRemove, setItemsToRemove] = useState<any>(null)
+  const togglePluralRemoveModal = () => setItemsToRemove(null)
+
+  const pluralRemoveTrigger = async (selections: any[]) => {
+    await pluralRemove(
+      'comments',
+      selections,
+      deleteComment,
+      (entity: string, id: any) => {
+        clearList(entity, id)
+        toast.success(`مورد با شناسه ${id} حذف شد`)
+      },
+      async () => {
+        setTableSelections([])
+        setItemsToRemove(null)
+      },
+    )
+  }
+
   const columns: any[] = [
     'شناسه نظر',
     'شناسه کاربر',
@@ -67,8 +86,8 @@ export const CommentsPage = () => {
     `کاربر ${comment?.user_id}` ?? '-',
     `محصول ${comment?.product_id}` ?? '-',
     comment?.content ?? '-',
-    comment?.created_at ?? '-',
-    comment?.updated_at ?? '-',
+    toLocalDate(comment?.created_at) ?? '-',
+    toLocalDate(comment?.updated_at) ?? '-',
     <Container>
       {comment?.admin_check ? (
         <Button
@@ -109,6 +128,14 @@ export const CommentsPage = () => {
     <Layout title="بنر های صفحه اصلی">
       <h1>نظر ها</h1>
 
+      <FlexContainer>
+        {tableSelections?.length > 0 && (
+          <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
+            حذف موارد انتخاب شده
+          </HeaderButton>
+        )}
+      </FlexContainer>
+
       <SearchBar
         fields={comments.fields}
         entity="comments"
@@ -138,6 +165,22 @@ export const CommentsPage = () => {
             </Button>
             <Button onClick={() => removeItem(itemToRemove)} disabled={loading} status="Danger">
               بله، حذف شود
+            </Button>
+          </ButtonGroup>
+        </ModalBox>
+      </Modal>
+
+      <Modal on={itemsToRemove} toggle={togglePluralRemoveModal}>
+        <ModalBox fluid>
+          آیا از حذف موارد
+          <span className="text-danger mx-1">{itemsToRemove?.join(' , ')}</span>
+          اطمینان دارید؟
+          <ButtonGroup>
+            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: '1rem' }}>
+              خیر، منصرم شدم
+            </Button>
+            <Button onClick={() => pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
+              بله، حذف شوند
             </Button>
           </ButtonGroup>
         </ModalBox>

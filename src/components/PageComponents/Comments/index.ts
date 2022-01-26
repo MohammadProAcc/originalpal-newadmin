@@ -1,3 +1,3 @@
-export * from './CommentsPage';
-export * from './SingleTagPage';
-export * from './EditComment';
+export * from './CommentsPage'
+export * from './SingleCommentPage'
+export * from './EditComment'
