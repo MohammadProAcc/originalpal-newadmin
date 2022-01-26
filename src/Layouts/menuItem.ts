@@ -1,4 +1,4 @@
-import { MenuItemType } from '@paljs/ui/types';
+import { MenuItemType } from '@paljs/ui/types'
 
 const items: MenuItemType[] = [
   {
@@ -6,7 +6,7 @@ const items: MenuItemType[] = [
     link: { href: '/dashboard' },
   },
   {
-    title: 'صفحه اصلی',
+    title: 'بنر های اسلایدر صفحه اصلی',
     link: { href: '/main-page' },
   },
   {
@@ -199,6 +199,6 @@ const items: MenuItemType[] = [
   //     },
   //   ],
   // },
-];
+]
 
-export default items;
+export default items

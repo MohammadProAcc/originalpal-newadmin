@@ -1,14 +1,14 @@
 import { Avatar } from '@material-ui/core'
 import { Add } from '@material-ui/icons'
 import { Button, Container, Modal } from '@paljs/ui'
-import { BasicTable, PaginationBar, SearchBar } from 'components'
+import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
 import Layout from 'Layouts'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
-import { useStore } from 'utils'
+import { pluralRemove, useStore } from 'utils'
 import { delete_banner } from 'utils/api/REST/actions/banners'
 
 export const MainPages = () => {
@@ -24,10 +24,13 @@ export const MainPages = () => {
   const [loading, setLoading] = useState(false)
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const [itemsToRemove, setItemsToRemove] = useState<any>(null)
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([])
 
   const toggleModal = () => setItemToRemove(null)
+
+  const togglePluralRemoveModal = () => setItemsToRemove(null)
 
   const removeItem = async (item: any) => {
     setLoading(true)
@@ -40,6 +43,22 @@ export const MainPages = () => {
       toast.error('حذف محصول موفقیت آمیز نبود')
     }
     setLoading(false)
+  }
+
+  const pluralRemoveTrigger = async (selections: any[]) => {
+    await pluralRemove(
+      'mainPageBanners',
+      selections,
+      delete_banner,
+      (entity: string, id: any) => {
+        clearList(entity, id)
+        toast.success(`مورد با شناسه ${id} حذف شد`)
+      },
+      async () => {
+        setTableSelections([])
+        setItemsToRemove(null)
+      },
+    )
   }
 
   const columns = [
@@ -110,19 +129,26 @@ export const MainPages = () => {
     <Layout title="بنر های صفحه اصلی">
       <h1>بنر های صفحه اصلی سایت </h1>
 
-      <Link href="/main-page/create">
-        <Button
-          style={{
-            margin: '1rem 0 1rem 1rem',
-            display: 'flex',
-          }}
-          status="Success"
-          appearance="outline"
-        >
-          افزودن بنر
-          <Add />
-        </Button>
-      </Link>
+      <FlexContainer>
+        <Link href="/main-page/create">
+          <Button
+            style={{
+              margin: '1rem 0 1rem 1rem',
+              display: 'flex',
+            }}
+            status="Success"
+            appearance="outline"
+          >
+            افزودن بنر
+            <Add />
+          </Button>
+        </Link>
+        {tableSelections?.length > 0 && (
+          <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
+            حذف موارد انتخاب شده
+          </HeaderButton>
+        )}
+      </FlexContainer>
 
       <SearchBar
         fields={mainPageBanners.fields}
@@ -153,6 +179,22 @@ export const MainPages = () => {
             </Button>
             <Button onClick={() => removeItem(itemToRemove)} disabled={loading} status="Danger">
               بله، حذف شود
+            </Button>
+          </ButtonGroup>
+        </ModalBox>
+      </Modal>
+
+      <Modal on={itemsToRemove} toggle={togglePluralRemoveModal}>
+        <ModalBox fluid>
+          آیا از حذف موارد
+          <span className="text-danger mx-1">{itemsToRemove?.join(' , ')}</span>
+          اطمینان دارید؟
+          <ButtonGroup>
+            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: '1rem' }}>
+              خیر، منصرم شدم
+            </Button>
+            <Button onClick={() => pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
+              بله، حذف شوند
             </Button>
           </ButtonGroup>
         </ModalBox>

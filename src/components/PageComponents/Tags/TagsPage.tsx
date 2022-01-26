@@ -81,7 +81,7 @@ export const TagsPage = () => {
   ])
 
   return (
-    <Layout title="بنر های صفحه اصلی">
+    <Layout title="برچسب ها">
       <h1>برچسب ها</h1>
 
       <FlexContainer>

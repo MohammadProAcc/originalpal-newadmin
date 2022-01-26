@@ -40,7 +40,7 @@ export function CreateProduct() {
   }
 
   return (
-    <Layout title="ساخت محصول صفحه اصلی">
+    <Layout title="ساخت محصول">
       <Form onSubmit={handleSubmit(onSubmit)}>
         <h1>ساخت محصول</h1>
 

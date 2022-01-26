@@ -1,32 +1,37 @@
-import { Button, Checkbox, InputGroup, Select } from '@paljs/ui';
-import Layout from 'Layouts';
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import styled from 'styled-components';
-import Cookies from 'js-cookie';
-import { toast } from 'react-toastify';
-import { createBrand } from 'utils';
+import { Button, Checkbox, InputGroup, Select } from '@paljs/ui'
+import Layout from 'Layouts'
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import styled from 'styled-components'
+import Cookies from 'js-cookie'
+import { toast } from 'react-toastify'
+import { createBrand } from 'utils'
+import router from 'next/router'
 
 export function CreateBrand() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, control } = useForm();
+  const { register, handleSubmit, reset } = useForm()
 
   const onSubmit = async (form: any) => {
-    setLoading(true);
-    const response = await createBrand(form, Cookies.get('token'));
+    setLoading(true)
+    const response = await createBrand(form, Cookies.get('token'))
     if (response?.status === 'success') {
-      toast.success('بنر با موفقیت ساخته شد');
+      reset()
+
+      toast.success('بنر با موفقیت ساخته شد')
+
+      router.push('/brands')
     } else {
-      toast.error('ساخت برند موفقیت آمیز نبود');
+      toast.error('ساخت برند موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   return (
     <Layout title="ساخت بنر صفحه اصلی">
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <h1>ساخت بنر</h1>
+        <h1>ساخت برند</h1>
 
         <InputGroup className="col">
           <label>نام برند</label>
@@ -38,7 +43,7 @@ export function CreateBrand() {
           <input {...register('meta_title', { required: true })} placeholder="عنوان متا" />
 
           <InputGroup className="col mt-4">
-            <label>لینک</label>
+            <label>کلمات کلیدی</label>
             <input {...register('meta_keywords', { required: true })} placeholder="کلمات کلیدی متا" />
           </InputGroup>
         </InputGroup>
@@ -63,11 +68,11 @@ export function CreateBrand() {
         </Button>
       </Form>
     </Layout>
-  );
+  )
 }
 
 const Form = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
-`;
+`

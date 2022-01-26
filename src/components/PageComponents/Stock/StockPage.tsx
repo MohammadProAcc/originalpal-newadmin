@@ -90,7 +90,7 @@ export const StockPage = () => {
   ])
 
   return (
-    <Layout title="بنر های صفحه اصلی">
+    <Layout title="انبار">
       <h1>انبار</h1>
 
       <FlexContainer>

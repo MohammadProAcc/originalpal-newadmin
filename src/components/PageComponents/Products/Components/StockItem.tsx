@@ -14,8 +14,9 @@ const discoutTypeOptions = [
 
 interface IStockItemProps {
   stock: ProductStock
+  callback?: any
 }
-export const StockItem: React.FC<IStockItemProps> = ({ stock }) => {
+export const StockItem: React.FC<IStockItemProps> = ({ stock, callback }) => {
   // -==>>> Stock Form <<<==-
   const {
     register,
@@ -33,8 +34,9 @@ export const StockItem: React.FC<IStockItemProps> = ({ stock }) => {
         delete form[key as keyof StockForm]
       }
     }
-    const response = await editStock(router?.query?.stock_id, form, Cookies.get('token'))
+    const response = await editStock(stock?.id, form, Cookies.get('token'))
     if (response === null) {
+      await callback()
       toast.success('انبار با موفقیت بروز شد')
     } else {
       toast.error('بروزرسانی انبار موفقیت آمیز نبود')

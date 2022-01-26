@@ -1,46 +1,59 @@
-import Layout from 'Layouts';
-import { translator, useStore } from 'utils';
-import { Alert, Button, Card, CardBody, CardHeader, Checkbox, InputGroup, Select } from '@paljs/ui';
-import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import styled from 'styled-components';
-import { Dot } from 'components';
-import Image from 'next/image';
+import Layout from 'Layouts'
+import { removeItem, translator, useStore } from 'utils'
+import { Alert, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import { Button, Dot, FlexContainer, HeaderButton, ModalBox } from 'components'
+import Image from 'next/image'
+import { delete_banner } from 'utils/api/REST/actions/banners'
+import router from 'next/router'
 
 export const MainPage: React.FC = () => {
   const { banner } = useStore((state: any) => ({
     banner: state?.banner,
-  }));
-  console.log(banner);
+  }))
+  console.log(banner)
 
-  const [loading, setLoading] = useState(false);
-  const [active, setActive] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, control } = useForm({
-    defaultValues: {
-      ...(banner ?? {}),
-    },
-  });
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const closeRemovalModal = () => setItemToRemove(false)
 
-  const platformOptions = [
-    { label: 'دسکتاپ', value: 'desktop' },
-    { label: 'موبایل', value: 'mobile' },
-  ];
-
-  const typeOptions = [
-    { label: 'اسلاید', value: 'slide' },
-    { label: 'ایستاده', value: 'stand' },
-  ];
-
-  const onSubmit = async (form: any) => {
-    setLoading(true);
-    console.log(form);
-    setLoading(false);
-  };
+  const remove = async (removeId: any) => {
+    await removeItem('banners', removeId, delete_banner, () => router.push('/main-page'), [
+      `بنر ${removeId} با موفقیت حذف شد`,
+      'حذف بنر موفقیت آمیز نبود',
+    ])
+  }
 
   return (
     <Layout title="بنر صفحه اصلی">
-      <h1 style={{ marginBottom: '3rem' }}>بنر شماره {banner?.id ?? '?'}</h1>
+      <h1 style={{ marginBottom: '3rem' }}>
+        مشاهده بنر شماره {banner?.id ?? '?'}
+        <HeaderButton status="Info" href={`/main-page/edit/${banner?.id}`}>
+          ویرایش
+        </HeaderButton>
+        <HeaderButton status="Danger" onClick={() => setItemToRemove(banner)}>
+          حذف
+        </HeaderButton>
+      </h1>
+
+      {/* ....:::::: Modals :::::.... */}
+      <Modal on={itemToRemove} toggle={closeRemovalModal}>
+        <ModalBox>
+          <div style={{ marginBottom: '1rem' }}>
+            آیا از حذف بنر
+            <span className="mx-1">{itemToRemove?.id}</span>
+            اطمینان دارید؟
+          </div>
+          <FlexContainer jc="space-between">
+            <Button onClick={closeRemovalModal}>انصراف</Button>
+            <Button onClick={() => remove(itemToRemove?.id)} status="Danger">
+              حذف
+            </Button>
+          </FlexContainer>
+        </ModalBox>
+      </Modal>
 
       <Card>
         <CardHeader>عنوان</CardHeader>
@@ -111,11 +124,11 @@ export const MainPage: React.FC = () => {
         </CardBody>
       </Card>
     </Layout>
-  );
-};
+  )
+}
 
 const Form = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
-`;
+`

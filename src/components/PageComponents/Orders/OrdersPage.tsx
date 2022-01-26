@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { deleteOrder, translator, useStore } from 'utils'
+import { deleteOrder, pluralRemove, translator, useStore } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
-import { BasicTable, PaginationBar, SearchBar } from 'components'
+import { BasicTable, HeaderButton, PaginationBar, SearchBar } from 'components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Add } from '@material-ui/icons'
@@ -20,6 +20,9 @@ export const OrdersPage = () => {
   const [loading, setLoading] = useState(false)
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
+
+  const [itemsToRemove, setItemsToRemove] = useState<any>(null)
+  const togglePluralRemoveModal = () => setItemsToRemove(null)
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([])
 
@@ -38,6 +41,22 @@ export const OrdersPage = () => {
     }
     console.log(response)
     setLoading(false)
+  }
+
+  const pluralRemoveTrigger = async (selections: any[]) => {
+    await pluralRemove(
+      'orders',
+      selections,
+      deleteOrder,
+      (entity: string, id: any) => {
+        clearList(entity, id)
+        toast.success(`مورد با شناسه ${id} حذف شد`)
+      },
+      async () => {
+        await setTableSelections([])
+        setItemsToRemove(null)
+      },
+    )
   }
 
   const columns: any[] = ['شماره سفارش', 'وضعیت', 'کاربر', 'شماره پرداخت', 'آدرس', 'فعالیت ها']
@@ -66,8 +85,15 @@ export const OrdersPage = () => {
   ])
 
   return (
-    <Layout title="سارشات">
-      <h1>سفارشات</h1>
+    <Layout title="سفارشات">
+      <h1>
+        سفارشات
+        {tableSelections?.length > 0 && (
+          <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
+            حذف موارد انتخاب شده
+          </HeaderButton>
+        )}
+      </h1>
 
       <SearchBar
         fields={orders.fields}
@@ -99,6 +125,22 @@ export const OrdersPage = () => {
             </Button>
             <Button onClick={() => removeItem(itemToRemove)} disabled={loading} status="Danger">
               بله، حذف شود
+            </Button>
+          </ButtonGroup>
+        </ModalBox>
+      </Modal>
+
+      <Modal on={itemsToRemove} toggle={togglePluralRemoveModal}>
+        <ModalBox fluid>
+          آیا از حذف موارد
+          <span className="text-danger mx-1">{itemsToRemove?.join(' , ')}</span>
+          اطمینان دارید؟
+          <ButtonGroup>
+            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: '1rem' }}>
+              خیر، منصرم شدم
+            </Button>
+            <Button onClick={() => pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
+              بله، حذف شوند
             </Button>
           </ButtonGroup>
         </ModalBox>

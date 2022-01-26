@@ -1,30 +1,30 @@
-import produce from 'immer';
-import { useMemo } from 'react';
-import { initialLoginResponseUser, LoginResponseUser, Media, UserSlice } from 'types';
-import create from 'zustand';
-import { devtools } from 'zustand/middleware';
-import { userActions } from './slices';
+import produce from 'immer'
+import { useMemo } from 'react'
+import { initialLoginResponseUser, LoginResponseUser, Media, Product, UserSlice } from 'types'
+import create from 'zustand'
+import { devtools } from 'zustand/middleware'
+import { userActions } from './slices'
 
 // Turn the set method into an immer proxy
 const immer = (config: any) => (set: any, get: any, api: any) =>
   config(
     (partial: any, replace: any) => {
-      const nextState = typeof partial === 'function' ? produce(partial) : partial;
-      return set(nextState, replace);
+      const nextState = typeof partial === 'function' ? produce(partial) : partial
+      return set(nextState, replace)
     },
     get,
     api,
-  );
+  )
 
-let store: any;
+let store: any
 
 // export interface InitialState extends UserSlice {}
-export type InitialState = any;
+export type InitialState = any
 
 export const initialState: InitialState = {
   user: initialLoginResponseUser,
   cache: {},
-};
+}
 
 function initStore(preloadedState = initialState) {
   return create(
@@ -50,6 +50,10 @@ function initStore(preloadedState = initialState) {
               )),
           ),
         // -===>>> Product <<<===-
+        updateProduct: (product: Product) =>
+          set((state: any) => {
+            state.product = product
+          }),
         updateProductAfterMediaRemoval: (removedMedia: Media) =>
           set(
             (state: any) =>
@@ -65,11 +69,11 @@ function initStore(preloadedState = initialState) {
           ),
       })),
     ),
-  );
+  )
 }
 
 export const initializeStore = (preloadedState: any) => {
-  let _store = store ?? initStore(preloadedState);
+  let _store = store ?? initStore(preloadedState)
 
   // After navigating to a page with an initial Zustand state, merge that state
   // with the current state in the store, and create a new store
@@ -77,21 +81,21 @@ export const initializeStore = (preloadedState: any) => {
     _store = initStore({
       ...store.getState(),
       ...preloadedState,
-    });
+    })
     // Reset the current store
-    store = undefined;
+    store = undefined
   }
 
   // For SSG and SSR always create a new store
-  if (typeof window === 'undefined') return _store;
+  if (typeof window === 'undefined') return _store
   // Create the store once in the client
-  if (!store) store = _store;
+  if (!store) store = _store
 
-  return _store;
-};
+  return _store
+}
 
 export function useHydrate(initialState: Partial<InitialState>) {
-  const state = typeof initialState === 'string' ? JSON.parse(initialState) : initialState;
-  const store = useMemo(() => initializeStore(state), [state]);
-  return store;
+  const state = typeof initialState === 'string' ? JSON.parse(initialState) : initialState
+  const store = useMemo(() => initializeStore(state), [state])
+  return store
 }

@@ -1,5 +1,6 @@
-import { Button, Checkbox, InputGroup, Select } from '@paljs/ui'
+import { Button, Checkbox, InputGroup, Modal, Select } from '@paljs/ui'
 import axios from 'axios'
+import { FlexContainer, HeaderButton, ModalBox } from 'components'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
 import { useRouter } from 'next/router'
@@ -8,8 +9,8 @@ import Dropzone from 'react-dropzone-uploader'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
-import { admin, useStore } from 'utils'
-import { uploadBannerImage } from 'utils/api/REST/actions/banners'
+import { admin, removeItem, useStore } from 'utils'
+import { delete_banner, uploadBannerImage } from 'utils/api/REST/actions/banners'
 import { updateBanner } from 'utils/api/REST/actions/banners/updateBanner'
 
 export function EditMainPage() {
@@ -45,6 +46,16 @@ export function EditMainPage() {
       image: formData,
     })
     console.log(response)
+  }
+
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const closeRemovalModal = () => setItemToRemove(false)
+
+  const remove = async (removeId: any) => {
+    await removeItem('banners', removeId, delete_banner, () => router.push('/main-page'), [
+      `بنر ${removeId} با موفقیت حذف شد`,
+      'حذف بنر موفقیت آمیز نبود',
+    ])
   }
 
   // called every time a file's `status` changes
@@ -100,9 +111,33 @@ export function EditMainPage() {
 
   return (
     <Layout title="ساخت بنر صفحه اصلی">
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <h1>بروزرسانی بنر صفحه اصلی (شناسه: {banner?.id})</h1>
+      <h1>
+        بروزرسانی بنر صفحه اصلی (شناسه: {banner?.id})
+        <FlexContainer style={{ display: 'inline-flex' }}>
+          <HeaderButton status="Info" href={`/main-page/${banner?.id}`}>
+            مشاهده
+          </HeaderButton>
 
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(banner)}>
+            حذف
+          </HeaderButton>
+        </FlexContainer>
+      </h1>
+
+      {/* ....:::::: Modals :::::.... */}
+      <Modal on={itemToRemove} toggle={closeRemovalModal}>
+        <ModalBox>
+          آیا از حذف بنر {itemToRemove?.id} اطمینان دارید؟
+          <FlexContainer jc="space-between" className="mt-3">
+            <Button onClick={closeRemovalModal}>انصراف</Button>
+            <Button onClick={() => remove(itemToRemove?.id)} status="Danger">
+              حذف
+            </Button>
+          </FlexContainer>
+        </ModalBox>
+      </Modal>
+
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <InputGroup className="col">
           <label>عنوان</label>
           <InputGroup className="flex ali-end">

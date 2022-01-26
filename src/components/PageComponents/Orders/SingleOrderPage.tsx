@@ -1,15 +1,63 @@
-import { numeralize, translator, useStore } from 'utils';
-import Layout from 'Layouts';
-import { Card, CardBody, CardHeader } from '@paljs/ui';
+import { deleteOrder, numeralize, removeItem, translator, useStore } from 'utils'
+import Layout from 'Layouts'
+import { Card, CardBody, CardHeader, Modal } from '@paljs/ui'
+import React, { useState } from 'react'
+import router from 'next/router'
+import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
+
+const clacTotalPrice = (orderItems: any[]) => {
+  // const priceArr = order['order_items']
+  const priceArr = orderItems?.map((orderItem: any) => orderItem?.price)
+  if (priceArr?.length > 0) {
+    const price = priceArr?.reduce((prev: number, curr: number) => curr + prev)
+    return price
+  }
+}
 
 export const SingleOrderPage: React.FC = () => {
   const { order } = useStore((state: any) => ({
     order: state?.order,
-  }));
+  }))
+
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const closeRemovalModal = () => setItemToRemove(false)
+
+  const remove = async (removeId: any) => {
+    await removeItem('orders', removeId, deleteOrder, () => router.push('/orders'), [
+      `سفارش ${removeId} با موفقیت حذف شد`,
+      'حذف سفارش موفقیت آمیز نبود',
+    ])
+  }
 
   return (
     <Layout title={`سفارش شماره ${order?.id}`}>
-      <h1 style={{ margin: '0 0 4rem 0' }}>سفارش شماره {order?.id}</h1>
+      <h1 style={{ margin: '0 0 4rem 0' }}>
+        سفارش شماره {order?.id}
+        <HeaderButton status="Info" href={`/orders/edit/${order?.id}`}>
+          ویرایش
+        </HeaderButton>
+        <HeaderButton status="Danger" onClick={() => setItemToRemove(order)}>
+          حذف
+        </HeaderButton>
+      </h1>
+
+      {/* ....:::::: Modals :::::.... */}
+      <Modal on={itemToRemove} toggle={closeRemovalModal}>
+        <ModalBox>
+          <div style={{ marginBottom: '1rem' }}>
+            آیا از حذف سفارش
+            <span className="mx-1">{itemToRemove?.id}</span>
+            اطمینان دارید؟
+          </div>
+          <FlexContainer jc="space-between">
+            <Button onClick={closeRemovalModal}>انصراف</Button>
+            <Button onClick={() => remove(itemToRemove?.id)} status="Danger">
+              حذف
+            </Button>
+          </FlexContainer>
+        </ModalBox>
+      </Modal>
+
       <Card>
         <CardHeader>شماره سفارش</CardHeader>
         <CardBody>
@@ -98,15 +146,7 @@ export const SingleOrderPage: React.FC = () => {
             </Card>
           ))}
           <hr />
-          <p>
-            جمع کل :{' '}
-            {numeralize(
-              order['order_items']
-                ?.map((orderItem: any) => orderItem?.price)
-                ?.reduce((prev: number, curr: number) => curr + prev),
-            )}{' '}
-            تومان
-          </p>
+          <p>جمع کل : {numeralize(clacTotalPrice(order['order_items']))} تومان</p>
         </CardBody>
       </Card>
 
@@ -115,5 +155,5 @@ export const SingleOrderPage: React.FC = () => {
         <CardBody>{translator(order?.delivery)}</CardBody>
       </Card>
     </Layout>
-  );
-};
+  )
+}

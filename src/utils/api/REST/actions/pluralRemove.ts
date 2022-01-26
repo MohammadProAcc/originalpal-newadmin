@@ -6,7 +6,7 @@ export const pluralRemove = async (
   finalCallback: any,
 ) => {
   if (selections?.length > 0) {
-    const deletions = await selections?.map(async (id) => {
+    const deletions = selections?.map(async (id) => {
       const response = await removeFunction(id)
 
       if (response?.status === 'success') {

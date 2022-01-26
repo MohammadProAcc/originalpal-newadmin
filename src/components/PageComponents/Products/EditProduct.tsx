@@ -1,8 +1,19 @@
-import { admin, deleteProductMedia, editProduct, search_in, useStore } from 'utils'
+import {
+  admin,
+  deleteProductMedia,
+  deleteStock,
+  editProduct,
+  getSingleProduct,
+  removeItem,
+  search_in,
+  toLocalDate,
+  useStore,
+} from 'utils'
 import Layout from 'Layouts'
 import {
   Accordion,
   AccordionItem,
+  Alert,
   Card as _Card,
   CardBody as _CardBody,
   CardHeader as _CardHeader,
@@ -11,7 +22,7 @@ import {
   Modal,
   Select as _Select,
 } from '@paljs/ui'
-import { BasicEditor, Button, ProductImageCard, SearchBar, StockItem } from 'components'
+import { BasicEditor, Button, FlexContainer, ModalBox, ProductImageCard, SearchBar, StockItem } from 'components'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { Media, Product, ProductBrand, SearchForm } from 'types'
@@ -19,72 +30,75 @@ import styled from 'styled-components'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import Dropzone from 'react-dropzone-uploader'
 import axios from 'axios'
+import { CreateStock } from '..'
+import { StockForm } from '../Stock/components'
 
 // TODO: add search brand mechanism
 
 export const EditProductPage: React.FC = () => {
   const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
-  const { product, brands, updateProductAfterMediaRemoval } = useStore((state: any) => ({
+  const { product, updateProduct, brands, updateProductAfterMediaRemoval } = useStore((state: any) => ({
     product: state?.product,
     brands: state?.brands,
     updateProductAfterMediaRemoval: state?.updateProductAfterMediaRemoval,
+    updateProduct: state?.updateProduct,
   }))
-
-  const brandsOptions = brands?.data?.data?.map((brand: ProductBrand) => ({
-    label: brand?.name,
-    value: brand,
-  }))
-
-  const activationOptions = [
-    { label: 'فعال', value: '1' },
-    { label: 'غیرفعال', value: '0' },
-  ]
-
-  const onesizeOptions = [
-    { label: 'تک سایز', value: '1' },
-    { label: 'غیر تک سایز', value: '0' },
-  ]
-
-  const typeOptions = [
-    { label: 'جدید', value: 'new' },
-    { label: 'دوباره موجود شده در انبار', value: 'restock' },
-    { label: 'بزودی', value: 'comingsoon' },
-  ]
-
-  const categoryOptions = [{ label: 'کفش', value: 'shoe' }]
-
-  // const searchBrand = async (form: SearchForm) => {
-  // const result = await search_in('brands', form, router.query, Cookies.get('token'));
-  //   console.log(form);
-  // };
 
   const { register, handleSubmit, control } = useForm({
-    defaultValues: product,
+    defaultValues: {
+      slug: product?.slug,
+      Enable: product?.Enable,
+      brand_id: product?.brand_id,
+      code: product?.code,
+      description: product?.description,
+      discount_exp: product?.discount_exp,
+      discount_price: product?.discount_price,
+      meta_description: product?.meta_description,
+      meta_keywords: product?.meta_keywords,
+      meta_title: product?.meta_title,
+      name: product?.name,
+      price: product?.price,
+      sold: product?.sold,
+      state: product?.state,
+      summary: product?.summary,
+      title: product?.title,
+      title_page: product?.title_page,
+      trend: product?.trend,
+    },
   })
 
+  const resetProduct = async () => {
+    const updatedProduct = await getSingleProduct(product?.id)
+    updateProduct(updatedProduct)
+  }
+
   const onSubmit = async (form: any) => {
-    delete form?.brand
+    setLoading(true)
+
     delete form?.url
-    delete form?.collection
-    delete form?.category
-    delete form?.stock
     delete form?.color
 
     const finalForm = {
       ...form,
-      brand_id: form?.brand?.value.id,
     }
 
+    console.log('Final Submit Form >>>', finalForm)
+
     const response = await editProduct(product?.id, finalForm)
-    if (response === null) {
+
+    if (response !== null) {
+      await resetProduct()
       toast.success('محصول بروز شد')
     } else {
       toast.error('بروزرسانی محصول موفقیت آمیز نبود')
     }
+
+    setLoading(false)
   }
 
   // called every time a file's `status` changes
@@ -100,6 +114,7 @@ export const EditProductPage: React.FC = () => {
           },
         })
         .then((response) => {
+          getSingleProduct(product?.id).then((updatedProduct) => updateProduct(updatedProduct))
           toast.success('تصویر با موفقیت آپلود شد')
         })
         .catch((error) => console.warn(error?.response?.data))
@@ -119,7 +134,55 @@ export const EditProductPage: React.FC = () => {
     }
   }
 
-  console.log(product?.site_main_picture)
+  const [images, setImages] = useState<any>([product?.site_main_picture, ...product?.media])
+
+  const [showAddStockModal, setShowAddStockModal] = useState(false)
+
+  const brandsOptions = brands?.data?.map((brand: ProductBrand) => ({
+    label: brand?.name,
+    value: brand?.id,
+  }))
+
+  const afterStockCreation = async (response: any) => {
+    console.log(response)
+    await resetProduct()
+    setShowAddStockModal(false)
+  }
+
+  const activationOptions = [
+    { label: 'فعال', value: '1' },
+    { label: 'غیرفعال', value: '0' },
+  ]
+
+  const onesizeOptions = [
+    { label: 'تک سایز', value: '1' },
+    { label: 'غیر تک سایز', value: '0' },
+  ]
+
+  const typeOptions = [
+    { label: 'جدید', value: 'new' },
+    { label: 'دوباره موجود شده در انبار', value: 'restock' },
+    { label: 'بزودی', value: 'comingsoon' },
+  ]
+
+  const categoryOptions = [{ label: 'کفش', value: 'shoe' }]
+
+  const [stockToRemove, setStockToRemove] = useState<any>(null)
+
+  const removeStock = async (stockId: number) => {
+    setLoading(true)
+
+    const response = await deleteStock(stockId)
+    if (response !== null) {
+      await resetProduct()
+      setStockToRemove(null)
+      toast.success('انبار با موفقیت حذف شد')
+    } else {
+      toast.success('حذف انبار موفقیت آمیز نبود')
+    }
+
+    setLoading(true)
+  }
 
   return (
     <Layout title={`${product?.id}`}>
@@ -129,7 +192,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>َUrl منحصر به فرد</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('url', { required: true })} />
+              <input disabled value={product?.url} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -153,14 +216,14 @@ export const EditProductPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>برند : {product?.brand?.name}</CardHeader>
+          <CardHeader>برند : {product?.brand?.name ?? '-'}</CardHeader>
           <CardBody>
             <InputGroup>
               <Controller
-                name="brand"
+                name="brand_id"
                 control={control}
                 render={({ field }) => (
-                  <Select options={brandsOptions} {...field} onChange={(e: any) => field.onChange(e?.value)} />
+                  <Select options={brandsOptions} onChange={(e: any) => field.onChange(e?.value)} />
                 )}
               />
             </InputGroup>
@@ -195,13 +258,15 @@ export const EditProductPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>فعال یا غیرفعال کردن محصول</CardHeader>
+          <CardHeader>فعال یا غیرفعال کردن محصول : {product?.Enable ? 'فعال' : 'غیر فعال'}</CardHeader>
           <CardBody>
             <InputGroup>
               <Controller
                 control={control}
                 name="Enable"
-                render={({ field }) => <Select options={activationOptions} {...field} />}
+                render={({ field }) => (
+                  <Select options={activationOptions} onChange={(e: any) => field?.onChange(e?.value)} />
+                )}
               />
             </InputGroup>
           </CardBody>
@@ -212,15 +277,6 @@ export const EditProductPage: React.FC = () => {
           <CardBody>
             <InputGroup>
               <input {...register('state')} />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>رنگ</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input {...register('color')} placeholder="رنگ" />
             </InputGroup>
           </CardBody>
         </Card>
@@ -265,7 +321,7 @@ export const EditProductPage: React.FC = () => {
             </Card>
           </CardBody>
         </Card>
-
+        {/* 
         <Card>
           <CardHeader>نوع</CardHeader>
           <CardBody style={{ overflow: 'initial' }}>
@@ -276,7 +332,6 @@ export const EditProductPage: React.FC = () => {
                 render={({ field }) => (
                   <Select
                     options={typeOptions}
-                    {...field}
                     onChange={(e: any) => field.onChange(e?.value)}
                     placeholder="در صورتی که قصد تغییر دادن دارید کلیک کنید..."
                   />
@@ -296,7 +351,6 @@ export const EditProductPage: React.FC = () => {
                 render={({ field }) => (
                   <Select
                     options={categoryOptions}
-                    {...field}
                     onChange={(e: any) => field.onChange(e?.value)}
                     placeholder="در صورتی که قصد تغییر دادن دارید کلیک کنید..."
                   />
@@ -304,7 +358,7 @@ export const EditProductPage: React.FC = () => {
               />
             </InputGroup>
           </CardBody>
-        </Card>
+        </Card> */}
 
         <Card>
           <CardHeader>خلاصه</CardHeader>
@@ -341,16 +395,7 @@ export const EditProductPage: React.FC = () => {
           </CardBody>
         </Card>
 
-        <Card>
-          <CardHeader>زمان ایجاد</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input {...register('created_at')} placeholder="زمان ایجاد" />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
+        {/* <Card>
           <CardHeader>تک سایز : {product?.onesize ? 'بله' : 'خیر'}</CardHeader>
           <CardBody>
             <InputGroup>
@@ -360,18 +405,20 @@ export const EditProductPage: React.FC = () => {
                 render={({ field }) => (
                   <Select
                     options={onesizeOptions}
-                    {...field}
-                    onChange={(e: any) => field.onChange(e?.value)}
+                    onChange={(e: any) => field.onChange(Number(e?.value))}
                     placeholder="در صورتی که قصد تغییر دادن دارید کلیک کنید..."
                   />
                 )}
               />
             </InputGroup>
           </CardBody>
-        </Card>
+        </Card> */}
 
         <Card>
-          <CardHeader>پایان تخفیف</CardHeader>
+          <CardHeader>
+            پایان تخفیف : {toLocalDate(product?.discount_exp) ?? '-'} (برای بروزرسانی تاریخ پایان تخفیف، تاریخ موردنظر
+            خود را وارد کنید.)
+          </CardHeader>
           <CardBody>
             <InputGroup>
               <input type="date" {...register('discount_exp')} />
@@ -388,67 +435,107 @@ export const EditProductPage: React.FC = () => {
           </CardBody>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <h3 style={{ marginBottom: '1rem' }}>
-              تصاویر
-              <span style={{ fontSize: '1rem' }}>
-                ( برای اضافه کردن تصویر, از طریق ورودی زیر عکس مورد نظر را بارگذاری کنید )
-              </span>
-            </h3>
-            <DropZoneWrapper>
-              <Dropzone onChangeStatus={handleChangeStatus} accept="image/*,audio/*,video/*" inputContent="" />
-            </DropZoneWrapper>
-          </CardHeader>
-          <CardBody
-            style={{
-              maxHeight: '100vh',
-              overflow: 'scroll',
-            }}
-          >
-            {[
-              product?.site_main_picture !== null && product?.site_main_picture,
-              ...(product?.media?.length > 0 ? product?.media : []),
-            ]?.map((media: Media, index: number) => (
-              <ProductImageCard index={index} media={media} removalCallback={setItemToRemove} />
-            ))}
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>انبار</CardHeader>
-          <CardBody>
-            <Accordion>
-              {product?.stock?.map((stock: any) => (
-                <AccordionItem uniqueKey={stock?.id} title={`سایز :${stock?.size}`}>
-                  <StockItem stock={stock} />
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </CardBody>
-        </Card>
-
-        <Button status="Info" type="submit" appearance="outline">
-          بروزرسانی محصول
+        <Button disabled={loading} className="mb-4" status="Warning" type="submit" appearance="hero">
+          بروزرسانی اطلاعات محصول
         </Button>
       </Form>
+
+      <Card>
+        <CardHeader>
+          <h3 style={{ marginBottom: '1rem' }}>
+            تصاویر
+            <span style={{ fontSize: '1rem' }}>
+              ( برای اضافه کردن تصویر, از طریق ورودی زیر عکس مورد نظر را بارگذاری کنید )
+            </span>
+          </h3>
+          <DropZoneWrapper>
+            <Dropzone onChangeStatus={handleChangeStatus} accept="image/*,audio/*,video/*" inputContent="" />
+          </DropZoneWrapper>
+        </CardHeader>
+        <CardBody
+          style={{
+            maxHeight: '100vh',
+            overflow: 'scroll',
+          }}
+        >
+          {images?.map((media: Media, index: number) => (
+            <ProductImageCard index={index} media={media} removalCallback={setItemToRemove} />
+          ))}
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex ali-center">
+          انبار{' '}
+          <Button className="mx-3" status="Success" appearance="hero" onClick={() => setShowAddStockModal(true)}>
+            افزودن انبار
+          </Button>
+        </CardHeader>
+        <CardBody>
+          <Accordion>
+            {product?.stock?.length > 0 ? (
+              product?.stock?.map((stock: any) => (
+                <AccordionItem
+                  uniqueKey={stock?.id}
+                  title={
+                    <strong>
+                      سایز :{stock?.size}{' '}
+                      <Button
+                        onClick={() => setStockToRemove(stock)}
+                        className="mr-3"
+                        appearance="outline"
+                        status="Danger"
+                      >
+                        حذف انبار
+                      </Button>
+                    </strong>
+                  }
+                >
+                  <StockItem callback={resetProduct} stock={stock} />
+                </AccordionItem>
+              ))
+            ) : (
+              <Alert status="Warning">این محصول در انبار موجود نیست</Alert>
+            )}
+          </Accordion>
+        </CardBody>
+      </Card>
 
       {/* -===>>> Modals <<<===- */}
       <Modal on={!!itemToRemove} toggle={() => setItemToRemove((current: boolean) => !current)}>
         <Card>
-          <CardHeader>
-            آیا از حذف تصویر {<Image width="100px" height="100px" src={`${process.env.SRC}/${itemToRemove?.u}`} />}{' '}
-            اطمینان دارید؟
-          </CardHeader>
-          <CardBody>
-            <Button onClick={() => setItemToRemove(null)} status="Info">
-              انصراف
-            </Button>
-            <Button onClick={() => removeProductMedia(itemToRemove)} status="Danger">
-              بله، حذف شود
-            </Button>
+          <CardHeader>آیا از حذف تصویر زیر اطمینان دارید؟</CardHeader>
+          <CardBody className="flex">
+            <div className="flex col justify-content-between">
+              <Button onClick={() => removeProductMedia(itemToRemove)} status="Danger">
+                بله، حذف شود
+              </Button>
+              <Button onClick={() => setItemToRemove(null)} status="Info">
+                انصراف
+              </Button>
+            </div>
+            {<img className="mb-2" width="100px" height="100px" src={`${process.env.SRC}/${itemToRemove?.u}`} />}{' '}
           </CardBody>
         </Card>
+      </Modal>
+
+      <Modal on={showAddStockModal} toggle={() => setShowAddStockModal(false)}>
+        <ModalBox>
+          <StockForm callback={afterStockCreation} />
+        </ModalBox>
+      </Modal>
+
+      <Modal on={stockToRemove} toggle={() => setStockToRemove(null)}>
+        <ModalBox>
+          آیا از حذف انبار شماره {stockToRemove?.id} مربوط به محصول {product?.name} با سایز {stockToRemove?.size}{' '}
+          اطمینان دارید؟
+          <FlexContainer className="mt-3 flex justify-content-between">
+            <Button onClick={() => setStockToRemove(null)}>انصراف</Button>
+            <Button status="Danger" onClick={() => removeStock(stockToRemove?.id)}>
+              حذف
+            </Button>
+          </FlexContainer>
+        </ModalBox>
       </Modal>
     </Layout>
   )

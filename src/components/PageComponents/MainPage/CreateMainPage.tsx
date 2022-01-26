@@ -18,7 +18,7 @@ export function CreateMainPage() {
   const [loading, setLoading] = useState(false)
   const [active, setActive] = useState(false)
 
-  const { register, handleSubmit, control } = useForm()
+  const { register, handleSubmit, control, reset } = useForm()
 
   const onSubmit = async (form: any) => {
     setLoading(true)
@@ -43,7 +43,11 @@ export function CreateMainPage() {
       const { data: response } = await admin().post(`/banners/image/${bannerId}`, formData)
       console.log(response)
 
+      reset()
+
       toast.success('بنر با موفقیت ساخته شد')
+
+      router.push('/main-page')
     } catch (err) {
       toast.error('بنر با موفقیت ساخته شد')
     }

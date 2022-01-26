@@ -1,15 +1,24 @@
-import { FormGroup } from '@material-ui/core';
-import { Add, Close } from '@material-ui/icons';
-import { Alert, Button, Card, CardBody, CardHeader, Container, InputGroup, Modal, Select } from '@paljs/ui';
-import { BasicEditor } from 'components';
-import Cookies from 'js-cookie';
-import Layout from 'Layouts';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import styled, { css } from 'styled-components';
-import { add_stock_option, admin, numeralize, removeOrderItem, translator, update_order_status, useStore } from 'utils';
+import { Add, Close } from '@material-ui/icons'
+import { Alert, Button, Card, CardBody, CardHeader, Checkbox, Container, InputGroup, Modal, Select } from '@paljs/ui'
+import { BasicEditor, FlexContainer, HeaderButton, ModalBox } from 'components'
+import Cookies from 'js-cookie'
+import Layout from 'Layouts'
+import { useRouter } from 'next/router'
+import React, { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import styled, { css } from 'styled-components'
+import {
+  add_stock_option,
+  admin,
+  deleteOrder,
+  numeralize,
+  removeItem,
+  removeOrderItem,
+  translator,
+  update_order_status,
+  useStore,
+} from 'utils'
 
 const statusOptions = [
   { label: 'در انتظار پرداخت', value: 'waiting' },
@@ -17,60 +26,61 @@ const statusOptions = [
   { label: 'در حال پردازش', value: 'process' },
   { label: 'پست شده', value: 'post' },
   { label: 'تحویل شده', value: 'delivered' },
-];
+]
 
 export const EditSingleOrderPage: React.FC = () => {
-  const router = useRouter();
+  const router = useRouter()
 
   const { order, stocks, clearOrderItems } = useStore((state: any) => ({
     order: state?.order,
     stocks: state?.stocks,
     clearOrderItems: state?.clearOrderItems,
-  }));
+  }))
 
   const [stockOptions, setStockOptions] = useState(
     stocks?.map((stock: any) => ({
       label: `شناسه انبار: ${stock?.id}, سایز: ${stock?.size} شناسه محصول: ${stock?.product_id}`,
       value: stock,
     })),
-  );
-  const [status, setStatus] = useState<any>();
+  )
+  const [status, setStatus] = useState<any>()
+  const [sms, setSms] = useState<any>(false)
 
   const changeStatus = async () => {
-    setLoading(true);
+    setLoading(true)
     const response = await update_order_status(
       router.query.order_id as string,
-      { status, sms: false },
+      { status, sms },
       Cookies.get('token') ?? '',
-    );
+    )
     if (response?.status === 'success') {
-      toast.success(`وضعیت با موفقیت تغییر کرد به ${translator(status)}`);
+      toast.success(`وضعیت با موفقیت تغییر کرد به ${translator(status)}`)
     } else {
-      toast.error('تغییر وضعیت موفقیت آمیز نبود');
+      toast.error('تغییر وضعیت موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
-  const [selectedStock, setSelectedStock] = useState();
+  const [selectedStock, setSelectedStock] = useState()
 
-  const [stockToRemove, setStockToRemove] = useState<any>(null);
+  const [stockToRemove, setStockToRemove] = useState<any>(null)
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const { register: addStockRegister, handleSubmit: addStockHandleSubmit, control: addStockControl } = useForm();
+  const { register: addStockRegister, handleSubmit: addStockHandleSubmit, control: addStockControl } = useForm()
 
   const addStock = async (form: any) => {
     const finalForm = {
       quantity: Number(form?.quantity),
       stock_id: form?.stock?.id.toString(),
-    };
-    const response = await add_stock_option(router?.query?.order_id as string, finalForm, Cookies.get('token') ?? '');
-    if (response?.status === 'success') {
-      toast.success('محصول با موفقیت اضافه شد');
-    } else {
-      toast.error('افزودن محصول موفقیت آمیز نبود');
     }
-  };
+    const response = await add_stock_option(router?.query?.order_id as string, finalForm, Cookies.get('token') ?? '')
+    if (response?.status === 'success') {
+      toast.success('محصول با موفقیت اضافه شد')
+    } else {
+      toast.error('افزودن محصول موفقیت آمیز نبود')
+    }
+  }
 
   const { register, handleSubmit, control } = useForm({
     defaultValues: {
@@ -79,56 +89,102 @@ export const EditSingleOrderPage: React.FC = () => {
       payment_id: order?.payment_id,
       coupon_id: order?.coupon_id,
     },
-  });
+  })
 
   const onSubmit = async (form: any) => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const { data: response } = await admin().put(`/orders/${router?.query?.order_id}`, form);
+      const { data: response } = await admin().put(`/orders/${router?.query?.order_id}`, form)
       if (response?.status === 'success') {
-        toast.success('سفارش با موفقیت بروز شد');
+        toast.success('سفارش با موفقیت بروز شد')
       }
     } catch (err) {
-      console.log(err);
-      toast.error('بروزرسانی سفارش موفقیت آمیز نبود');
+      console.log(err)
+      toast.error('بروزرسانی سفارش موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
-  const { register: smsRegister, handleSubmit: smsHandleSubmit } = useForm();
+  const { register: smsRegister, handleSubmit: smsHandleSubmit } = useForm()
 
   const submitSmsForm = async (form: any) => {
-    console.log(form);
-  };
+    console.log(form)
+  }
 
   const removeStock = async (stock: any) => {
-    setLoading(true);
-    const response = await removeOrderItem(stock?.id);
+    setLoading(true)
+    const response = await removeOrderItem(stock?.id)
     if (response?.status === 'success') {
-      clearOrderItems(stock?.id);
-      setStockToRemove(null);
-      toast.success('محصول با موفقیت از سبد خرید شما حذف شد');
+      clearOrderItems(stock?.id)
+      setStockToRemove(null)
+      toast.success('محصول با موفقیت از سبد خرید شما حذف شد')
     } else {
-      toast.error('حذف محصول با موفقیت انجام شد');
+      toast.error('حذف محصول با موفقیت انجام شد')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
+
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const closeRemovalModal = () => setItemToRemove(false)
+
+  const remove = async (removeId: any) => {
+    await removeItem('orders', removeId, deleteOrder, () => router.push('/orders'), [
+      `سفارش ${removeId} با موفقیت حذف شد`,
+      'حذف سفارش موفقیت آمیز نبود',
+    ])
+  }
 
   return (
     <Layout title={`سفارش شماره ${order?.id}`}>
-      <h1 style={{ margin: '0 0 4rem 0' }}>ویرایش سفارش شماره {order?.id}</h1>
+      <h1 style={{ margin: '0 0 4rem 0' }}>
+        ویرایش سفارش شماره {order?.id}
+        <FlexContainer style={{ display: 'inline-flex' }}>
+          <HeaderButton status="Info" href={`/orders/${order?.id}`}>
+            مشاهده
+          </HeaderButton>
+
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(order)}>
+            حذف
+          </HeaderButton>
+        </FlexContainer>
+      </h1>
+
+      {/* ....:::::: Modals :::::.... */}
+      <Modal on={itemToRemove} toggle={closeRemovalModal}>
+        <ModalBox>
+          آیا از حذف سفارش {itemToRemove?.id} اطمینان دارید؟
+          <FlexContainer jc="space-between" className="mt-3">
+            <Button onClick={closeRemovalModal}>انصراف</Button>
+            <Button onClick={() => remove(itemToRemove?.id)} status="Danger">
+              حذف
+            </Button>
+          </FlexContainer>
+        </ModalBox>
+      </Modal>
+
       <p>نام کاربر : {order?.user?.name}</p>
       <p>شماره همراه کاربر : {order?.user?.phone_number ?? '?'}</p>
       <p>شماره سفارش : {order?.id}</p>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card>
-          <CardHeader>
+          <CardHeader style={{ display: 'flex', alignItems: 'center' }}>
             وضعیت : {translator(order?.status)}{' '}
             {status && (
-              <Button status="Warning" appearance="outline" disabled={status === order?.status} onClick={changeStatus}>
+              <Button
+                status="Warning"
+                appearance="outline"
+                disabled={status === order?.status}
+                onClick={changeStatus}
+                className="mx-3"
+              >
                 تغییر وضعیت به {translator(status)}
               </Button>
             )}{' '}
+            {status && status !== order?.status && (
+              <Checkbox checked={sms} onChange={setSms} style={{ marginRight: '2rem' }}>
+                پیامک تغییر وضعیت ارسال شود؟
+              </Checkbox>
+            )}
           </CardHeader>
           <Select
             placeholder="برای تغییر دادن وضعیت کلیک کنید..."
@@ -194,8 +250,8 @@ export const EditSingleOrderPage: React.FC = () => {
                   options={stockOptions}
                   // onChange={(e: any) => setSelectedStock(e.value)}
                   onChange={(e: any) => {
-                    setSelectedStock(e.value);
-                    field.onChange(e.value);
+                    setSelectedStock(e.value)
+                    field.onChange(e.value)
                   }}
                   placeholder="افزودن سفارش"
                 />
@@ -394,16 +450,16 @@ export const EditSingleOrderPage: React.FC = () => {
         </Card>
       </Modal>
     </Layout>
-  );
-};
+  )
+}
 
 const AddStockSelect = styled(Select)`
   width: 20rem;
   margin: 0 1rem;
-`;
+`
 
 interface IFormProps {
-  smsForm?: boolean;
+  smsForm?: boolean
 }
 const Form = styled.form<IFormProps>`
   display: flex;
@@ -415,4 +471,4 @@ const Form = styled.form<IFormProps>`
       flex-direction: column;
       align-items: flex-start;
     `}
-`;
+`

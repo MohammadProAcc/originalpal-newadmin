@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useStore, deleteProduct, numeralize } from 'utils'
+import { useStore, deleteProduct, numeralize, pluralRemove } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
-import { BasicTable, PaginationBar, SearchBar } from 'components'
+import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Add } from '@material-ui/icons'
@@ -83,23 +83,49 @@ export const ProductsPage = () => {
     </Container>,
   ])
 
+  const [itemsToRemove, setItemsToRemove] = useState<any>(null)
+  const togglePluralRemoveModal = () => setItemsToRemove(null)
+
+  const pluralRemoveTrigger = async (selections: any[]) => {
+    await pluralRemove(
+      'products',
+      selections,
+      deleteProduct,
+      (entity: string, id: any) => {
+        clearList(entity, id)
+        toast.success(`مورد با شناسه ${id} حذف شد`)
+      },
+      async () => {
+        await setTableSelections([])
+        setItemsToRemove(null)
+      },
+    )
+  }
+
   return (
-    <Layout title="بنر های صفحه اصلی">
+    <Layout title="محصولات">
       <h1>محصول ها</h1>
 
-      <Link href="/products/create">
-        <Button
-          style={{
-            margin: '1rem 0 1rem 1rem',
-            display: 'flex',
-          }}
-          status="Success"
-          appearance="outline"
-        >
-          افزودن محصول
-          <Add />
-        </Button>
-      </Link>
+      <FlexContainer>
+        <Link href="/products/create">
+          <Button
+            style={{
+              margin: '1rem 0 1rem 1rem',
+              display: 'flex',
+            }}
+            status="Success"
+            appearance="outline"
+          >
+            افزودن محصول
+            <Add />
+          </Button>
+        </Link>
+        {tableSelections?.length > 0 && (
+          <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
+            حذف موارد انتخاب شده
+          </HeaderButton>
+        )}
+      </FlexContainer>
 
       <SearchBar
         fields={products.fields}
