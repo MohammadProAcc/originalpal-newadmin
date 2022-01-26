@@ -1,6 +1,6 @@
 import produce from 'immer'
 import { useMemo } from 'react'
-import { initialLoginResponseUser, LoginResponseUser, Media, Product, UserSlice } from 'types'
+import { initialLoginResponseUser, LoginResponseUser, Media, Product, User, UserSlice } from 'types'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { userActions } from './slices'
@@ -67,6 +67,11 @@ function initStore(preloadedState = initialState) {
                 comment?.id === commentId ? { ...comment, admin_check: adminCheck } : comment,
               )),
           ),
+        // -==>>> comments <<<==-
+        updateUser: (user: User) =>
+          set((state: any) => {
+            state.user = user
+          }),
       })),
     ),
   )

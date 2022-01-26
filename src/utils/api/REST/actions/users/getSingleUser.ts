@@ -1,10 +1,10 @@
-import { admin } from 'utils';
+import { admin } from 'utils'
 
-export const getSingleUser = async (userId: string, token: string) => {
+export const getSingleUser = async (userId: string, token?: string) => {
   try {
-    const { data: user } = await admin(token).get(`/users/${userId}`);
-    return user;
+    const { data: user } = await admin(token).get(`/users/${userId}`)
+    return user
   } catch (err) {
-    return null;
+    return null
   }
-};
+}

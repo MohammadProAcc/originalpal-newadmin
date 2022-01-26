@@ -96,7 +96,7 @@ export const ProductsPage = () => {
         toast.success(`مورد با شناسه ${id} حذف شد`)
       },
       async () => {
-        await setTableSelections([])
+        setTableSelections([])
         setItemsToRemove(null)
       },
     )
@@ -156,6 +156,22 @@ export const ProductsPage = () => {
             </Button>
             <Button onClick={() => removeItem(itemToRemove)} disabled={loading} status="Danger">
               بله، حذف شود
+            </Button>
+          </ButtonGroup>
+        </ModalBox>
+      </Modal>
+
+      <Modal on={itemsToRemove} toggle={togglePluralRemoveModal}>
+        <ModalBox fluid>
+          آیا از حذف موارد
+          <span className="text-danger mx-1">{itemsToRemove?.join(' , ')}</span>
+          اطمینان دارید؟
+          <ButtonGroup>
+            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: '1rem' }}>
+              خیر، منصرم شدم
+            </Button>
+            <Button onClick={() => pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
+              بله، حذف شوند
             </Button>
           </ButtonGroup>
         </ModalBox>

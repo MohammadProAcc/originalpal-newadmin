@@ -1,32 +1,35 @@
-import { Button, InputGroup, Select } from '@paljs/ui';
-import Layout from 'Layouts';
-import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import styled from 'styled-components';
-import Cookies from 'js-cookie';
-import { toast } from 'react-toastify';
-import { createUser } from 'utils';
+import { Button, InputGroup, Select } from '@paljs/ui'
+import Layout from 'Layouts'
+import React, { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import styled from 'styled-components'
+import Cookies from 'js-cookie'
+import { toast } from 'react-toastify'
+import { createUser } from 'utils'
+import router from 'next/router'
 
 const roleOptions = [
   { label: 'ادمین', value: 'admin' },
   { label: 'بدون نقش', value: null },
-];
+]
 
 export function CreateUser() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, control } = useForm();
+  const { register, handleSubmit, control, reset } = useForm()
 
   const onSubmit = async (form: any) => {
-    setLoading(true);
-    const response = await createUser(form, Cookies.get('token'));
+    setLoading(true)
+    const response = await createUser(form, Cookies.get('token'))
     if (response?.status === 'success') {
-      toast.success('کاربر با موفقیت ساخته شد');
+      reset()
+      router.push('/users')
+      toast.success('کاربر با موفقیت ساخته شد')
     } else {
-      toast.error('ساخت کاربر موفقیت آمیز نبود');
+      toast.error('ساخت کاربر موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   return (
     <Layout title="ساخت کاربر صفحه اصلی">
@@ -67,11 +70,11 @@ export function CreateUser() {
         </Button>
       </Form>
     </Layout>
-  );
+  )
 }
 
 const Form = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
-`;
+`
