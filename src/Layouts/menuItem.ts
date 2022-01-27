@@ -45,6 +45,10 @@ const items: MenuItemType[] = [
     title: 'وبلاگ',
     link: { href: '/blog' },
   },
+  {
+    title: 'منو',
+    link: { href: '/menu' },
+  },
   // {
   //   title: 'FEATURES',
   //   group: true,
