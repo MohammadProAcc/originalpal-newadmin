@@ -1,52 +1,80 @@
-import { editBlog, useStore } from 'utils'
+import { deleteBlog, editBlog, getSingleBlog, removeItem, useStore } from 'utils'
 import Layout from 'Layouts'
-import { Card, CardBody, CardHeader, Checkbox, InputGroup } from '@paljs/ui'
-import { BasicEditor, Button } from 'components'
+import { Card, CardBody, CardHeader, Checkbox, InputGroup, Modal } from '@paljs/ui'
+import { BasicEditor, Button, FlexContainer, HeaderButton, ModalBox } from 'components'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import React, { useState, useLayoutEffect } from 'react'
 import styled from 'styled-components'
+import { MediaCard } from 'components/Card'
+import router from 'next/router'
 
 export const EditBlogPage: React.FC = () => {
-  const { blog } = useStore((state: any) => ({
+  const { blog, reload } = useStore((state: any) => ({
     blog: state?.blog,
+    reload: state?.reload,
   }))
+
+  const reloadBlog = async () => {
+    const reloadedBlog = await getSingleBlog(blog?.id)
+    reload('blog', reloadedBlog)
+  }
 
   const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, control } = useForm({
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { dirtyFields },
+  } = useForm({
     defaultValues: blog,
   })
 
   const onSubmit = async (form: any) => {
     setLoading(true)
-    delete form.id
-    delete form.created_at
-    delete form.updated_at
 
-    const endimage = new FormData()
-    endimage.append('media[]', form?.endimage[0])
+    for (let key in form) {
+      if (dirtyFields[key]) delete form[key]
+    }
 
     const finalForm = {
       ...form,
-      endimage,
     }
 
     const response = await editBlog(blog?.id, finalForm)
 
     if (response?.status === 'success') {
-      toast.success('برچسب بروز شد')
+      toast.success('وبلاگ  بروز شد')
     } else {
-      toast.error('بروزرسانی برچسب موفقیت آمیز نبود')
+      toast.error('بروزرسانی وبلاگ موفقیت آمیز نبود')
     }
     setLoading(false)
   }
 
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const closeRemovalModal = () => setItemToRemove(false)
+
+  const remove = async (removeId: any) => {
+    await removeItem('blog', removeId, deleteBlog, () => router.push('/blog'), [
+      `وبلاگ ${removeId} با موفقیت حذف شد`,
+      'حذف وبلاگ موفقیت آمیز نبود',
+    ])
+  }
+
   return (
     <Layout title={`${blog?.id}`}>
-      <h1 style={{ marginBottom: '4rem' }}>ویرایش وبلاگ شماره {blog?.id}</h1>
+      <h1 style={{ marginBottom: '4rem' }}>
+        ویرایش وبلاگ شماره {blog?.id}
+        <HeaderButton status="Info" href={`/blog/${blog?.id}`}>
+          مشاهده
+        </HeaderButton>
+        <HeaderButton status="Danger" onClick={() => setItemToRemove(blog)}>
+          حذف
+        </HeaderButton>
+      </h1>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <h1>
+        <h2>
           <span style={{ margin: '0 0 0 1rem' }}>ساخت وبلاگ</span>
           <Controller
             name="is_news"
@@ -60,7 +88,24 @@ export const EditBlogPage: React.FC = () => {
               </span>
             )}
           />
-        </h1>
+        </h2>
+
+        {/* ....:::::: Remove Modals :::::.... */}
+        <Modal on={itemToRemove} toggle={closeRemovalModal}>
+          <ModalBox>
+            <div style={{ marginBottom: '1rem' }}>
+              آیا از حذف برچسب
+              <span className="mx-1">{itemToRemove?.id}</span>
+              اطمینان دارید؟
+            </div>
+            <FlexContainer jc="space-between">
+              <Button onClick={closeRemovalModal}>انصراف</Button>
+              <Button onClick={() => remove(itemToRemove?.id)} status="Danger">
+                حذف
+              </Button>
+            </FlexContainer>
+          </ModalBox>
+        </Modal>
 
         <InputGroup className="col mb-4" fullWidth>
           <label>عنوان</label>
@@ -99,8 +144,9 @@ export const EditBlogPage: React.FC = () => {
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
-          <label>تصویر بنر</label>
-          <input {...register('thumb')} placeholder="تصویر بنر" />
+          <label>تصویر بنر ( برای جایگزینی تصویر، تصویر موردنظر خود را از طریق ورودی زیر بارگزاری کنید)</label>
+          <input type="file" {...register('thumb')} placeholder="تصویر پایانی" />
+          <MediaCard media={blog?.thumb} removalCallback={console.log} updateCallback={console.log} index={0} />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
@@ -143,8 +189,9 @@ export const EditBlogPage: React.FC = () => {
           <CardHeader>تصویر پایانی</CardHeader>
           <CardBody>
             <InputGroup className="col" fullWidth>
-              <label>تصویر پایانی</label>
+              <label>تصویر پایانی ( برای جایگزینی تصویر، تصویر موردنظر خود را از طریق ورودی زیر بارگزاری کنید)</label>
               <input type="file" {...register('endimage')} placeholder="تصویر پایانی" />
+              <MediaCard media={blog?.endimage} removalCallback={console.log} updateCallback={console.log} index={0} />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>

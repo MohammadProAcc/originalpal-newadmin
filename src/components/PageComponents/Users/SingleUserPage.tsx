@@ -32,7 +32,7 @@ export const SingleUserPage: React.FC = () => {
         </HeaderButton>
       </h1>
 
-      {/* ....:::::: Modals :::::.... */}
+      {/* ....:::::: Removal Modals :::::.... */}
       <Modal on={itemToRemove} toggle={closeRemovalModal}>
         <ModalBox>
           <div style={{ marginBottom: '1rem' }}>

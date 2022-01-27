@@ -72,7 +72,7 @@ export const EditUserPage: React.FC = () => {
         </HeaderButton>
       </h1>
 
-      {/* ....:::::: Modals :::::.... */}
+      {/* ....:::::: Remove Modals :::::.... */}
       <Modal on={itemToRemove} toggle={closeRemovalModal}>
         <ModalBox>
           <div style={{ marginBottom: '1rem' }}>

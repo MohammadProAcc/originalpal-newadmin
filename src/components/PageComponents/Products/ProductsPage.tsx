@@ -67,11 +67,11 @@ export const ProductsPage = () => {
     product?.brand ?? '-',
     product?.Enable,
     <Container>
-      <Link href={`/products/${product?.id}`}>
+      {/* <Link href={`/products/${product?.id}`}>
         <Button style={{ marginLeft: '1rem' }} status="Info">
           مشاهده
         </Button>
-      </Link>
+      </Link> */}
       <Link href={`/products/edit/${product?.id}`}>
         <Button style={{ marginLeft: '1rem' }} status="Primary">
           ویرایش

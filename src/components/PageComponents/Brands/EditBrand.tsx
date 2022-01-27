@@ -64,7 +64,7 @@ export const EditBrandPage: React.FC = () => {
       <Modal on={itemToRemove} toggle={closeRemovalModal}>
         <ModalBox>
           آیا از حذف برند {itemToRemove?.id} اطمینان دارید؟
-          <FlexContainer jc="space-between">
+          <FlexContainer jc="space-between" className="mt-3">
             <Button onClick={closeRemovalModal}>انصراف</Button>
             <Button onClick={() => remove(itemToRemove?.id)} status="Danger">
               حذف

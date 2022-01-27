@@ -1,37 +1,55 @@
-import { Button, Card, CardBody, CardHeader, Checkbox, InputGroup, Radio, Select } from '@paljs/ui';
-import Layout from 'Layouts';
-import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import styled from 'styled-components';
-import Cookies from 'js-cookie';
-import { toast } from 'react-toastify';
-import { createBlog } from 'utils';
-import { BasicEditor } from 'components';
+import { Button, Card, CardBody, CardHeader, Checkbox, InputGroup, Radio, Select } from '@paljs/ui'
+import Layout from 'Layouts'
+import React, { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import styled from 'styled-components'
+import Cookies from 'js-cookie'
+import { toast } from 'react-toastify'
+import { createBlog, search_in, uploadBlogImage } from 'utils'
+import { BasicEditor } from 'components'
+import router from 'next/router'
 
 export function CreateBlog() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, control } = useForm();
+  const { register, handleSubmit, control } = useForm()
 
   const onSubmit = async (form: any) => {
-    setLoading(true);
+    setLoading(true)
 
     // FIXME: temporary
-    delete form?.srcvideo;
-    delete form?.endimage;
-    form.value = 'value';
+    delete form?.srcvideo
 
-    const response = await createBlog(form, Cookies.get('token'));
-    if (response?.status === 'success') {
-      toast.success('وبلاگ با موفقیت ساخته شد');
+    const thumb = form?.thumb[0]
+    delete form?.thumb
+
+    const endImage = form?.endimage[0]
+    delete form?.endimage
+
+    const response = await createBlog(form, Cookies.get('token'))
+    if (response !== null) {
+      const {
+        data: { data },
+      } = await search_in('blog', { key: 'title', type: '=', value: form?.title }, router?.query)
+      const blogId = data[0]?.id
+      console.log('blogId', blogId)
+
+      const thumbUploadResponse = await uploadBlogImage(blogId, 'thumb', thumb)
+      if (thumbUploadResponse?.status === 'success') toast.success('تصویر بنر وبلاگ آپلود شد')
+
+      const endimageUploadResponse = await uploadBlogImage(blogId, 'endimage', endImage)
+      if (endimageUploadResponse?.status === 'success') toast.success('تصویر پایانی وبلاگ آپلود شد')
+
+      toast.success('وبلاگ با موفقیت ساخته شد')
     } else {
-      toast.error('ساخت وبلاگ موفقیت آمیز نبود');
+      toast.error('ساخت وبلاگ موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+
+    setLoading(false)
+  }
 
   return (
-    <Layout title="ساخت وبلاگ صفحه اصلی">
+    <Layout title="ساخت وبلاگ ">
       <Form onSubmit={handleSubmit(onSubmit)}>
         <h1>
           <span style={{ margin: '0 0 0 1rem' }}>ساخت وبلاگ</span>
@@ -85,7 +103,7 @@ export function CreateBlog() {
 
         <InputGroup className="col" fullWidth>
           <label>تصویر بنر</label>
-          <input {...register('thumb')} placeholder="تصویر بنر" />
+          <input type="file" {...register('thumb')} placeholder="تصویر بنر" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
@@ -207,12 +225,12 @@ export function CreateBlog() {
           <input {...register('trend')} placeholder="ترند" />
         </InputGroup>
 
-        <Button disabled={loading} style={{ width: '10rem', marginTop: '3rem' }} status="Success" appearance="outline">
+        <Button disabled={false} style={{ width: '10rem', marginTop: '3rem' }} status="Success" appearance="outline">
           {loading ? '...' : 'ساخت وبلاگ'}
         </Button>
       </Form>
     </Layout>
-  );
+  )
 }
 
 const Form = styled.form`
@@ -231,4 +249,4 @@ const Form = styled.form`
   label {
     margin-bottom: 1rem;
   }
-`;
+`

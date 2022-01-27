@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useStore, deleteBlog } from 'utils'
+import { useStore, deleteBlog, pluralRemove } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
-import { BasicTable, PaginationBar, SearchBar } from 'components'
+import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Add } from '@material-ui/icons'
@@ -38,6 +38,25 @@ export const BlogsPage = () => {
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([])
 
+  const [itemsToRemove, setItemsToRemove] = useState<any>(null)
+  const togglePluralRemoveModal = () => setItemsToRemove(null)
+
+  const pluralRemoveTrigger = async (selections: any[]) => {
+    await pluralRemove(
+      'blog',
+      selections,
+      deleteBlog,
+      (entity: string, id: any) => {
+        clearList(entity, id)
+        toast.success(`مورد با شناسه ${id} حذف شد`)
+      },
+      async () => {
+        setTableSelections([])
+        setItemsToRemove(null)
+      },
+    )
+  }
+
   const columns: any[] = ['شناسه وبلاگ', 'عنوان وبلاگ', 'فعالیت ها']
 
   const data = blog?.data?.data?.map((blog: any) => [
@@ -62,22 +81,29 @@ export const BlogsPage = () => {
   ])
 
   return (
-    <Layout title="بنر های صفحه اصلی">
+    <Layout title="وبلاگ ها">
       <h1>وبلاگ ها</h1>
 
-      <Link href="/blog/create">
-        <Button
-          style={{
-            margin: '1rem 0 1rem 1rem',
-            display: 'flex',
-          }}
-          status="Success"
-          appearance="outline"
-        >
-          افزودن وبلاگ
-          <Add />
-        </Button>
-      </Link>
+      <FlexContainer>
+        <Link href="/blog/create">
+          <Button
+            style={{
+              margin: '1rem 0 1rem 1rem',
+              display: 'flex',
+            }}
+            status="Success"
+            appearance="outline"
+          >
+            افزودن وبلاگ
+            <Add />
+          </Button>
+        </Link>
+        {tableSelections?.length > 0 && (
+          <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
+            حذف موارد انتخاب شده
+          </HeaderButton>
+        )}
+      </FlexContainer>
 
       <SearchBar
         fields={blog.fields}
@@ -108,6 +134,22 @@ export const BlogsPage = () => {
             </Button>
             <Button onClick={() => removeItem(itemToRemove)} disabled={loading} status="Danger">
               بله، حذف شود
+            </Button>
+          </ButtonGroup>
+        </ModalBox>
+      </Modal>
+
+      <Modal on={itemsToRemove} toggle={togglePluralRemoveModal}>
+        <ModalBox fluid>
+          آیا از حذف موارد
+          <span className="text-danger mx-1">{itemsToRemove?.join(' , ')}</span>
+          اطمینان دارید؟
+          <ButtonGroup>
+            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: '1rem' }}>
+              خیر، منصرم شدم
+            </Button>
+            <Button onClick={() => pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
+              بله، حذف شوند
             </Button>
           </ButtonGroup>
         </ModalBox>

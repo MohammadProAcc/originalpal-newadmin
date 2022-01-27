@@ -1,19 +1,38 @@
-import { useStore } from 'utils';
-import Layout from 'Layouts';
-import { Alert as _Alert, Card, CardBody, CardHeader } from '@paljs/ui';
-import Image from 'next/image';
-import styled from 'styled-components';
+import { deleteBlog, removeItem, toLocalDate, useStore } from 'utils'
+import Layout from 'Layouts'
+import { Alert as _Alert, Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
+import Image from 'next/image'
+import styled from 'styled-components'
+import React, { useState } from 'react'
+import router from 'next/router'
+import { FlexContainer, HeaderButton, ModalBox } from 'components'
 
 export const SingleBlogPage: React.FC = () => {
   const { blog } = useStore((state: any) => ({
     blog: state?.blog,
-  }));
+  }))
+
+  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const closeRemovalModal = () => setItemToRemove(false)
+
+  const remove = async (removeId: any) => {
+    await removeItem('blog', removeId, deleteBlog, () => router.push('/blog'), [
+      `وبلاگ ${removeId} با موفقیت حذف شد`,
+      'حذف وبلاگ موفقیت آمیز نبود',
+    ])
+  }
 
   return (
-    <Layout title={`${blog?.id}`}>
+    <Layout title={`مشاهده وبلاگ ${blog?.id}`}>
       <h1 style={{ marginBottom: '4rem' }}>
-        <span style={{ marginLeft: '1rem' }}>وبلاگ {blog?.id}</span>{' '}
-        {blog?.is_news && (
+        <span style={{ marginLeft: '1rem' }}>مشاهده وبلاگ {blog?.id}</span>{' '}
+        <HeaderButton status="Info" href={`/blog/edit/${blog.id}`}>
+          ویرایش
+        </HeaderButton>
+        <HeaderButton status="Danger" onClick={() => setItemToRemove(blog)}>
+          حذف
+        </HeaderButton>
+        {blog?.is_news ? (
           <Alert status="Info">
             <h2
               style={{
@@ -23,8 +42,27 @@ export const SingleBlogPage: React.FC = () => {
               اخبار
             </h2>
           </Alert>
+        ) : (
+          <></>
         )}
       </h1>
+
+      {/* ....:::::: Removal Modals :::::.... */}
+      <Modal on={itemToRemove} toggle={closeRemovalModal}>
+        <ModalBox>
+          <div style={{ marginBottom: '1rem' }}>
+            آیا از حذف برچسب
+            <span className="mx-1">{itemToRemove?.id}</span>
+            اطمینان دارید؟
+          </div>
+          <FlexContainer jc="space-between">
+            <Button onClick={closeRemovalModal}>انصراف</Button>
+            <Button onClick={() => remove(itemToRemove?.id)} status="Danger">
+              حذف
+            </Button>
+          </FlexContainer>
+        </ModalBox>
+      </Modal>
 
       <Card>
         <CardHeader>شناسه وبلاگ</CardHeader>
@@ -143,20 +181,20 @@ export const SingleBlogPage: React.FC = () => {
         <CardBody>
           <Card>
             <CardHeader>ساخته شده در</CardHeader>
-            <CardBody>{blog?.created_at}</CardBody>
+            <CardBody>{toLocalDate(blog?.created_at)}</CardBody>
           </Card>
           <Card>
             <CardHeader>بروز شده در</CardHeader>
-            <CardBody>{blog?.updated_at}</CardBody>
+            <CardBody>{toLocalDate(blog?.updated_at)}</CardBody>
           </Card>
         </CardBody>
       </Card>
     </Layout>
-  );
-};
+  )
+}
 
 const Alert = styled(_Alert)`
   width: 10rem;
   display: inline-flex;
   text-align: center;
-`;
+`
