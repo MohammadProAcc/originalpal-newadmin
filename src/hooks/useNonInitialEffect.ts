@@ -13,7 +13,7 @@ export const useNonInitialEffect = (effect: EffectCallback, deps?: DependencyLis
     if (initialRender.current) {
       initialRender.current = false
     } else {
-      effectReturns = effect()
+      effectReturns = effect() as any
     }
 
     if (effectReturns && typeof effectReturns === 'function') {
