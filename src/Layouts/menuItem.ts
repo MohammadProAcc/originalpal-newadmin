@@ -49,6 +49,15 @@ const items: MenuItemType[] = [
     title: 'منو',
     link: { href: '/menu' },
   },
+  {
+    title: 'ابزار',
+    children: [
+      {
+        title: 'منو ساز',
+        link: { target: 'blank', href: 'https://www.jqueryscript.net/demo/Drag-Drop-Menu-Builder-For-Bootstrap/' },
+      },
+    ],
+  },
   // {
   //   title: 'FEATURES',
   //   group: true,

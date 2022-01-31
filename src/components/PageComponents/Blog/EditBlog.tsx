@@ -1,4 +1,4 @@
-import { deleteBlog, editBlog, getSingleBlog, removeItem, useStore } from 'utils'
+import { deleteBlog, editBlog, getSingleBlog, removeItem, uploadBlogImage, useStore } from 'utils'
 import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, Checkbox, InputGroup, Modal } from '@paljs/ui'
 import { BasicEditor, Button, FlexContainer, HeaderButton, ModalBox } from 'components'
@@ -17,7 +17,7 @@ export const EditBlogPage: React.FC = () => {
 
   const reloadBlog = async () => {
     const reloadedBlog = await getSingleBlog(blog?.id)
-    reload('blog', reloadedBlog)
+    reload('blog', reloadedBlog?.data)
   }
 
   const [loading, setLoading] = useState(false)
@@ -35,7 +35,12 @@ export const EditBlogPage: React.FC = () => {
     setLoading(true)
 
     for (let key in form) {
-      if (dirtyFields[key]) delete form[key]
+      if (!dirtyFields[key]) delete form[key]
+    }
+
+    if (form?.length < 1) {
+      toast.info('ابتدا تغییرات را اعمال کنید')
+      return
     }
 
     const finalForm = {
@@ -52,6 +57,23 @@ export const EditBlogPage: React.FC = () => {
     setLoading(false)
   }
 
+  const updateBlogImage = async (form: any, source: 'endimage' | 'thumb') => {
+    setLoading(true)
+
+    const response = await editBlog(blog?.id, {
+      [source]: form,
+    })
+
+    if (response?.status === 'success') {
+      await reloadBlog()
+      toast.success('وبلاگ  بروز شد')
+    } else {
+      toast.error('بروزرسانی وبلاگ موفقیت آمیز نبود')
+    }
+
+    setLoading(false)
+  }
+
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
 
@@ -60,6 +82,18 @@ export const EditBlogPage: React.FC = () => {
       `وبلاگ ${removeId} با موفقیت حذف شد`,
       'حذف وبلاگ موفقیت آمیز نبود',
     ])
+  }
+
+  const replaceMedia = async (source: 'thumb' | 'endimage' | 'srcvideo', file: File) => {
+    setLoading(true)
+    const response = await uploadBlogImage(blog?.id, source, file)
+    if (response?.status === 'success') {
+      await reloadBlog()
+      toast.success('وبلاگ با موفقیت بروز شد')
+    } else {
+      toast.error('بروزرسانی وبلاگ موفقیت آمیز منبود')
+    }
+    setLoading(false)
   }
 
   return (
@@ -144,12 +178,6 @@ export const EditBlogPage: React.FC = () => {
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
-          <label>تصویر بنر ( برای جایگزینی تصویر، تصویر موردنظر خود را از طریق ورودی زیر بارگزاری کنید)</label>
-          <input type="file" {...register('thumb')} placeholder="تصویر پایانی" />
-          <MediaCard media={blog?.thumb} removalCallback={console.log} updateCallback={console.log} index={0} />
-        </InputGroup>
-
-        <InputGroup className="col" fullWidth>
           <label>خلاصه</label>
           <Controller
             control={control}
@@ -184,117 +212,157 @@ export const EditBlogPage: React.FC = () => {
             </InputGroup>
           </CardBody>
         </Card>
+        {/*
+                <InputGroup className="col" fullWidth>
+                    <label>is board</label>
+                    <Controller
+                        control={control}
+                        name="isboard"
+                        render={({ field }) => (
+                            <CheckBoxWrapper>
+                                <Checkbox checked={field?.value} {...field} />
+                            </CheckBoxWrapper>
+                        )}
+                    />
+                </InputGroup>
 
-        <Card>
-          <CardHeader>تصویر پایانی</CardHeader>
-          <CardBody>
-            <InputGroup className="col" fullWidth>
-              <label>تصویر پایانی ( برای جایگزینی تصویر، تصویر موردنظر خود را از طریق ورودی زیر بارگزاری کنید)</label>
-              <input type="file" {...register('endimage')} placeholder="تصویر پایانی" />
-              <MediaCard media={blog?.endimage} removalCallback={console.log} updateCallback={console.log} index={0} />
-            </InputGroup>
+                <InputGroup className="col" fullWidth>
+                    <label>is highlight</label>
+                    <Controller
+                        control={control}
+                        name="ishighlight"
+                        render={({ field }) => (
+                            <CheckBoxWrapper>
+                                <Checkbox checked={field?.value} {...field} />
+                            </CheckBoxWrapper>
+                        )}
+                    />
+                </InputGroup>
 
-            <InputGroup className="col" fullWidth>
-              <label>عنوان پایانی</label>
-              <input {...register('endtitle')} placeholder="عنوان پایانی" />
-            </InputGroup>
+                <InputGroup className="col" fullWidth>
+                    <label>is top</label>
+                    <Controller
+                        control={control}
+                        name="istop"
+                        render={({ field }) => (
+                            <CheckBoxWrapper>
+                                <Checkbox checked={field?.value} {...field} />
+                            </CheckBoxWrapper>
+                        )}
+                    />
+                </InputGroup>
 
-            <InputGroup className="col" fullWidth>
-              <label>تگ آلت تصویر پایانی</label>
-              <input {...register('endtitle')} placeholder="تگ آلت تصویر پایانی" />
-            </InputGroup>
+                <InputGroup className="col" fullWidth>
+                    <label>is cast</label>
+                    <Controller
+                        control={control}
+                        name="iscast"
+                        render={({ field }) => (
+                            <CheckBoxWrapper>
+                                <Checkbox checked={field?.value} {...field} />
+                            </CheckBoxWrapper>
+                        )}
+                    />
+                </InputGroup>
 
-            <InputGroup className="col" fullWidth>
-              <label>متن تصویر پایانی</label>
-              <input {...register('endtext')} placeholder="متن تصویر پایانی" />
-            </InputGroup>
-          </CardBody>
-        </Card>
+                <InputGroup className="col" fullWidth>
+                    <label>هدر ها</label>
+                    <input {...register('headers')} placeholder="هدر ها" />
+                </InputGroup>
 
-        <InputGroup className="col" fullWidth>
-          <label>is board</label>
-          <Controller
-            control={control}
-            name="isboard"
-            render={({ field }) => (
-              <CheckBoxWrapper>
-                <Checkbox checked={field?.value} {...field} />
-              </CheckBoxWrapper>
-            )}
-          />
-        </InputGroup>
+                <InputGroup className="col" fullWidth>
+                    <label>ترند</label>
+                    <input {...register('trend')} placeholder="ترند" />
+                </InputGroup>
 
-        <InputGroup className="col" fullWidth>
-          <label>is highlight</label>
-          <Controller
-            control={control}
-            name="ishighlight"
-            render={({ field }) => (
-              <CheckBoxWrapper>
-                <Checkbox checked={field?.value} {...field} />
-              </CheckBoxWrapper>
-            )}
-          />
-        </InputGroup>
-
-        <InputGroup className="col" fullWidth>
-          <label>is top</label>
-          <Controller
-            control={control}
-            name="istop"
-            render={({ field }) => (
-              <CheckBoxWrapper>
-                <Checkbox checked={field?.value} {...field} />
-              </CheckBoxWrapper>
-            )}
-          />
-        </InputGroup>
-
-        <InputGroup className="col" fullWidth>
-          <label>is cast</label>
-          <Controller
-            control={control}
-            name="iscast"
-            render={({ field }) => (
-              <CheckBoxWrapper>
-                <Checkbox checked={field?.value} {...field} />
-              </CheckBoxWrapper>
-            )}
-          />
-        </InputGroup>
-
-        <InputGroup className="col" fullWidth>
-          <label>ویدیو دارد؟</label>
-          <Controller
-            control={control}
-            name="isvideo"
-            render={({ field }) => (
-              <CheckBoxWrapper>
-                <Checkbox checked={field?.value} {...field} />
-              </CheckBoxWrapper>
-            )}
-          />
-        </InputGroup>
+                <InputGroup className="col" fullWidth>
+                    <label>ویدیو دارد؟</label>
+                    <Controller
+                        control={control}
+                        name="isvideo"
+                        render={({ field }) => (
+                            <CheckBoxWrapper>
+                                <Checkbox checked={field?.value} {...field} />
+                            </CheckBoxWrapper>
+                        )}
+                    />
+                </InputGroup>
+*/}
 
         <InputGroup className="col" fullWidth>
           <label>فایل ویدیویی</label>
-          <input type="file" {...register('srcvideo')} placeholder="فایل ویدیویی" />
+          <video controls src={`https://api.originalpal.co.uk/images/${JSON.parse(blog.srcvideo)?.u}`}></video>
+          <label>برای جایگزینی فایل ویدیویی، فایل خود را از طریق ورودی زیر بارگذاری کنید</label>
+          <input
+            type="file"
+            placeholder="فایل ویدیویی"
+            onChange={(e: any) => replaceMedia('srcvideo', e?.target?.files[0])}
+          />
         </InputGroup>
 
-        <InputGroup className="col" fullWidth>
-          <label>هدر ها</label>
-          <input {...register('headers')} placeholder="هدر ها" />
-        </InputGroup>
-
-        <InputGroup className="col" fullWidth>
-          <label>ترند</label>
-          <input {...register('trend')} placeholder="ترند" />
-        </InputGroup>
-
-        <Button disabled={loading} style={{ width: '10rem', marginTop: '3rem' }} status="Info" appearance="outline">
+        <Button disabled={loading} style={{ width: 'auto', margin: '3rem 0' }} status="Info" appearance="outline">
           {loading ? '...' : 'بروزرسانی وبلاگ'}
         </Button>
       </form>
+
+      <h3 className="mb-4">رسانه</h3>
+
+      <Card>
+        <CardHeader>تصویر پایانی</CardHeader>
+        <CardBody>
+          <InputGroup className="col" fullWidth>
+            <label>تصویر پایانی ( برای جایگزینی تصویر، تصویر موردنظر خود را از طریق ورودی زیر بارگزاری کنید)</label>
+            <input
+              type="file"
+              onChange={(e: any) => replaceMedia('endimage', e?.target?.files[0])}
+              placeholder="تصویر پایانی"
+            />
+            <MediaCard
+              media={JSON.parse(blog?.endimage)}
+              removalCallback={console.log}
+              updateCallback={(form: any) => updateBlogImage(form, 'endimage')}
+              index={0}
+            />
+          </InputGroup>
+
+          <InputGroup className="col" fullWidth>
+            <label>عنوان پایانی</label>
+            <input {...register('endtitle')} placeholder="عنوان پایانی" />
+          </InputGroup>
+
+          <InputGroup className="col" fullWidth>
+            <label>تگ آلت تصویر پایانی</label>
+            <input {...register('endtitle')} placeholder="تگ آلت تصویر پایانی" />
+          </InputGroup>
+
+          <InputGroup className="col" fullWidth>
+            <label>متن تصویر پایانی</label>
+            <input {...register('endtext')} placeholder="متن تصویر پایانی" />
+          </InputGroup>
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <label>تصویر بنر ( برای جایگزینی تصویر، تصویر موردنظر خود را از طریق ورودی زیر بارگزاری کنید)</label>
+        </CardHeader>
+        <CardBody>
+          <InputGroup className="col" fullWidth>
+            <input
+              type="file"
+              onChange={(e: any) => replaceMedia('thumb', e?.target?.files[0])}
+              placeholder="تصویر بنر"
+            />
+
+            <MediaCard
+              media={JSON.parse(blog?.thumb)}
+              removalCallback={console.log}
+              updateCallback={(form: any) => updateBlogImage(form, 'thumb')}
+              index={0}
+            />
+          </InputGroup>
+        </CardBody>
+      </Card>
     </Layout>
   )
 }

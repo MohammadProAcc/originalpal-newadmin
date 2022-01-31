@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useStore, deleteMenu, pluralRemove, editMenu } from 'utils'
 import Layout from 'Layouts'
@@ -63,9 +63,12 @@ export const MenuPage = () => {
   const [menuToEdit, setMenuToEdit] = useState<any>(null)
   const [editMenuState, setEditMenuState] = useState<any>(null)
 
+  useEffect(() => console.log(editMenuState), [editMenuState])
+
   const updateMenu = async (form: any) => {
     setLoading(true)
 
+    console.log(editMenuState)
     const response = await editMenu(menuToEdit?.id, { items: editMenuState })
 
     if (response?.status === 'success') {
@@ -86,17 +89,21 @@ export const MenuPage = () => {
     menu?.id,
     menu?.type,
     <Container>
-      <Link href={`/menu/${menu?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
-        </Button>
-      </Link>
+      {/*
+        <Link href={`/menu/${menu?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </Link>
+      */}
       <Button onClick={() => setMenuToEdit(menu)} style={{ marginLeft: '1rem' }} status="Primary">
         ویرایش
       </Button>
-      <Button status="Danger" onClick={() => setItemToRemove(menu)}>
-        حذف
-      </Button>
+      {/*
+        <Button status="Danger" onClick={() => setItemToRemove(menu)}>
+          حذف
+        </Button>
+      */}
     </Container>,
   ])
 
@@ -177,11 +184,7 @@ export const MenuPage = () => {
                   </p>
                 }
               >
-                <textarea
-                  {...register('items')}
-                  onChange={(e) => setEditMenuState(e.target.value)}
-                  placeholder="موارد"
-                />
+                <input {...register('items')} onChange={(e) => setEditMenuState(e.target.value)} placeholder="موارد" />
               </Popover>
             </InputGroup>
             <Button status="Info" type="submit">

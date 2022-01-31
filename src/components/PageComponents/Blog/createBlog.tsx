@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 import styled from 'styled-components'
 import Cookies from 'js-cookie'
 import { toast } from 'react-toastify'
-import { createBlog, search_in, uploadBlogImage } from 'utils'
+import { createBlog, editBlog, search_in, uploadBlogImage } from 'utils'
 import { BasicEditor } from 'components'
 import router from 'next/router'
 
@@ -18,6 +18,7 @@ export function CreateBlog() {
     setLoading(true)
 
     // FIXME: temporary
+    const srcvideo = form?.srcvideo
     delete form?.srcvideo
 
     const thumb = form?.thumb[0]
@@ -28,10 +29,8 @@ export function CreateBlog() {
 
     const response = await createBlog(form, Cookies.get('token'))
     if (response !== null) {
-      const {
-        data: { data },
-      } = await search_in('blog', { key: 'title', type: '=', value: form?.title }, router?.query)
-      const blogId = data[0]?.id
+      const { data: blogs } = await search_in('blog', { key: 'title', type: '=', value: form?.title }, router?.query)
+      const blogId = blogs?.data[blogs?.total - 1]?.id
       console.log('blogId', blogId)
 
       const thumbUploadResponse = await uploadBlogImage(blogId, 'thumb', thumb)
@@ -40,7 +39,11 @@ export function CreateBlog() {
       const endimageUploadResponse = await uploadBlogImage(blogId, 'endimage', endImage)
       if (endimageUploadResponse?.status === 'success') toast.success('تصویر پایانی وبلاگ آپلود شد')
 
+      const srcvideoUploadResponse = await uploadBlogImage(blogId, 'srcvideo', srcvideo)
+      if (srcvideoUploadResponse?.status === 'success') toast.success('ویدیو وبلاگ آپلود شد')
+
       toast.success('وبلاگ با موفقیت ساخته شد')
+      router.push(`/blog/edit/${blogId}`)
     } else {
       toast.error('ساخت وبلاگ موفقیت آمیز نبود')
     }
@@ -225,7 +228,7 @@ export function CreateBlog() {
           <input {...register('trend')} placeholder="ترند" />
         </InputGroup>
 
-        <Button disabled={false} style={{ width: '10rem', marginTop: '3rem' }} status="Success" appearance="outline">
+        <Button disabled={loading} style={{ width: '10rem', marginTop: '3rem' }} status="Success" appearance="outline">
           {loading ? '...' : 'ساخت وبلاگ'}
         </Button>
       </Form>
