@@ -4,9 +4,9 @@ import {
   deleteStock,
   editProduct,
   getSingleProduct,
-  removeItem,
-  search_in,
   toLocalDate,
+  search_in,
+  removeItem,
   useStore,
 } from 'utils'
 import Layout from 'Layouts'
@@ -20,6 +20,7 @@ import {
   Container,
   InputGroup,
   Modal,
+  Popover,
   Select as _Select,
 } from '@paljs/ui'
 import { BasicEditor, Button, FlexContainer, ModalBox, ProductImageCard, SearchBar, StockItem } from 'components'
@@ -35,6 +36,7 @@ import Dropzone from 'react-dropzone-uploader'
 import axios from 'axios'
 import { CreateStock } from '..'
 import { StockForm } from '../Stock/components'
+import { uploadProductImage } from 'utils/api/REST/actions/products/uploadProductImage'
 
 // TODO: add search brand mechanism
 
@@ -83,13 +85,22 @@ export const EditProductPage: React.FC = () => {
     delete form?.url
     delete form?.color
 
+    const tags = form?.tags
+    delete form?.tags
+
     const finalForm = {
       ...form,
     }
 
-    console.log('Final Submit Form >>>', finalForm)
+    console.log('Final Submit Form >>>', {
+      ...finalForm,
+      tags: tags?.split(' ').map((tagId: string) => Number(tagId)),
+    })
 
-    const response = await editProduct(product?.id, finalForm)
+    const response = await editProduct(product?.id, {
+      ...finalForm,
+      tags: tags?.split(' ').map((tagId: string) => Number(tagId)),
+    })
 
     if (response !== null) {
       await resetProduct()
@@ -107,6 +118,14 @@ export const EditProductPage: React.FC = () => {
     if (status === 'done') {
       const formData = new FormData()
       formData.append('media[]', file)
+      // const response = await uploadProductImage(product?.id, 'media', file)
+      // if (response !== null) {
+      //     getSingleProduct(product?.id).then((updatedProduct) => updateProduct(updatedProduct))
+      //     toast.success('تصویر با موفقیت آپلود شد')
+      // } else {
+      //     console.warn(response)
+      //     toast.error('بارگذاری فایل موفیت آمیز نبود')
+      // }
       axios
         .post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
           headers: {
@@ -114,10 +133,45 @@ export const EditProductPage: React.FC = () => {
           },
         })
         .then((response) => {
-          getSingleProduct(product?.id).then((updatedProduct) => updateProduct(updatedProduct))
+          getSingleProduct(product?.id).then((updatedProduct) => {
+            console.log(updatedProduct)
+            updateProduct(updatedProduct)
+          })
           toast.success('تصویر با موفقیت آپلود شد')
         })
         .catch((error) => console.warn(error?.response?.data))
+    }
+  }
+  const handleMainChangeStatus = ({ meta, file }: any, status: any) => {
+    console.log(file)
+    if (status === 'done') {
+      const formData = new FormData()
+      formData.append('site_main_picture', file)
+      // const response = await uploadProductImage(product?.id, 'media', file)
+      // if (response !== null) {
+      //     getSingleProduct(product?.id).then((updatedProduct) => updateProduct(updatedProduct))
+      //     toast.success('تصویر با موفقیت آپلود شد')
+      // } else {
+      //     console.warn(response)
+      //     toast.error('بارگذاری فایل موفیت آمیز نبود')
+      // }
+      axios
+        .post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('token')}`,
+          },
+        })
+        .then((response) => {
+          getSingleProduct(product?.id).then((updatedProduct) => {
+            toast.success('تصویر اصلی با موفقیت بارگذاری شد')
+            updateProduct(updatedProduct)
+          })
+          toast.success('تصویر با موفقیت آپلود شد')
+        })
+        .catch((error) => {
+          console.warn(error?.response?.data)
+          toast.error('بارکذاری تصویر اصلی موفیت آمیز نبود')
+        })
     }
   }
 
@@ -134,7 +188,13 @@ export const EditProductPage: React.FC = () => {
     }
   }
 
-  const [images, setImages] = useState<any>([product?.site_main_picture, ...product?.media])
+  const [images, setImages] = useState<any>(
+    product?.site_main_picture && product?.media?.length > 0
+      ? [product?.site_main_picture, ...product?.media]
+      : product?.site_main_picture
+      ? [product?.site_main_picture]
+      : [null, ...product?.media],
+  )
 
   const [showAddStockModal, setShowAddStockModal] = useState(false)
 
@@ -226,6 +286,21 @@ export const EditProductPage: React.FC = () => {
                   <Select options={brandsOptions} onChange={(e: any) => field.onChange(e?.value)} />
                 )}
               />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>برچسب ها : {product?.tags ?? '-'}</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <Popover
+                trigger="focus"
+                overlay="شناسه برچسب ها را با فاصله(space) وارد کنید. مثال: 1 12 9"
+                placement="top"
+              >
+                <input {...register('tags')} placeholder="برجسب ها" />
+              </Popover>
             </InputGroup>
           </CardBody>
         </Card>
@@ -449,6 +524,11 @@ export const EditProductPage: React.FC = () => {
             </span>
           </h3>
           <DropZoneWrapper>
+            <label>تصویر اصلی</label>
+            <Dropzone onChangeStatus={handleMainChangeStatus} accept="image/*,audio/*,video/*" inputContent="" />
+          </DropZoneWrapper>
+          <DropZoneWrapper>
+            <label>تصویر</label>
             <Dropzone onChangeStatus={handleChangeStatus} accept="image/*,audio/*,video/*" inputContent="" />
           </DropZoneWrapper>
         </CardHeader>
