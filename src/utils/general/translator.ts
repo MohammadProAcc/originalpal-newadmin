@@ -80,6 +80,8 @@ const dictionary = {
   size: 'سایز',
   width: 'عرض',
   product_id: 'شناسه محصول',
+  product: 'محصول',
+  banner: 'بنر',
   purchased: 'خریداری شده',
   phone: 'شماره تلفن',
   lastname: 'نام خانوادگی',

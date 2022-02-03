@@ -41,6 +41,13 @@ function initStore(preloadedState = initialState) {
             (state: any) =>
               void (state[entity].data.data = state[entity]?.data.data.filter((item: any) => item?.id !== itemId)),
           ),
+        clearMainPageSectionsList: (itemId: number) =>
+          set(
+            (state: any) =>
+              void (state.mainPageSections.data = state?.mainPageSections?.data.filter(
+                (item: any) => item?.id !== itemId,
+              )),
+          ),
         // --===>>> General <<<===--
         reload: (entity: string, value: any) =>
           set((state: any) => {

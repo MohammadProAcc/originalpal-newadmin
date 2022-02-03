@@ -291,7 +291,7 @@ export const EditBlogPage: React.FC = () => {
 
         <InputGroup className="col" fullWidth>
           <label>فایل ویدیویی</label>
-          <video controls src={`https://api.originalpal.co.uk/images/${JSON.parse(blog.srcvideo)?.u}`}></video>
+          <video controls src={`https://api.originalpal.co.uk/images/${blog.srcvideo?.u}`}></video>
           <label>برای جایگزینی فایل ویدیویی، فایل خود را از طریق ورودی زیر بارگذاری کنید</label>
           <input
             type="file"
@@ -318,7 +318,9 @@ export const EditBlogPage: React.FC = () => {
               placeholder="تصویر پایانی"
             />
             <MediaCard
-              media={JSON.parse(blog?.endimage)}
+              media={
+                typeof blog?.endimage === 'string' ? { a: null, t: null, p: null, u: blog?.endimage } : blog?.endimage
+              }
               removalCallback={console.log}
               updateCallback={(form: any) => updateBlogImage(form, 'endimage')}
               index={0}
@@ -355,7 +357,7 @@ export const EditBlogPage: React.FC = () => {
             />
 
             <MediaCard
-              media={JSON.parse(blog?.thumb)}
+              media={typeof blog?.thumb === 'string' ? { a: null, t: null, p: null, u: blog?.thumb } : blog?.thumb}
               removalCallback={console.log}
               updateCallback={(form: any) => updateBlogImage(form, 'thumb')}
               index={0}

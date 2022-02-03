@@ -26,12 +26,6 @@ export const SingleBlogPage: React.FC = () => {
     <Layout title={`مشاهده وبلاگ ${blog?.id}`}>
       <h1 style={{ marginBottom: '4rem' }}>
         <span style={{ marginLeft: '1rem' }}>مشاهده وبلاگ {blog?.id}</span>{' '}
-        <HeaderButton status="Info" href={`/blog/edit/${blog.id}`}>
-          ویرایش
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(blog)}>
-          حذف
-        </HeaderButton>
         {blog?.is_news ? (
           <Alert status="Info">
             <h2
@@ -45,6 +39,12 @@ export const SingleBlogPage: React.FC = () => {
         ) : (
           <></>
         )}
+        <HeaderButton status="Info" href={`/blog/edit/${blog.id}`}>
+          ویرایش
+        </HeaderButton>
+        <HeaderButton status="Danger" onClick={() => setItemToRemove(blog)}>
+          حذف
+        </HeaderButton>
       </h1>
 
       {/* ....:::::: Removal Modals :::::.... */}

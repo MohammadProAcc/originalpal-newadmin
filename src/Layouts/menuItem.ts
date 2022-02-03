@@ -6,6 +6,10 @@ const items: MenuItemType[] = [
     link: { href: '/dashboard' },
   },
   {
+    title: 'بخش های صفحه اصلی',
+    link: { href: '/main-page-sections' },
+  },
+  {
     title: 'بنر های اسلایدر صفحه اصلی',
     link: { href: '/main-page' },
   },

@@ -1,42 +1,42 @@
-import { Button } from '@paljs/ui/Button';
-import { InputGroup } from '@paljs/ui/Input';
-import Auth, { Group } from 'components/Auth';
-import Cookies from 'js-cookie';
-import Layout from 'Layouts';
-import Link from 'next/link';
-import router from 'next/router';
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import { initialLoginResponseUser } from 'types';
-import { login, useUserStore } from 'utils';
+import { Button } from '@paljs/ui/Button'
+import { InputGroup } from '@paljs/ui/Input'
+import Auth, { Group } from 'components/Auth'
+import Cookies from 'js-cookie'
+import Layout from 'Layouts'
+import Link from 'next/link'
+import router from 'next/router'
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import { initialLoginResponseUser } from 'types'
+import { login, useUserStore } from 'utils'
 
 export default function Login() {
   const { setUser } = useUserStore((state) => ({
     setUser: state?.setUser,
-  }));
+  }))
 
   // const onCheckbox = () => {
   // v will be true or false
   // };
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit } = useForm()
 
   const onFormSubmit = async (form: { username: string; password: string }) => {
-    setLoading(true);
-    const user = await login(form);
+    setLoading(true)
+    const user = await login(form)
     if (user !== null) {
-      Cookies.set('token', user.token);
-      setUser!(user ?? initialLoginResponseUser);
-      toast.success('خوش آمدید');
-      router.push('/');
+      Cookies.set('token', user.token)
+      setUser!(user ?? initialLoginResponseUser)
+      toast.success('خوش آمدید')
+      router.push('/dashboard')
     } else {
-      toast.error('ورود موفقیت آمیز نبود');
+      toast.error('ورود موفقیت آمیز نبود')
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   return (
     <Layout title="ورود">
@@ -69,5 +69,5 @@ export default function Login() {
         </p> */}
       </Auth>
     </Layout>
-  );
+  )
 }

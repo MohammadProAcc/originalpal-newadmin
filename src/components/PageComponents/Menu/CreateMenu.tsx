@@ -47,8 +47,8 @@ export function CreateMenu() {
             overlay={
               <p>
                 منوی ساخته شده توسط{' '}
-                <a href="https://www.jqueryscript.net/demo/Drag-Drop-Menu-Builder-For-Bootstrap/">ابزار منو ساز</a> را
-                در انی مورودی کپی منید
+                <a href="https://www.jqueryscript.net/demo/Drag-Drop-Menu-Builder-For-Bootstrap">ابزار منو ساز</a> را در
+                انی مورودی کپی منید
               </p>
             }
           >

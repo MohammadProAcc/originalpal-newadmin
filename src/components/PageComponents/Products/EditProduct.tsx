@@ -71,6 +71,7 @@ export const EditProductPage: React.FC = () => {
       title: product?.title,
       title_page: product?.title_page,
       trend: product?.trend,
+      tags: product?.tags,
     },
   })
 
