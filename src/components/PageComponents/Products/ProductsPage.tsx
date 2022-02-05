@@ -64,7 +64,7 @@ export const ProductsPage = () => {
     </span>,
     product?.name,
     product?.code,
-    product?.brand ?? '-',
+    product?.brand?.name ? product?.brand?.name : product?.brand ?? '-',
     product?.Enable,
     <Container>
       {/* <Link href={`/products/${product?.id}`}>
@@ -140,6 +140,7 @@ export const ProductsPage = () => {
       />
 
       <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+
       <PaginationBar
         totalPages={products?.data?.last_page}
         activePage={router.query.page ? Number(router.query.page) : 1}

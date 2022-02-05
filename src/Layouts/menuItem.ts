@@ -14,6 +14,10 @@ const items: MenuItemType[] = [
     link: { href: '/main-page' },
   },
   {
+    title: 'بنر ها',
+    link: { href: '/banners' },
+  },
+  {
     title: 'سفارشات',
     link: { href: '/orders' },
   },

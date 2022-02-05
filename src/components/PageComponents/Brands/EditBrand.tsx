@@ -119,15 +119,6 @@ export const EditBrandPage: React.FC = () => {
           </CardBody>
         </Card>
 
-        <Card>
-          <CardHeader>متن برچسب</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input {...register('tagtext')} />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
         <Button status="Info" type="submit" appearance="outline" disabled={loading}>
           بروزرسانی برند
         </Button>

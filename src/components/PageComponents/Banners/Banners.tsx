@@ -1,21 +1,24 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-
-import { useStore, deleteMainPageSection, numeralize, translator } from 'utils'
-import Layout from 'Layouts'
+import { Avatar } from '@material-ui/core'
+import { Add } from '@material-ui/icons'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
+import Layout from 'Layouts'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Add } from '@material-ui/icons'
+import React, { useState } from 'react'
 import { toast } from 'react-toastify'
+import styled from 'styled-components'
+import { pluralRemove, useStore } from 'utils'
+import { deleteBanner } from 'utils/api/REST/actions/banners'
 
-export const MainPageSectionPage = () => {
+export const Banners = () => {
   const router = useRouter()
 
-  const { mainPageSections, clearList } = useStore((state) => ({
-    mainPageSections: state?.mainPageSections,
-    clearList: state?.clearMainPageSectionsList,
+  const { banners, clearList } = useStore((state) => ({
+    banners: state?.banners,
+    cache: state?.cache,
+    setCache: state?.setCache,
+    clearList: state?.clearList,
   }))
 
   const [loading, setLoading] = useState(false)
@@ -26,74 +29,108 @@ export const MainPageSectionPage = () => {
   const [tableSelections, setTableSelections] = useState<number[] | []>([])
 
   const toggleModal = () => setItemToRemove(null)
+
   const togglePluralRemoveModal = () => setItemsToRemove(null)
 
   const removeItem = async (item: any) => {
     setLoading(true)
-    const response = await deleteMainPageSection(item?.id)
+    const response = await deleteBanner(item?.id)
     if (response?.status === 'success') {
-      clearList(item?.id)
+      clearList('banners', item?.id)
       setItemToRemove(null)
-      toast.success('بخش صفحه اصلی با موفقیت حذف شد')
+      toast.success('بنر با موفیت حذف شد')
     } else {
-      toast.error('حذف بخش صفحه اصلی موفقیت آمیز نبود')
+      toast.error('حذف محصول موفقیت آمیز نبود')
     }
     setLoading(false)
   }
 
   const pluralRemoveTrigger = async (selections: any[]) => {
-    setLoading(true)
-
-    if (selections?.length > 0) {
-      const deletions = selections?.map(async (id) => {
-        const response = await deleteMainPageSection(id)
-
-        if (response?.status === 'success') {
-          clearList('mainPageSections', id)
-
-          toast.success(`مورد با شناسه ${id} حذف شد`)
-        }
-      })
-
-      setTableSelections([])
-      setItemsToRemove(null)
-    }
-
-    setLoading(false)
+    await pluralRemove(
+      'banners',
+      selections,
+      deleteBanner,
+      (entity: string, id: any) => {
+        clearList(entity, id)
+        toast.success(`مورد با شناسه ${id} حذف شد`)
+      },
+      async () => {
+        setTableSelections([])
+        setItemsToRemove(null)
+      },
+    )
   }
 
-  const columns: any[] = ['شناسه بخش صفحه اصلی', 'نوع بخش', 'عنوان', 'اولویت', 'فعالیت']
+  const columns = [
+    'شناسه بنر',
+    'تصویر',
+    'عنوان بنر',
+    'رنگ عنوان بنر',
+    'توضیحات',
+    'رنگ توضیحات',
+    'وضعیت',
+    <p style={{ margin: 0, textAlign: 'center' }}>فعالیت ها</p>,
+  ]
 
-  console.log(mainPageSections)
-  const data = mainPageSections?.data?.map((mainPageSection: any) => [
-    // =====>> Table Columns <<=====
-    mainPageSection?.id,
-    translator(mainPageSection?.type),
-    mainPageSection?.title,
-    mainPageSection?.priority,
+  console.log('Banners >>', banners?.data?.data)
+
+  const data = banners?.data?.data?.map((banner: any) => [
+    banner?.id,
+    <Avatar src={`${process.env.SRC}/${banner?.media ? banner?.media[0]?.u : null}`} />,
+    banner?.title,
+    <div
+      style={{
+        backgroundColor: banner?.title_color,
+        color: '#212121',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        direction: 'ltr',
+        borderRadius: '0.5rem',
+        padding: '.5rem 1rem',
+      }}
+    >
+      {banner?.title_color}
+    </div>,
+    banner?.content,
+    <div
+      style={{
+        backgroundColor: banner?.content_color,
+        color: '#212121',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        direction: 'ltr',
+        borderRadius: '0.5rem',
+        padding: '.5rem 1rem',
+      }}
+    >
+      {banner?.content_color}
+    </div>,
+    banner?.active,
     <Container>
-      <Link href={`/main-page-sections/${mainPageSection?.id}`}>
+      <Link href={`/banners/${banner?.id}`}>
         <Button style={{ marginLeft: '1rem' }} status="Info">
           مشاهده
         </Button>
       </Link>
-      <Link href={`/main-page-sections/edit/${mainPageSection?.id}`}>
+      <Link href={`/banners/edit/${banner?.id}`}>
         <Button style={{ marginLeft: '1rem' }} status="Primary">
           ویرایش
         </Button>
       </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(mainPageSection)}>
+      <Button status="Danger" onClick={() => setItemToRemove(banner)}>
         حذف
       </Button>
     </Container>,
   ])
 
   return (
-    <Layout title="بخش صفحه اصلی">
-      <h1>بخش صفحه اصلی</h1>
+    <Layout title="بنر های">
+      <h1>بنر ها</h1>
 
       <FlexContainer>
-        <Link href="/main-page-sections/create">
+        <Link href="/banners/create">
           <Button
             style={{
               margin: '1rem 0 1rem 1rem',
@@ -102,7 +139,7 @@ export const MainPageSectionPage = () => {
             status="Success"
             appearance="outline"
           >
-            افزودن بخش صفحه اصلی
+            افزودن بنر
             <Add />
           </Button>
         </Link>
@@ -114,30 +151,28 @@ export const MainPageSectionPage = () => {
       </FlexContainer>
 
       <SearchBar
-        // fields={mainPageSections.fields}
-        fields={[]}
-        entity="mainPageSections"
+        fields={banners.fields}
+        entity="banners"
         params={router.query}
         callback={(form: any) =>
           router.push({
-            pathname: '/main-page-sections/search',
+            pathname: '/banners/search',
             query: form,
           })
         }
       />
 
       <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
-
       <PaginationBar
-        totalPages={mainPageSections?.data?.last_page}
+        totalPages={banners?.data?.last_page}
         activePage={router.query.page ? Number(router.query.page) : 1}
         router={router}
       />
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
-          آیا از حذف بخش صفحه اصلی <span className="text-danger">{`${itemToRemove?.id} `}</span> با عنوان{' '}
-          <span className="text-danger">{`${itemToRemove?.title} `}</span> اطمینان دارید؟
+          آیا از حذف بنر شماره <span className="text-danger">{itemToRemove?.id}</span> با عنوان{' '}
+          <span className="text-danger">{itemToRemove?.title}</span> اطمینان دارید؟
           <ButtonGroup>
             <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>
               خیر، منصرم شدم

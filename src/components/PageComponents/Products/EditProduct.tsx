@@ -1,14 +1,4 @@
-import {
-  admin,
-  deleteProductMedia,
-  deleteStock,
-  editProduct,
-  getSingleProduct,
-  toLocalDate,
-  search_in,
-  removeItem,
-  useStore,
-} from 'utils'
+import { deleteProductMedia, deleteStock, editProduct, getSingleProduct, toLocalDate, useStore } from 'utils'
 import Layout from 'Layouts'
 import {
   Accordion,
@@ -17,26 +7,22 @@ import {
   Card as _Card,
   CardBody as _CardBody,
   CardHeader as _CardHeader,
-  Container,
   InputGroup,
   Modal,
   Popover,
   Select as _Select,
 } from '@paljs/ui'
-import { BasicEditor, Button, FlexContainer, ModalBox, ProductImageCard, SearchBar, StockItem } from 'components'
+import { BasicEditor, Button, FlexContainer, ModalBox, ProductImageCard, StockItem } from 'components'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
-import { Media, Product, ProductBrand, SearchForm } from 'types'
+import { Media, ProductBrand } from 'types'
 import styled from 'styled-components'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/router'
-import Image from 'next/image'
-import { useLayoutEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Dropzone from 'react-dropzone-uploader'
 import axios from 'axios'
-import { CreateStock } from '..'
 import { StockForm } from '../Stock/components'
-import { uploadProductImage } from 'utils/api/REST/actions/products/uploadProductImage'
 
 // TODO: add search brand mechanism
 
@@ -44,11 +30,12 @@ export const EditProductPage: React.FC = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
-  const { product, updateProduct, brands, updateProductAfterMediaRemoval } = useStore((state: any) => ({
+  const { product, updateProduct, brands, updateProductAfterMediaRemoval, reload } = useStore((state: any) => ({
     product: state?.product,
     brands: state?.brands,
     updateProductAfterMediaRemoval: state?.updateProductAfterMediaRemoval,
     updateProduct: state?.updateProduct,
+    reload: state?.reload,
   }))
 
   const { register, handleSubmit, control } = useForm({
@@ -71,13 +58,13 @@ export const EditProductPage: React.FC = () => {
       title: product?.title,
       title_page: product?.title_page,
       trend: product?.trend,
-      tags: product?.tags,
+      tags: product?.tags?.map((tag: any) => tag?.id)?.join(' '),
     },
   })
 
   const resetProduct = async () => {
     const updatedProduct = await getSingleProduct(product?.id)
-    updateProduct(updatedProduct)
+    reload('product', updatedProduct)
   }
 
   const onSubmit = async (form: any) => {
@@ -92,11 +79,6 @@ export const EditProductPage: React.FC = () => {
     const finalForm = {
       ...form,
     }
-
-    console.log('Final Submit Form >>>', {
-      ...finalForm,
-      tags: tags?.split(' ').map((tagId: string) => Number(tagId)),
-    })
 
     const response = await editProduct(product?.id, {
       ...finalForm,
@@ -115,27 +97,18 @@ export const EditProductPage: React.FC = () => {
 
   // called every time a file's `status` changes
   const handleChangeStatus = ({ meta, file }: any, status: any) => {
-    console.log(file)
     if (status === 'done') {
       const formData = new FormData()
       formData.append('media[]', file)
-      // const response = await uploadProductImage(product?.id, 'media', file)
-      // if (response !== null) {
-      //     getSingleProduct(product?.id).then((updatedProduct) => updateProduct(updatedProduct))
-      //     toast.success('تصویر با موفقیت آپلود شد')
-      // } else {
-      //     console.warn(response)
-      //     toast.error('بارگذاری فایل موفیت آمیز نبود')
-      // }
+
       axios
         .post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
           headers: {
             Authorization: `Bearer ${Cookies.get('token')}`,
           },
         })
-        .then((response) => {
+        .then(() => {
           getSingleProduct(product?.id).then((updatedProduct) => {
-            console.log(updatedProduct)
             updateProduct(updatedProduct)
           })
           toast.success('تصویر با موفقیت آپلود شد')
@@ -144,28 +117,20 @@ export const EditProductPage: React.FC = () => {
     }
   }
   const handleMainChangeStatus = ({ meta, file }: any, status: any) => {
-    console.log(file)
     if (status === 'done') {
       const formData = new FormData()
       formData.append('site_main_picture', file)
-      // const response = await uploadProductImage(product?.id, 'media', file)
-      // if (response !== null) {
-      //     getSingleProduct(product?.id).then((updatedProduct) => updateProduct(updatedProduct))
-      //     toast.success('تصویر با موفقیت آپلود شد')
-      // } else {
-      //     console.warn(response)
-      //     toast.error('بارگذاری فایل موفیت آمیز نبود')
-      // }
+
       axios
         .post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
           headers: {
             Authorization: `Bearer ${Cookies.get('token')}`,
           },
         })
-        .then((response) => {
+        .then(() => {
           getSingleProduct(product?.id).then((updatedProduct) => {
-            toast.success('تصویر اصلی با موفقیت بارگذاری شد')
             updateProduct(updatedProduct)
+            toast.success('تصویر اصلی با موفقیت بارگذاری شد')
           })
           toast.success('تصویر با موفقیت آپلود شد')
         })
@@ -183,6 +148,7 @@ export const EditProductPage: React.FC = () => {
     if (response?.includes('operation done successfully')) {
       updateProductAfterMediaRemoval(media)
       setItemToRemove(null)
+      await resetProduct()
       toast.success('تصویر با موفقیت حذف شد')
     } else {
       toast.error('حذف تصویر موفیت آمیز نبود')
@@ -194,7 +160,7 @@ export const EditProductPage: React.FC = () => {
       ? [product?.site_main_picture, ...product?.media]
       : product?.site_main_picture
       ? [product?.site_main_picture]
-      : [null, ...product?.media],
+      : [null],
   )
 
   const [showAddStockModal, setShowAddStockModal] = useState(false)
@@ -205,7 +171,6 @@ export const EditProductPage: React.FC = () => {
   }))
 
   const afterStockCreation = async (response: any) => {
-    console.log(response)
     await resetProduct()
     setShowAddStockModal(false)
   }
@@ -292,7 +257,7 @@ export const EditProductPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>برچسب ها : {product?.tags ?? '-'}</CardHeader>
+          <CardHeader>برچسب ها : {product?.tags?.map((tag: any) => tag?.name)?.join('-') ?? '-'}</CardHeader>
           <CardBody>
             <InputGroup>
               <Popover

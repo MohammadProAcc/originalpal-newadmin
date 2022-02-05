@@ -4,7 +4,6 @@ import { FlexContainer } from 'components/Container/FlexContainer'
 import Layout from 'Layouts'
 import router from 'next/router'
 import { useState } from 'react'
-import styled, { css } from 'styled-components'
 import { deleteMainPageSection, removeItem, toLocalDate, useStore } from 'utils'
 
 export const SingleMainPageSectionPage: React.FC = () => {

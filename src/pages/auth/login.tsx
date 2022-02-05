@@ -51,10 +51,11 @@ export default function Login() {
           <Group>
             {/* <Checkbox checked onChange={onCheckbox}>
               Remember me
-            </Checkbox> */}
+            </Checkbox> 
             <Link href="/auth/request-password">
               <a>رمز عبور خود را فراموش کرده ام</a>
             </Link>
+            */}
           </Group>
           <Button status="Success" type="submit" disabled={loading} shape="SemiRound" fullWidth>
             {loading ? '...' : 'ورود'}

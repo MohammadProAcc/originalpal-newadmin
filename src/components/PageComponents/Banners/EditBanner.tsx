@@ -1,9 +1,11 @@
 import { Button, Checkbox, InputGroup, Modal, Select } from '@paljs/ui'
+import axios from 'axios'
 import { FlexContainer, HeaderButton, ModalBox } from 'components'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
+import Dropzone from 'react-dropzone-uploader'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
@@ -11,7 +13,7 @@ import { admin, removeItem, useStore } from 'utils'
 import { deleteBanner, uploadBannerImage } from 'utils/api/REST/actions/banners'
 import { updateBanner } from 'utils/api/REST/actions/banners/updateBanner'
 
-export function EditMainPage() {
+export function EditBanner() {
   const router = useRouter()
 
   const { banner } = useStore((state: any) => ({
@@ -50,7 +52,7 @@ export function EditMainPage() {
   const closeRemovalModal = () => setItemToRemove(false)
 
   const remove = async (removeId: any) => {
-    await removeItem('banners', removeId, deleteBanner, () => router.push('/main-page'), [
+    await removeItem('banners', removeId, deleteBanner, () => router.push('/banners'), [
       `بنر ${removeId} با موفقیت حذف شد`,
       'حذف بنر موفقیت آمیز نبود',
     ])
@@ -84,7 +86,7 @@ export function EditMainPage() {
       ...form,
       platform: platform?.value,
       active,
-      type: 'slide',
+      type: 'stand',
     }
 
     const updatBannerResponse = await updateBanner(
@@ -108,11 +110,11 @@ export function EditMainPage() {
   }
 
   return (
-    <Layout title="ساخت بنر صفحه اصلی">
+    <Layout title="ویرایش بنر">
       <h1>
-        بروزرسانی بنر صفحه اصلی (شناسه: {banner?.id})
+        بروزرسانی بنر (شناسه: {banner?.id})
         <FlexContainer style={{ display: 'inline-flex' }}>
-          <HeaderButton status="Info" href={`/main-page/${banner?.id}`}>
+          <HeaderButton status="Info" href={`/banners/${banner?.id}`}>
             مشاهده
           </HeaderButton>
 
@@ -176,34 +178,35 @@ export function EditMainPage() {
           <Checkbox checked={active} onChange={(e: any) => setActive(e)} />
         </InputGroup>
 
-        <InputGroup className="d-flex align-items-center">
-          <img
-            style={{ width: '12rem', height: '12rem' }}
-            src={`https://api.originalpal.co.uk/images/${banner?.media?.u}`}
-          />
+        <InputGroup className="col m-4">
+          <label>تصویر بنر</label>
+          <InputGroup>
+            {/* <DropZoneWrapper>
+              <Dropzone
+                onChangeStatus={handleChangeStatus}
+                accept="image/*,audio/*,video/*"
+                inputContent=""
+              />
+            </DropZoneWrapper> */}
+            <input type="file" {...register('image')} />
+          </InputGroup>
 
-          <InputGroup className="col m-4">
-            <InputGroup>
-              <label style={{ minWidth: '6rem' }}>تصویر بنر</label>
-              <input type="file" {...register('image')} />
-            </InputGroup>
+          <InputGroup>
+            <label style={{ width: '6rem' }}>تگ آلت تصویر</label>
+            <input {...register('media.a')} placeholder="a" />
+          </InputGroup>
 
-            <InputGroup>
-              <label style={{ width: '6rem' }}>تگ آلت تصویر</label>
-              <input {...register('media.a')} placeholder="a" />
-            </InputGroup>
+          <InputGroup>
+            <label style={{ width: '6rem' }}>تگ تایتل تصویر</label>
+            <input {...register('media.t')} placeholder="t" />
+          </InputGroup>
 
-            <InputGroup>
-              <label style={{ width: '6rem' }}>تگ تایتل تصویر</label>
-              <input {...register('media.t')} placeholder="t" />
-            </InputGroup>
-
-            <InputGroup>
-              <label style={{ width: '6rem' }}>اولویت تصویر</label>
-              <input {...register('media.p')} type="number" placeholder="p" />
-            </InputGroup>
+          <InputGroup>
+            <label style={{ width: '6rem' }}>اولویت تصویر</label>
+            <input {...register('media.p')} type="number" placeholder="p" />
           </InputGroup>
         </InputGroup>
+
         <InputGroup status="Success">
           <Button disabled={loading} status="Info" appearance="outline" className="mt-5" type="submit">
             {loading ? '...' : 'بروزرسانی بنر'}

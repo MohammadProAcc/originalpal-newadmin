@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { deleteBanner } from 'utils/api/REST/actions/banners'
 import router from 'next/router'
 
-export const MainPage: React.FC = () => {
+export const Banner: React.FC = () => {
   const { banner } = useStore((state: any) => ({
     banner: state?.banner,
   }))
@@ -20,7 +20,7 @@ export const MainPage: React.FC = () => {
   const closeRemovalModal = () => setItemToRemove(false)
 
   const remove = async (removeId: any) => {
-    await removeItem('banners', removeId, deleteBanner, () => router.push('/main-page'), [
+    await removeItem('banners', removeId, deleteBanner, () => router.push('/banners'), [
       `بنر ${removeId} با موفقیت حذف شد`,
       'حذف بنر موفقیت آمیز نبود',
     ])
@@ -30,7 +30,7 @@ export const MainPage: React.FC = () => {
     <Layout title="بنر صفحه اصلی">
       <h1 style={{ marginBottom: '3rem' }}>
         مشاهده بنر شماره {banner?.id ?? '?'}
-        <HeaderButton status="Info" href={`/main-page/edit/${banner?.id}`}>
+        <HeaderButton status="Info" href={`/banners/edit/${banner?.id}`}>
           ویرایش
         </HeaderButton>
         <HeaderButton status="Danger" onClick={() => setItemToRemove(banner)}>

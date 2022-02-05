@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import Cookies from 'js-cookie'
 import { toast } from 'react-toastify'
 import { createTag } from 'utils'
+import router from 'next/router'
 
 export function CreateTag() {
   const [loading, setLoading] = useState(false)
@@ -18,6 +19,7 @@ export function CreateTag() {
     if (response?.status === 'success') {
       toast.success('برچسب با موفقیت ساخته شد')
       reset()
+      router.push('/tags')
     } else {
       toast.error('ساخت برچسب موفقیت آمیز نبود')
     }
@@ -57,11 +59,6 @@ export function CreateTag() {
         <InputGroup className="col mt-4">
           <label>عنوان صفحه</label>
           <input {...register('title_page', { required: true })} placeholder="عنوان صفحه" />
-        </InputGroup>
-
-        <InputGroup className="col mt-4">
-          <label>متن برچسب</label>
-          <input {...register('tagText', { required: true })} placeholder="متن برچسب" />
         </InputGroup>
 
         <Button disabled={loading} style={{ width: '10rem', marginTop: '3rem' }} status="Success" appearance="outline">

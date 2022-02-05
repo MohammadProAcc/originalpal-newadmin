@@ -19,7 +19,7 @@ export function CreateBrand() {
     if (response?.status === 'success') {
       reset()
 
-      toast.success('بنر با موفقیت ساخته شد')
+      toast.success('برند با موفقیت ساخته شد')
 
       router.push('/brands')
     } else {
@@ -29,7 +29,7 @@ export function CreateBrand() {
   }
 
   return (
-    <Layout title="ساخت بنر صفحه اصلی">
+    <Layout title="ساخت برند صفحه اصلی">
       <Form onSubmit={handleSubmit(onSubmit)}>
         <h1>ساخت برند</h1>
 
@@ -56,11 +56,6 @@ export function CreateBrand() {
         <InputGroup className="col mt-4">
           <label>عنوان صفحه</label>
           <input {...register('title_page', { required: true })} placeholder="عنوان صفحه" />
-        </InputGroup>
-
-        <InputGroup className="col mt-4">
-          <label>متن برچسب</label>
-          <input {...register('tagText', { required: true })} placeholder="متن برچسب" />
         </InputGroup>
 
         <Button disabled={loading} style={{ width: '10rem', marginTop: '3rem' }} status="Success" appearance="outline">

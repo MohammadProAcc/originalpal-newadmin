@@ -9,7 +9,7 @@ import styled from 'styled-components'
 import { admin, search_in } from 'utils'
 import { createBanner, uploadBannerImage } from 'utils/api/REST/actions/banners'
 
-export function CreateMainPage() {
+export function CreateBanner() {
   const platformOptions = [
     { label: 'دسکتاپ', value: 'desktop' },
     { label: 'موبایل', value: 'mobile' },
@@ -25,22 +25,18 @@ export function CreateMainPage() {
 
     const finalForm = {
       ...form,
-      type: 'slide',
+      type: 'stand',
     }
     delete finalForm?.image
 
-    console.log(finalForm)
-
     try {
-      await createBanner(finalForm, Cookies.get('token'))
+      const bannerCreationResponse = await createBanner(finalForm, Cookies.get('token'))
+      console.log('banner creation response', bannerCreationResponse)
       const result = await search_in('banners', { key: 'content', type: '=', value: form?.content }, router?.query)
-      const bannerId = result?.data?.data[result?.data?.total - 1]?.id
+      const bannerId = result?.data?.data[0]?.id
 
       const formData = new FormData()
       formData.append('image', form?.image[0])
-      formData.append('a', form?.media?.a)
-      formData.append('t', form?.media?.t)
-      formData.append('p', form?.media?.p)
 
       const uploadResponse = await uploadBannerImage(bannerId, formData)
       console.log('Upload Response >>>', uploadResponse)
@@ -52,7 +48,7 @@ export function CreateMainPage() {
 
       toast.success('بنر با موفقیت ساخته شد')
 
-      router.push('/main-page')
+      router.push('/banners')
     } catch (err) {
       toast.error('بنر با موفقیت ساخته شد')
     }
@@ -61,9 +57,9 @@ export function CreateMainPage() {
   }
 
   return (
-    <Layout title="ساخت بنر صفحه اصلی">
+    <Layout title="ساخت بنر">
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <h1>ساخت بنر صفحه اصلی</h1>
+        <h1>ساخت بنر</h1>
 
         <InputGroup className="col">
           <label>عنوان</label>
@@ -132,9 +128,9 @@ export function CreateMainPage() {
         </InputGroup>
 
         <InputGroup className="col m-4">
+          <label>تصویر بنر</label>
           <InputGroup style={{ marginBottom: '1rem' }}>
-            <label>تصویر بنر</label>
-            <input type="file" {...register('image', { required: true })} />
+            <input type="file" {...register('image')} />
           </InputGroup>
 
           <label style={{ width: '100%' }}>تگ alt تصویر</label>

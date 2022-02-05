@@ -10,8 +10,8 @@ export const removeItem = async (
   const response = await removeCallback(removeId)
   if (response?.status === 'success') {
     clearCallback && (await clearCallback(entity, removeId))
-    await toast.success(toastMessege[0])
+    toast.success(toastMessege[0])
   } else {
-    await toast.error(toastMessege[1])
+    toast.error(toastMessege[1])
   }
 }

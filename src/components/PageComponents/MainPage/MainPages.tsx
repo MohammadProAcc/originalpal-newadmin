@@ -9,7 +9,7 @@ import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { pluralRemove, useStore } from 'utils'
-import { delete_banner } from 'utils/api/REST/actions/banners'
+import { deleteBanner } from 'utils/api/REST/actions/banners'
 
 export const MainPages = () => {
   const router = useRouter()
@@ -34,7 +34,7 @@ export const MainPages = () => {
 
   const removeItem = async (item: any) => {
     setLoading(true)
-    const response = await delete_banner(item?.id)
+    const response = await deleteBanner(item?.id)
     if (response?.status === 'success') {
       clearList('mainPageBanners', item?.id)
       setItemToRemove(null)
@@ -49,7 +49,7 @@ export const MainPages = () => {
     await pluralRemove(
       'mainPageBanners',
       selections,
-      delete_banner,
+      deleteBanner,
       (entity: string, id: any) => {
         clearList(entity, id)
         toast.success(`مورد با شناسه ${id} حذف شد`)

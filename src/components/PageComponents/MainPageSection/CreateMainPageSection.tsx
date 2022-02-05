@@ -1,8 +1,8 @@
 import { Button, Checkbox, InputGroup as _InputGroup, Popover, Select as _Select } from '@paljs/ui'
 import Layout from 'Layouts'
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import Cookies from 'js-cookie'
 import { toast } from 'react-toastify'
 import { createMainPageSection, translator } from 'utils'
@@ -19,6 +19,39 @@ export function CreateMainPageSection() {
 
   const [selectedType, setSelectedType] = useState<any>(null)
 
+  const [insertedLinks, setInsertedLinks] = useState<any>([])
+
+  useEffect(() => {
+    linkTitleRef.current.value = ''
+    linkLinkRef.current.value = ''
+  }, [insertedLinks])
+
+  const linkTitleRef = useRef<any>(null)
+  const linkLinkRef = useRef<any>(null)
+
+  const addLink = () => {
+    setInsertedLinks((current: any) =>
+      current?.length > 0
+        ? [
+            ...current,
+            {
+              title: linkTitleRef?.current?.value,
+              link: linkLinkRef?.current?.value,
+            },
+          ]
+        : [
+            {
+              title: linkTitleRef?.current?.value,
+              link: linkLinkRef?.current?.value,
+            },
+          ],
+    )
+  }
+
+  const removeLink = (linkTitle: string) => {
+    setInsertedLinks((current: any) => current?.filter((item: any) => item?.title !== linkTitle))
+  }
+
   const { register, handleSubmit, control, reset } = useForm()
 
   const onSubmit = async (form: any) => {
@@ -29,6 +62,7 @@ export function CreateMainPageSection() {
       tags: form?.tags?.split(' '),
       brands: form?.brands?.split(' '),
       banners: form?.banners?.split(' '),
+      links: insertedLinks,
     }
 
     console.log('final', final)
@@ -125,6 +159,37 @@ export function CreateMainPageSection() {
         ) : (
           <>
             <H3>جزییات بخش لینک</H3>
+
+            <InputGroup col>
+              <label>لینک ها</label>
+
+              <input placeholder="عنوان لینک" ref={linkTitleRef} style={{ marginBottom: '0.5rem' }} />
+
+              <input ref={linkLinkRef} placeholder="مسیر لینک" />
+
+              <AddLinkButton
+                onClick={() => {
+                  console.log('clicked')
+                  addLink()
+                }}
+              >
+                افزودن لینک
+              </AddLinkButton>
+
+              <LinksContainer>
+                {insertedLinks?.length > 0 ? (
+                  <>
+                    {insertedLinks?.map((link: any) => (
+                      <LinkEx title={link?.link} onClick={() => removeLink(link?.title)}>
+                        {link?.title}
+                      </LinkEx>
+                    ))}
+                  </>
+                ) : (
+                  <strong>لینکی وارد نکرده اید</strong>
+                )}
+              </LinksContainer>
+            </InputGroup>
           </>
         )}
 
@@ -146,8 +211,17 @@ const Form = styled.form`
   }
 `
 
-const InputGroup = styled(_InputGroup)`
+interface IInputGroupProps {
+  col?: boolean
+}
+const InputGroup = styled(_InputGroup)<IInputGroupProps>`
   margin: 0 0 1rem 0;
+  ${(p) =>
+    p?.col &&
+    css`
+      display: flex;
+      flex-direction: column;
+    `}
 `
 
 const Select = styled(_Select)`
@@ -156,4 +230,43 @@ const Select = styled(_Select)`
 
 const H3 = styled.h3`
   margin: 0 0 2rem 0;
+`
+
+const LinksContainer = styled.div`
+  display: flex;
+`
+
+const AddLinkButton = styled.a`
+  max-width: 10rem;
+
+  padding: 0.5rem;
+  border: 1px solid #00d68f;
+  border-radius: 0.5rem;
+  margin: 0.75rem 0;
+
+  display: flex;
+  justify-content: center;
+
+  &:hover {
+    cursor: pointer;
+    background-color: rgba(0, 214, 143, 0.5);
+  }
+`
+
+const LinkEx = styled.a`
+  max-width: 10rem;
+
+  padding: 0.5rem;
+  border: 1px solid #222b45;
+  border-radius: 0.5rem;
+  margin: 0.75rem 0.25rem;
+
+  display: flex;
+  justify-content: center;
+
+  &:hover {
+    cursor: pointer;
+    background-color: rgba(255, 0, 0, 0.25);
+    border-color: transparent;
+  }
 `

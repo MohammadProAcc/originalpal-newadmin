@@ -12,6 +12,8 @@ import {
   add_stock_option,
   admin,
   deleteOrder,
+  editOrderAddress,
+  getSingleOrder,
   numeralize,
   removeItem,
   removeOrderItem,
@@ -31,11 +33,19 @@ const statusOptions = [
 export const EditSingleOrderPage: React.FC = () => {
   const router = useRouter()
 
-  const { order, stocks, clearOrderItems } = useStore((state: any) => ({
+  const { order, stocks, clearOrderItems, reload } = useStore((state: any) => ({
     order: state?.order,
     stocks: state?.stocks,
     clearOrderItems: state?.clearOrderItems,
+    reload: state?.reload,
   }))
+
+  const reloadOrder = async () => {
+    const { data: updatedOrder } = await getSingleOrder(order?.id)
+    reload('order', updatedOrder)
+  }
+
+  console.log(order)
 
   const [stockOptions, setStockOptions] = useState(
     stocks?.map((stock: any) => ({
@@ -90,6 +100,22 @@ export const EditSingleOrderPage: React.FC = () => {
       coupon_id: order?.coupon_id,
     },
   })
+
+  const { register: addressRegister, handleSubmit: addressHandleSubmit } = useForm({
+    defaultValues: {
+      ...order?.address,
+    },
+  })
+
+  const addressOnSubmit = async (form: any) => {
+    const response = await editOrderAddress(order?.id, order?.address?.id, form)
+    console.log(response)
+    if (response?.status === 'success') {
+      toast.success('آدرس با موفقیت بروز شد')
+    } else {
+      toast.error('بروزرسانی آدرس موفقیت آمیز نبود')
+    }
+  }
 
   const onSubmit = async (form: any) => {
     setLoading(true)
@@ -228,10 +254,43 @@ export const EditSingleOrderPage: React.FC = () => {
           )}
         />
 
-        <Button style={{ margin: '1rem 0' }} status="Warning" appearance="outline">
+        <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline">
           اعمال تغییرات
         </Button>
       </form>
+
+      <hr />
+
+      <AddressForm onSubmit={addressHandleSubmit(addressOnSubmit)}>
+        <Card>
+          <CardHeader>ویرایش آدرس</CardHeader>
+          <CardBody>
+            <AddressInputGroup>
+              <label>استان</label>
+              <input {...addressRegister('province')} />
+            </AddressInputGroup>
+
+            <AddressInputGroup>
+              <label>شهر</label>
+              <input {...addressRegister('city')} />
+            </AddressInputGroup>
+
+            <AddressInputGroup>
+              <label>آدرس</label>
+              <textarea {...addressRegister('address')} />
+            </AddressInputGroup>
+
+            <AddressInputGroup>
+              <label>کد پستی</label>
+              <input {...addressRegister('postalcode')} />
+            </AddressInputGroup>
+          </CardBody>
+        </Card>
+
+        <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline">
+          اعمال تغییرات آدرس
+        </Button>
+      </AddressForm>
 
       <hr />
 
@@ -471,4 +530,22 @@ const Form = styled.form<IFormProps>`
       flex-direction: column;
       align-items: flex-start;
     `}
+`
+
+const AddressForm = styled.form`
+  label {
+    min-width: 5rem;
+  }
+`
+
+const AddressInputGroup = styled(InputGroup)`
+  margin-bottom: 1rem;
+
+  input {
+    width: 100%;
+  }
+
+  textarea {
+    width: 100%;
+  }
 `

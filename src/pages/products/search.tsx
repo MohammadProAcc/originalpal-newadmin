@@ -8,6 +8,7 @@ export default PageName
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context?.req?.cookies?.token) {
     const { data: result } = await search_in('products', context.query, context.query, context.req.cookies.token)
+    console.log(search_in)
 
     return {
       props: {
