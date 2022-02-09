@@ -23,6 +23,7 @@ import React, { useState } from 'react'
 import Dropzone from 'react-dropzone-uploader'
 import axios from 'axios'
 import { StockForm } from '../Stock/components'
+import { useNonInitialEffect } from 'hooks'
 
 // TODO: add search brand mechanism
 
@@ -37,6 +38,73 @@ export const EditProductPage: React.FC = () => {
     updateProduct: state?.updateProduct,
     reload: state?.reload,
   }))
+
+  const [images, setImages] = useState<any>(
+    product?.site_main_picture && product?.media?.length > 0
+      ? [product?.site_main_picture, ...product?.media]
+      : product?.site_main_picture
+      ? [product?.site_main_picture]
+      : [null],
+  )
+
+  useNonInitialEffect(
+    () =>
+      setImages(
+        product?.site_main_picture && product?.media?.length > 0
+          ? [product?.site_main_picture, ...product?.media]
+          : product?.site_main_picture
+          ? [product?.site_main_picture]
+          : [null],
+      ),
+    product,
+  )
+
+  const [showAddStockModal, setShowAddStockModal] = useState(false)
+
+  const brandsOptions = brands?.data?.map((brand: ProductBrand) => ({
+    label: brand?.name,
+    value: brand?.id,
+  }))
+
+  const afterStockCreation = async (response: any) => {
+    await resetProduct()
+    setShowAddStockModal(false)
+  }
+
+  const activationOptions = [
+    { label: 'فعال', value: '1' },
+    { label: 'غیرفعال', value: '0' },
+  ]
+
+  const onesizeOptions = [
+    { label: 'تک سایز', value: '1' },
+    { label: 'غیر تک سایز', value: '0' },
+  ]
+
+  const typeOptions = [
+    { label: 'جدید', value: 'new' },
+    { label: 'دوباره موجود شده در انبار', value: 'restock' },
+    { label: 'بزودی', value: 'comingsoon' },
+  ]
+
+  const categoryOptions = [{ label: 'کفش', value: 'shoe' }]
+
+  const [stockToRemove, setStockToRemove] = useState<any>(null)
+
+  const removeStock = async (stockId: number) => {
+    setLoading(true)
+
+    const response = await deleteStock(stockId)
+    if (response !== null) {
+      await resetProduct()
+      setStockToRemove(null)
+      toast.success('انبار با موفقیت حذف شد')
+    } else {
+      toast.success('حذف انبار موفقیت آمیز نبود')
+    }
+
+    setLoading(true)
+  }
 
   const { register, handleSubmit, control } = useForm({
     defaultValues: {
@@ -155,59 +223,17 @@ export const EditProductPage: React.FC = () => {
     }
   }
 
-  const [images, setImages] = useState<any>(
-    product?.site_main_picture && product?.media?.length > 0
-      ? [product?.site_main_picture, ...product?.media]
-      : product?.site_main_picture
-      ? [product?.site_main_picture]
-      : [null],
-  )
+  const [removeAllImageModal, setRemoveAllImagesModal] = useState(false)
 
-  const [showAddStockModal, setShowAddStockModal] = useState(false)
-
-  const brandsOptions = brands?.data?.map((brand: ProductBrand) => ({
-    label: brand?.name,
-    value: brand?.id,
-  }))
-
-  const afterStockCreation = async (response: any) => {
-    await resetProduct()
-    setShowAddStockModal(false)
-  }
-
-  const activationOptions = [
-    { label: 'فعال', value: '1' },
-    { label: 'غیرفعال', value: '0' },
-  ]
-
-  const onesizeOptions = [
-    { label: 'تک سایز', value: '1' },
-    { label: 'غیر تک سایز', value: '0' },
-  ]
-
-  const typeOptions = [
-    { label: 'جدید', value: 'new' },
-    { label: 'دوباره موجود شده در انبار', value: 'restock' },
-    { label: 'بزودی', value: 'comingsoon' },
-  ]
-
-  const categoryOptions = [{ label: 'کفش', value: 'shoe' }]
-
-  const [stockToRemove, setStockToRemove] = useState<any>(null)
-
-  const removeStock = async (stockId: number) => {
+  const removeAllImages = async () => {
     setLoading(true)
 
-    const response = await deleteStock(stockId)
-    if (response !== null) {
-      await resetProduct()
-      setStockToRemove(null)
-      toast.success('انبار با موفقیت حذف شد')
-    } else {
-      toast.success('حذف انبار موفقیت آمیز نبود')
+    for (let i = 0; i < images?.length; i++) {
+      await removeProductMedia(images[i])
     }
 
-    setLoading(true)
+    setRemoveAllImagesModal(false)
+    setLoading(false)
   }
 
   return (
@@ -488,6 +514,16 @@ export const EditProductPage: React.FC = () => {
             <span style={{ fontSize: '1rem' }}>
               ( برای اضافه کردن تصویر, از طریق ورودی زیر عکس مورد نظر را بارگذاری کنید )
             </span>
+            {images?.length > 0 && (
+              <Button
+                status="Danger"
+                appearance="outline"
+                style={{ display: 'inline-block', marginRight: '0.5rem' }}
+                onClick={() => setRemoveAllImagesModal(true)}
+              >
+                حذف تمام تصاویر
+              </Button>
+            )}
           </h3>
           <DropZoneWrapper>
             <label>تصویر اصلی</label>
@@ -579,6 +615,18 @@ export const EditProductPage: React.FC = () => {
             <Button onClick={() => setStockToRemove(null)}>انصراف</Button>
             <Button status="Danger" onClick={() => removeStock(stockToRemove?.id)}>
               حذف
+            </Button>
+          </FlexContainer>
+        </ModalBox>
+      </Modal>
+
+      <Modal on={removeAllImageModal} toggle={() => setRemoveAllImagesModal(false)}>
+        <ModalBox>
+          آیا از حذف تمامی تصاویر محصول اطمینان دارید ؟
+          <FlexContainer className="mt-3 flex justify-content-between">
+            <Button onClick={() => setRemoveAllImagesModal(false)}>انصراف</Button>
+            <Button status="Danger" onClick={removeAllImages}>
+              بله، همگی حذف شوند
             </Button>
           </FlexContainer>
         </ModalBox>

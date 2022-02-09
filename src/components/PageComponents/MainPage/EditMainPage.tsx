@@ -173,7 +173,7 @@ export function EditMainPage() {
 
         <InputGroup className="mt-4">
           <label>فعال بودن</label>
-          <Checkbox checked={active} onChange={(e: any) => setActive(e)} />
+          <Checkbox style={{ color: 'transparent' }} checked={active} onChange={(e: any) => setActive(e)} />
         </InputGroup>
 
         <InputGroup className="d-flex align-items-center">

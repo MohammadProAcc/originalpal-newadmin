@@ -60,8 +60,11 @@ export function CreateBlog() {
             name="is_news"
             control={control}
             render={({ field }) => (
-              // <Checkbox checked={field.value} onChange={(e: any) => field.onChange(e ? 1 : 0)}>
-              <Checkbox checked={field.value} onChange={(e: any) => field.onChange(e ? 1 : 0)}>
+              <Checkbox
+                style={{ color: 'transparent' }}
+                checked={field.value}
+                onChange={(e: any) => field.onChange(e ? 1 : 0)}
+              >
                 اخبار
               </Checkbox>
             )}
@@ -173,7 +176,7 @@ export function CreateBlog() {
           <Controller
             control={control}
             name="isboard"
-            render={({ field }) => <Checkbox checked={field?.value} {...field} />}
+            render={({ field }) => <Checkbox style={{ color: 'transparent' }} checked={field?.value} {...field} />}
           />
         </InputGroup>
 
@@ -182,7 +185,7 @@ export function CreateBlog() {
           <Controller
             control={control}
             name="ishighlight"
-            render={({ field }) => <Checkbox checked={field?.value} {...field} />}
+            render={({ field }) => <Checkbox style={{ color: 'transparent' }} checked={field?.value} {...field} />}
           />
         </InputGroup>
 
@@ -191,7 +194,7 @@ export function CreateBlog() {
           <Controller
             control={control}
             name="istop"
-            render={({ field }) => <Checkbox checked={field?.value} {...field} />}
+            render={({ field }) => <Checkbox style={{ color: 'transparent' }} checked={field?.value} {...field} />}
           />
         </InputGroup>
 
@@ -200,7 +203,7 @@ export function CreateBlog() {
           <Controller
             control={control}
             name="iscast"
-            render={({ field }) => <Checkbox checked={field?.value} {...field} />}
+            render={({ field }) => <Checkbox style={{ color: 'transparent' }} checked={field?.value} {...field} />}
           />
         </InputGroup>
 
@@ -209,7 +212,7 @@ export function CreateBlog() {
           <Controller
             control={control}
             name="isvideo"
-            render={({ field }) => <Checkbox checked={field?.value} {...field} />}
+            render={({ field }) => <Checkbox style={{ color: 'transparent' }} checked={field?.value} {...field} />}
           />
         </InputGroup>
 

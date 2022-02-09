@@ -4,6 +4,7 @@ export const pluralRemove = async (
   removeFunction: any,
   removeCallback: any,
   finalCallback: any,
+  errorCallback: any,
 ) => {
   if (selections?.length > 0) {
     const deletions = selections?.map(async (id) => {
@@ -11,6 +12,8 @@ export const pluralRemove = async (
 
       if (response?.status === 'success') {
         removeCallback(entity, id)
+      } else {
+        errorCallback(id)
       }
     })
 

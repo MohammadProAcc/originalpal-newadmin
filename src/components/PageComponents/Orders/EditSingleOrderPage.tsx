@@ -207,7 +207,7 @@ export const EditSingleOrderPage: React.FC = () => {
               </Button>
             )}{' '}
             {status && status !== order?.status && (
-              <Checkbox checked={sms} onChange={setSms} style={{ marginRight: '2rem' }}>
+              <Checkbox style={{ color: 'transparent', marginRight: '2rem' }} checked={sms} onChange={setSms}>
                 پیامک تغییر وضعیت ارسال شود؟
               </Checkbox>
             )}

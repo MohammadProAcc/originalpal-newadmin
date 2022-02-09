@@ -56,6 +56,7 @@ export const OrdersPage = () => {
         await setTableSelections([])
         setItemsToRemove(null)
       },
+      (id: number) => toast.error(`حذف  سقارش با  شناسه ${id} موفقیت آمیز نبود`),
     )
   }
 

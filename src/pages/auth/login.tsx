@@ -49,7 +49,7 @@ export default function Login() {
             <input {...register('password', { required: true })} type="password" placeholder="رمز عبور" />
           </InputGroup>
           <Group>
-            {/* <Checkbox checked onChange={onCheckbox}>
+            {/* <Checkbox style={{color: "transparent"}} checked onChange={onCheckbox}>
               Remember me
             </Checkbox> 
             <Link href="/auth/request-password">

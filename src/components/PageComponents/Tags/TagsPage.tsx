@@ -53,6 +53,7 @@ export const TagsPage = () => {
         await setTableSelections([])
         setItemsToRemove(null)
       },
+      (id: number) => toast.error(`حذف برچسب با شناسه ${id} موفقیت آمیز نبود`),
     )
   }
 

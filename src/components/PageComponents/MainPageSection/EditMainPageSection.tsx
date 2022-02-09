@@ -186,7 +186,9 @@ export const EditMainPageSectionPage: React.FC = () => {
           <Controller
             name="active"
             control={control}
-            render={({ field }) => <Checkbox checked={field?.value} onChange={field?.onChange}></Checkbox>}
+            render={({ field }) => (
+              <Checkbox style={{ color: 'transparent' }} checked={field?.value} onChange={field?.onChange}></Checkbox>
+            )}
           />
         </InputGroup>
 
@@ -213,7 +215,13 @@ export const EditMainPageSectionPage: React.FC = () => {
               <Controller
                 name="inStock"
                 control={control}
-                render={({ field }) => <Checkbox checked={field?.value} onChange={field?.onChange}></Checkbox>}
+                render={({ field }) => (
+                  <Checkbox
+                    checked={field?.value}
+                    onChange={field?.onChange}
+                    style={{ color: 'transparent' }}
+                  ></Checkbox>
+                )}
               />
             </InputGroup>
           </>

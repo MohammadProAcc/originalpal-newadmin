@@ -67,6 +67,7 @@ export const CommentsPage = () => {
         setTableSelections([])
         setItemsToRemove(null)
       },
+      (id: number) => toast.error(`حذف  نظر با  شناسه ${id} موفقیت آمیز نبود`),
     )
   }
 

@@ -58,6 +58,7 @@ export const Banners = () => {
         setTableSelections([])
         setItemsToRemove(null)
       },
+      (id: number) => toast.error(`حذف  بنر با  شناسه ${id} موفقیت آمیز نبود`),
     )
   }
 

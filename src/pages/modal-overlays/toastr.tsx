@@ -1,23 +1,23 @@
-import React, { useRef, useState } from 'react';
-import { Toastr, ToastrRef, ToastrProps } from '@paljs/ui/Toastr';
-import Row from '@paljs/ui/Row';
-import Col from '@paljs/ui/Col';
-import { Card, CardBody } from '@paljs/ui/Card';
-import { Button } from '@paljs/ui/Button';
-import { Checkbox } from '@paljs/ui/Checkbox';
-import { InputGroup } from '@paljs/ui/Input';
-import Select from '@paljs/ui/Select';
-import styled from 'styled-components';
-import Layout from 'Layouts';
+import React, { useRef, useState } from 'react'
+import { Toastr, ToastrRef, ToastrProps } from '@paljs/ui/Toastr'
+import Row from '@paljs/ui/Row'
+import Col from '@paljs/ui/Col'
+import { Card, CardBody } from '@paljs/ui/Card'
+import { Button } from '@paljs/ui/Button'
+import { Checkbox } from '@paljs/ui/Checkbox'
+import { InputGroup } from '@paljs/ui/Input'
+import Select from '@paljs/ui/Select'
+import styled from 'styled-components'
+import Layout from 'Layouts'
 
 const SelectStyled = styled(Select)`
   margin-bottom: 1rem;
-`;
+`
 
 export default function ToastrPage() {
-  const [count, setCount] = useState(1);
-  const [title, setTitle] = useState('HI there!');
-  const [message, setMessage] = useState('cool toaster');
+  const [count, setCount] = useState(1)
+  const [title, setTitle] = useState('HI there!')
+  const [message, setMessage] = useState('cool toaster')
 
   const [data, setData] = useState<ToastrProps>({
     position: 'topEnd',
@@ -26,22 +26,22 @@ export default function ToastrPage() {
     hasIcon: true,
     destroyByClick: true,
     preventDuplicates: false,
-  });
+  })
 
-  type Option = { value: any; label: any };
+  type Option = { value: any; label: any }
 
-  const toastrRef = useRef<ToastrRef>(null);
+  const toastrRef = useRef<ToastrRef>(null)
 
   const showToastr = () => {
-    setCount(count + 1);
-    toastrRef.current?.add(message, title + count, { ...data });
-  };
+    setCount(count + 1)
+    toastrRef.current?.add(message, title + count, { ...data })
+  }
 
   const onChangeHandle = (name: keyof ToastrProps, value: any) => {
-    const newData = { ...data };
-    newData[name] = value;
-    setData(newData);
-  };
+    const newData = { ...data }
+    newData[name] = value
+    setData(newData)
+  }
 
   const positionOptions: Option[] = [
     { value: 'topRight', label: 'Top-Right' },
@@ -52,7 +52,7 @@ export default function ToastrPage() {
     { value: 'topEnd', label: 'Top-End' },
     { value: 'bottomStart', label: 'Bottom-Start' },
     { value: 'bottomEnd', label: 'Bottom-End' },
-  ];
+  ]
   const statusOption: Option[] = [
     { value: 'Info', label: 'Info' },
     { value: 'Success', label: 'Success' },
@@ -60,7 +60,7 @@ export default function ToastrPage() {
     { value: 'Primary', label: 'Primary' },
     { value: 'Warning', label: 'Warning' },
     { value: 'Default', label: 'Default' },
-  ];
+  ]
 
   return (
     <Layout title="Toaster">
@@ -108,16 +108,25 @@ export default function ToastrPage() {
                     onChange={(v: Option) => onChangeHandle('status', v.value)}
                   />
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <Checkbox checked={!!data.destroyByClick} onChange={(v) => onChangeHandle('destroyByClick', v)}>
+                    <Checkbox
+                      style={{ color: 'transparent' }}
+                      checked={!!data.destroyByClick}
+                      onChange={(v) => onChangeHandle('destroyByClick', v)}
+                    >
                       Hide on click
                     </Checkbox>
                     <Checkbox
+                      style={{ color: 'transparent' }}
                       checked={!!data.preventDuplicates}
                       onChange={(v) => onChangeHandle('preventDuplicates', v)}
                     >
                       Prevent arising of duplicate toast
                     </Checkbox>
-                    <Checkbox checked={!!data.hasIcon} onChange={(v) => onChangeHandle('hasIcon', v)}>
+                    <Checkbox
+                      style={{ color: 'transparent' }}
+                      checked={!!data.hasIcon}
+                      onChange={(v) => onChangeHandle('hasIcon', v)}
+                    >
                       Show toast with icon
                     </Checkbox>
                   </div>
@@ -131,5 +140,5 @@ export default function ToastrPage() {
         </Col>
       </Row>
     </Layout>
-  );
+  )
 }

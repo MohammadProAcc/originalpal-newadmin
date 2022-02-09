@@ -99,6 +99,7 @@ export const ProductsPage = () => {
         setTableSelections([])
         setItemsToRemove(null)
       },
+      (id: number) => toast.error(`حذف محصول با شناسه ${id} موفقیت آمیز نبود`),
     )
   }
 

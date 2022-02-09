@@ -54,6 +54,7 @@ export const UsersPage = () => {
         setTableSelections([])
         setItemsToRemove(null)
       },
+      (id: number) => toast.error(`حذف کاربر با شناسه ${id} موفقیت آمیز نبود`),
     )
   }
 
@@ -85,7 +86,7 @@ export const UsersPage = () => {
   ])
 
   return (
-    <Layout title="بنر های صفحه اصلی">
+    <Layout title="کاربران">
       <h1>کاربر ها</h1>
 
       <FlexContainer>

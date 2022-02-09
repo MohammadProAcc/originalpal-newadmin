@@ -54,6 +54,7 @@ export const BlogsPage = () => {
         setTableSelections([])
         setItemsToRemove(null)
       },
+      (id: number) => toast.error(`حذف  وبلاگ با  شناسه ${id} موفقیت آمیز نبود`),
     )
   }
 

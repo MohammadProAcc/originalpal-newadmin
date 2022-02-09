@@ -54,6 +54,7 @@ export const BrandsPage = () => {
         await setTableSelections([])
         setItemsToRemove(null)
       },
+      (id: number) => toast.error(`حذف  برند با  شناسه ${id} موفقیت آمیز نبود`),
     )
   }
 

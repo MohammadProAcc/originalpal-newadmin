@@ -54,6 +54,7 @@ export const CouponsPage = () => {
         setTableSelections([])
         setItemsToRemove(null)
       },
+      (id: number) => toast.error(`حذف  کوپن با  شناسه ${id} موفقیت آمیز نبود`),
     )
   }
 

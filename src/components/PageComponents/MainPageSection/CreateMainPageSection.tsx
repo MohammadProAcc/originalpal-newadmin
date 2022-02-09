@@ -114,7 +114,9 @@ export function CreateMainPageSection() {
           <Controller
             name="active"
             control={control}
-            render={({ field }) => <Checkbox checked={field?.value} onChange={field?.onChange}></Checkbox>}
+            render={({ field }) => (
+              <Checkbox style={{ color: 'transparent' }} checked={field?.value} onChange={field?.onChange}></Checkbox>
+            )}
           />
         </InputGroup>
 
@@ -125,14 +127,14 @@ export function CreateMainPageSection() {
             <InputGroup>
               <label>برند ها</label>
               <Popover trigger="focus" placement="top" overlay="شناسه برند های مورد نظر را با فاصله (space) وارد کنید">
-                <input {...register('brands')} type="number" />
+                <input {...register('brands')} />
               </Popover>
             </InputGroup>
 
             <InputGroup>
               <label>برچسب ها</label>
               <Popover trigger="focus" placement="top" overlay="شناسه برچسب های مورد نظر را با فاصله (space) وارد کنید">
-                <input {...register('tags')} type="number" />
+                <input {...register('tags')} />
               </Popover>
             </InputGroup>
 
@@ -141,7 +143,13 @@ export function CreateMainPageSection() {
               <Controller
                 name="inStock"
                 control={control}
-                render={({ field }) => <Checkbox checked={field?.value} onChange={field?.onChange}></Checkbox>}
+                render={({ field }) => (
+                  <Checkbox
+                    style={{ color: 'transparent' }}
+                    checked={field?.value}
+                    onChange={field?.onChange}
+                  ></Checkbox>
+                )}
               />
             </InputGroup>
           </>
@@ -152,7 +160,7 @@ export function CreateMainPageSection() {
             <InputGroup>
               <label>بنر ها</label>
               <Popover trigger="focus" placement="top" overlay="شناسه بنر های مورد نظر را با فاصله (space) وارد کنید">
-                <input {...register('banners')} type="number" />
+                <input {...register('banners')} />
               </Popover>
             </InputGroup>
           </>

@@ -69,7 +69,9 @@ function initStore(preloadedState = initialState) {
         updateProductAfterMediaRemoval: (removedMedia: Media) =>
           set(
             (state: any) =>
-              void (state.product.media = state.product.media.filter((media: Media) => media.u !== removedMedia.u)),
+              void (state.product.media = state?.product?.media?.filter(
+                (media: Media) => media?.u !== removedMedia?.u,
+              )),
           ),
         // -==>>> comments <<<==-
         updateCommentCheck: (commentId: number, adminCheck: 0 | 1) =>

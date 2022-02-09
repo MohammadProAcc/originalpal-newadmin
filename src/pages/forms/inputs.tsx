@@ -1,37 +1,37 @@
-import Select from '@paljs/ui/Select';
-import { Radio } from '@paljs/ui/Radio';
-import { Card, CardBody } from '@paljs/ui/Card';
-import { Checkbox } from '@paljs/ui/Checkbox';
-import { InputGroup } from '@paljs/ui/Input';
-import Col from '@paljs/ui/Col';
-import Row from '@paljs/ui/Row';
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import Layout from 'Layouts';
+import Select from '@paljs/ui/Select'
+import { Radio } from '@paljs/ui/Radio'
+import { Card, CardBody } from '@paljs/ui/Card'
+import { Checkbox } from '@paljs/ui/Checkbox'
+import { InputGroup } from '@paljs/ui/Input'
+import Col from '@paljs/ui/Col'
+import Row from '@paljs/ui/Row'
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import Layout from 'Layouts'
 
 const options = [
   { value: 'chocolate', label: 'Chocolate' },
   { value: 'strawberry', label: 'Strawberry' },
   { value: 'vanilla', label: 'Vanilla' },
-];
+]
 
 const Input = styled(InputGroup)`
   margin-bottom: 10px;
-`;
+`
 
 const InputPage = () => {
   const [checkbox, setCheckbox] = useState({
     1: false,
     2: false,
     3: false,
-  });
+  })
 
   const onChangeCheckbox = (value: boolean, name: number) => {
-    setCheckbox({ ...checkbox, [name]: value });
-  };
+    setCheckbox({ ...checkbox, [name]: value })
+  }
   const onChangeRadio = (_value: any) => {
     // value will be item value
-  };
+  }
   return (
     <Layout title="Input">
       <Row>
@@ -119,17 +119,32 @@ const InputPage = () => {
               </Row>
               <Row>
                 <Col breakPoint={{ xs: 12, sm: 4 }}>
-                  <Checkbox checked={checkbox[1]} status="Success" onChange={(value) => onChangeCheckbox(value, 1)}>
+                  <Checkbox
+                    style={{ color: 'transparent' }}
+                    checked={checkbox[1]}
+                    status="Success"
+                    onChange={(value) => onChangeCheckbox(value, 1)}
+                  >
                     Success
                   </Checkbox>
                 </Col>
                 <Col breakPoint={{ xs: 12, sm: 4 }}>
-                  <Checkbox checked={checkbox[2]} status="Danger" onChange={(value) => onChangeCheckbox(value, 2)}>
+                  <Checkbox
+                    style={{ color: 'transparent' }}
+                    checked={checkbox[2]}
+                    status="Danger"
+                    onChange={(value) => onChangeCheckbox(value, 2)}
+                  >
                     Danger
                   </Checkbox>
                 </Col>
                 <Col breakPoint={{ xs: 12, sm: 4 }}>
-                  <Checkbox checked={checkbox[3]} status="Warning" onChange={(value) => onChangeCheckbox(value, 3)}>
+                  <Checkbox
+                    style={{ color: 'transparent' }}
+                    checked={checkbox[3]}
+                    status="Warning"
+                    onChange={(value) => onChangeCheckbox(value, 3)}
+                  >
                     Warning
                   </Checkbox>
                 </Col>
@@ -139,6 +154,6 @@ const InputPage = () => {
         </Col>
       </Row>
     </Layout>
-  );
-};
-export default InputPage;
+  )
+}
+export default InputPage

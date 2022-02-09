@@ -116,6 +116,7 @@ export function CreateBanner() {
             control={control}
             render={({ field }) => (
               <Checkbox
+                style={{ color: 'transparent' }}
                 checked={active}
                 {...register('priority', { required: true })}
                 onChange={(e: any) => {

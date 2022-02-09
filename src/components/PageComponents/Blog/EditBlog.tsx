@@ -114,9 +114,12 @@ export const EditBlogPage: React.FC = () => {
             name="is_news"
             control={control}
             render={({ field }) => (
-              // <Checkbox checked={field.value} onChange={(e: any) => field.onChange(e ? 1 : 0)}>
               <span style={{ color: 'transparent', fontSize: '0' }}>
-                <Checkbox checked={field.value} onChange={(e: any) => field.onChange(e ? 1 : 0)}>
+                <Checkbox
+                  style={{ color: 'transparent' }}
+                  checked={field.value}
+                  onChange={(e: any) => field.onChange(e ? 1 : 0)}
+                >
                   اخبار
                 </Checkbox>
               </span>
@@ -220,7 +223,7 @@ export const EditBlogPage: React.FC = () => {
                         name="isboard"
                         render={({ field }) => (
                             <CheckBoxWrapper>
-                                <Checkbox checked={field?.value} {...field} />
+                                <Checkbox style={{color: "transparent"}} checked={field?.value} {...field} />
                             </CheckBoxWrapper>
                         )}
                     />
@@ -233,7 +236,7 @@ export const EditBlogPage: React.FC = () => {
                         name="ishighlight"
                         render={({ field }) => (
                             <CheckBoxWrapper>
-                                <Checkbox checked={field?.value} {...field} />
+                                <Checkbox style={{color: "transparent"}} checked={field?.value} {...field} />
                             </CheckBoxWrapper>
                         )}
                     />
@@ -246,7 +249,7 @@ export const EditBlogPage: React.FC = () => {
                         name="istop"
                         render={({ field }) => (
                             <CheckBoxWrapper>
-                                <Checkbox checked={field?.value} {...field} />
+                                <Checkbox style={{color: "transparent"}} checked={field?.value} {...field} />
                             </CheckBoxWrapper>
                         )}
                     />
@@ -259,7 +262,7 @@ export const EditBlogPage: React.FC = () => {
                         name="iscast"
                         render={({ field }) => (
                             <CheckBoxWrapper>
-                                <Checkbox checked={field?.value} {...field} />
+                                <Checkbox style={{color: "transparent"}} checked={field?.value} {...field} />
                             </CheckBoxWrapper>
                         )}
                     />
@@ -282,7 +285,7 @@ export const EditBlogPage: React.FC = () => {
                         name="isvideo"
                         render={({ field }) => (
                             <CheckBoxWrapper>
-                                <Checkbox checked={field?.value} {...field} />
+                                <Checkbox style={{color: "transparent"}} checked={field?.value} {...field} />
                             </CheckBoxWrapper>
                         )}
                     />
