@@ -233,6 +233,8 @@ export const EditProductPage: React.FC = () => {
     }
 
     setRemoveAllImagesModal(false)
+    router.reload()
+
     setLoading(false)
   }
 
