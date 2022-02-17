@@ -18,7 +18,7 @@ import {
 interface TopSiteMenuFormProps {
   loading?: boolean
   callback: any
-  defaultValues: any
+  defaultValues?: any
 }
 
 export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callback, defaultValues }) => {
