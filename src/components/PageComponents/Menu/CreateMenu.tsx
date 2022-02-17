@@ -1,24 +1,28 @@
-import { Button, Card, CardBody, CardHeader, Checkbox, InputGroup, Popover, Radio, Select } from '@paljs/ui'
+import { InputGroup, Select as _Select } from '@paljs/ui'
+import { AdsMenuForm, TopSiteMenuForm } from 'components'
 import Layout from 'Layouts'
-import React, { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import styled from 'styled-components'
-import Cookies from 'js-cookie'
-import { toast } from 'react-toastify'
-import { createMenu, search_in } from 'utils'
-import { BasicEditor } from 'components'
 import router from 'next/router'
+import React, { useState } from 'react'
+import { toast } from 'react-toastify'
+import styled from 'styled-components'
+import { createMenu } from 'utils'
+
+const menuTypes = [
+  { label: 'بالای صفحه', value: 'top-site' },
+  { label: 'تبلیغات', value: 'ad' },
+  { label: 'پایین صفحه', value: 'bottom-site' },
+]
 
 export function CreateMenu() {
   const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, reset } = useForm()
+  const [selectedType, setSelectedType] = useState<any>(null)
 
-  const onSubmit = async (form: any) => {
+  const createMenuCallback = async (type: 'ad' | 'top-site', form: any) => {
     setLoading(true)
-    const response = await createMenu(form)
+
+    const response = await createMenu({ ...form, type })
     if (response === null) {
-      reset()
       toast.success('منو با موفقیت ساخته شد')
       router.push('/menu')
     } else {
@@ -27,58 +31,42 @@ export function CreateMenu() {
     setLoading(false)
   }
 
+  const renderForm = (type: any) => {
+    switch (type) {
+      case 'top-site':
+        return <TopSiteMenuForm loading={loading} callback={console.log} />
+
+      case 'ad':
+        return <AdsMenuForm loading={loading} callback={(items: any) => createMenuCallback('ad', items)} />
+    }
+  }
+
   return (
     <Layout title="ساخت منو ">
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <h1>
-          <span style={{ margin: '0 0 0 1rem' }}>ساخت منو</span>
-        </h1>
+      <H1>
+        <span style={{ margin: '0 0 0 1rem' }}>ساخت منو</span>
+      </H1>
 
-        <InputGroup>
-          <label>نوع</label>
-          <input {...register('type')} placeholder="نوع" />
-        </InputGroup>
+      <InputGroup>
+        <label>نوع منو</label>
+        <Select
+          options={menuTypes}
+          onChange={(e: any) => {
+            setSelectedType(e?.value)
+          }}
+        />
+      </InputGroup>
 
-        <InputGroup>
-          <label>موارد</label>
-          <Popover
-            trigger="focus"
-            placement="top"
-            overlay={
-              <p>
-                منوی ساخته شده توسط{' '}
-                <a href="https://www.jqueryscript.net/demo/Drag-Drop-Menu-Builder-For-Bootstrap">ابزار منو ساز</a> را در
-                انی مورودی کپی منید
-              </p>
-            }
-          >
-            <textarea {...register('items')} placeholder="موارد" />
-          </Popover>
-        </InputGroup>
-
-        <Button disabled={loading} style={{ width: '10rem', marginTop: '3rem' }} status="Success" appearance="outline">
-          {loading ? '...' : 'ساخت منو'}
-        </Button>
-      </Form>
+      <hr />
+      {renderForm(selectedType)}
     </Layout>
   )
 }
 
-const Form = styled.form`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+const H1 = styled.h1`
+  margin-bottom: 2rem;
+`
 
-  h1 {
-    margin-bottom: 2rem;
-  }
-
-  .col {
-    flex-direction: column;
-  }
-
-  label {
-    min-width: 3rem;
-    margin-bottom: 1rem;
-  }
+const Select = styled(_Select)`
+  width: 20rem;
 `

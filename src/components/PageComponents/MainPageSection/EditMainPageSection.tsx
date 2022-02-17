@@ -232,7 +232,7 @@ export const EditMainPageSectionPage: React.FC = () => {
             <InputGroup>
               <label>بنر ها</label>
               <Popover trigger="focus" placement="top" overlay="شناسه بنر های مورد نظر را با فاصله (space) وارد کنید">
-                <input {...register('banners')} type="number" />
+                <input {...register('banners')} />
               </Popover>
             </InputGroup>
           </>

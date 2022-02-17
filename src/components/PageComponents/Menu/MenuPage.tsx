@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { useStore, deleteMenu, pluralRemove, editMenu } from 'utils'
+import { useStore, deleteMenu, pluralRemove, editMenu, translator } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, InputGroup, Modal, Popover } from '@paljs/ui'
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
@@ -88,7 +88,7 @@ export const MenuPage = () => {
   const data = menu?.data?.data?.map((menu: any) => [
     // =====>> Table Columns <<=====
     menu?.id,
-    menu?.type,
+    translator(menu?.type),
     <Container>
       {/*
         <Link href={`/menu/${menu?.id}`}>
@@ -97,9 +97,11 @@ export const MenuPage = () => {
           </Button>
         </Link>
       */}
-      <Button onClick={() => setMenuToEdit(menu)} style={{ marginLeft: '1rem' }} status="Primary">
-        ویرایش
-      </Button>
+      <Link href={`/menu/edit/${menu?.id}`}>
+        <Button style={{ marginLeft: '1rem' }} status="Primary">
+          ویرایش
+        </Button>
+      </Link>
       {/*
         <Button status="Danger" onClick={() => setItemToRemove(menu)}>
           حذف
@@ -115,7 +117,6 @@ export const MenuPage = () => {
       <FlexContainer>
         <Link href="/menu/create">
           <Button
-            disabled
             style={{
               margin: '1rem 0 1rem 1rem',
               display: 'flex',

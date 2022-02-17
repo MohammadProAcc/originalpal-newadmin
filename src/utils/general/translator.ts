@@ -121,6 +121,9 @@ const dictionary = {
   discount_amout: 'مقدار تخفسف',
   cash: 'نقدی',
   percent: 'درصدی',
+  'top-site': 'بالای صفحه',
+  ad: 'تبلیغات',
+  'bottom-site': 'پایین صفحه',
 }
 
 export const translator = (target: string) => {

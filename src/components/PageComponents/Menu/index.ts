@@ -1,4 +1,5 @@
-export * from './MenuPage'
-export * from './SingleMenuPage'
+export * from './components'
 export * from './CreateMenu'
 export * from './EditMenu'
+export * from './MenuPage'
+export * from './SingleMenuPage'
