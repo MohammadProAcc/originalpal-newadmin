@@ -1,14 +1,15 @@
-import { InputGroup as _InputGroup, Modal, Popover } from '@paljs/ui'
+import { InputGroup as _InputGroup, Modal } from '@paljs/ui'
 import { AdsMenuForm, Button, FlexContainer, HeaderButton, ModalBox, TopSiteMenuForm } from 'components'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
-import router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { MenuType, TopSiteMenu } from 'types'
-import { deleteMenu, editMenu, getSingleMenu, removeItem, translator, useStore } from 'utils'
+import { deleteMenu, editMenu, getSingleMenu, removeItem, useStore } from 'utils'
+import { BottomSiteMenuForm } from './components'
 
 export const EditMenuPage: React.FC = () => {
   const { menu, reload } = useStore((state: any) => ({
@@ -81,6 +82,15 @@ export const EditMenuPage: React.FC = () => {
             defaultValues={defaultValues}
           />
         )
+
+      case 'bottom-site':
+        return (
+          <BottomSiteMenuForm
+            loading={loading}
+            callback={(items: any) => updateMenuCallback('bottom-site', items)}
+            defaultValues={defaultValues}
+          />
+        )
     }
   }
 
@@ -117,13 +127,3 @@ export const EditMenuPage: React.FC = () => {
     </Layout>
   )
 }
-
-const Form = styled.form`
-  label {
-    min-width: 5rem;
-  }
-`
-
-const InputGroup = styled(_InputGroup)`
-  margin-bottom: 1rem;
-`

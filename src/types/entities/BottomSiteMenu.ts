@@ -11,5 +11,27 @@ export interface BottomSiteColumn {
 }
 
 export interface BottomSiteMenu {
-  colomns: BottomSiteColumn[]
+  columns: BottomSiteColumn[]
+}
+
+export const initialBottomSiteRow: BottomSiteRow = {
+  title: '',
+  href: '',
+  bold: false,
+}
+
+export const initialBottomSiteColumn: BottomSiteColumn = {
+  title: '',
+  href: '',
+  rows: [
+    {
+      title: '',
+      href: '',
+      bold: false,
+    },
+  ],
+}
+
+export const initialBottomSiteMenu: BottomSiteMenu = {
+  columns: [initialBottomSiteColumn],
 }
