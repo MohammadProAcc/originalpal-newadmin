@@ -4,42 +4,20 @@ import Cookies from 'js-cookie'
 import Layout from 'Layouts'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
-import styled from 'styled-components'
 import { MenuType, TopSiteMenu } from 'types'
-import { deleteMenu, editMenu, getSingleMenu, removeItem, useStore } from 'utils'
-import { BottomSiteMenuForm } from './components'
+import { deleteMenu, editMenu, removeItem, useStore } from 'utils'
+import { BottomSiteDescriptionForm, ProductsBottomSiteMenuForm } from './components'
+import { BottomSiteMenuForm } from './components/ProductsBottomSiteMenuForm'
 
 export const EditMenuPage: React.FC = () => {
-  const { menu, reload } = useStore((state: any) => ({
+  const { menu } = useStore((state: any) => ({
     menu: state?.menu,
-    reload: state?.reload,
   }))
 
   const router = useRouter()
 
-  const reloadMenu = async () => {
-    const reloadedMenu = await getSingleMenu(menu?.id)
-    reload('menu', reloadedMenu)
-  }
-
   const [loading, setLoading] = useState(false)
-
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { dirtyFields },
-  } = useForm({
-    defaultValues: menu,
-  })
-
-  const onSubmit = async (form: any) => {
-    setLoading(true)
-    console.log(form)
-    setLoading(false)
-  }
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
@@ -63,7 +41,7 @@ export const EditMenuPage: React.FC = () => {
     setLoading(false)
   }
 
-  const renderForm = (type: 'top-site' | 'ad' | 'bottom-site', defaultValues: any) => {
+  const renderForm = (type: MenuType, defaultValues: any) => {
     switch (type) {
       case 'top-site':
         return (
@@ -88,6 +66,24 @@ export const EditMenuPage: React.FC = () => {
           <BottomSiteMenuForm
             loading={loading}
             callback={(items: any) => updateMenuCallback('bottom-site', items)}
+            defaultValues={defaultValues}
+          />
+        )
+
+      case 'bottom-site-descriptions':
+        return (
+          <BottomSiteDescriptionForm
+            loading={loading}
+            callback={(items: any) => updateMenuCallback('bottom-site-descriptions', items)}
+            defaultValues={defaultValues}
+          />
+        )
+
+      case 'products-bottom-site-menu':
+        return (
+          <ProductsBottomSiteMenuForm
+            loading={loading}
+            callback={(items: any) => updateMenuCallback('products-bottom-site-menu', items)}
             defaultValues={defaultValues}
           />
         )

@@ -14,7 +14,7 @@ interface BottomSiteMenuFormProps {
   defaultValues?: any
 }
 
-export const ProductsBottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ loading, callback, defaultValues }) => {
+export const BottomSiteDescriptionForm: React.FC<BottomSiteMenuFormProps> = ({ loading, callback, defaultValues }) => {
   const [menu, setMenu] = useState<BottomSiteColumn[]>(defaultValues)
 
   // FIXME: temp

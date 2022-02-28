@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
-import { pluralRemove, useStore } from 'utils'
+import { pluralRemove, translator, useStore } from 'utils'
 import { deleteBanner } from 'utils/api/REST/actions/banners'
 
 export const MainPages = () => {
@@ -66,6 +66,7 @@ export const MainPages = () => {
     'شناسه بنر',
     'تصویر',
     'عنوان بنر',
+    'پلتفرم',
     'رنگ عنوان بنر',
     'توضیحات',
     'رنگ توضیحات',
@@ -79,6 +80,7 @@ export const MainPages = () => {
     banner?.id,
     <Avatar src={`${process.env.SRC}/${banner?.media ? banner?.media[0]?.u : null}`} />,
     banner?.title,
+    translator(banner?.platform),
     <div
       style={{
         backgroundColor: banner?.title_color,
@@ -128,7 +130,7 @@ export const MainPages = () => {
 
   return (
     <Layout title="بنر های صفحه اصلی">
-      <h1>بنر های صفحه اصلی سایت </h1>
+      <h1>بنر های صفحه اصلی سایت</h1>
 
       <FlexContainer>
         <Link href="/main-page/create">

@@ -1,4 +1,5 @@
 import { Button, Checkbox, InputGroup, Select } from '@paljs/ui'
+import { FlexContainer } from 'components'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
 import router from 'next/router'
@@ -33,7 +34,15 @@ export function CreateMainPage() {
 
     try {
       await createBanner(finalForm, Cookies.get('token'))
-      const result = await search_in('banners', { key: 'content', type: '=', value: form?.content }, router?.query)
+      const result = await search_in(
+        'banners',
+        {
+          key: 'content',
+          type: '=',
+          value: form?.content,
+        },
+        router?.query,
+      )
       const bannerId = result?.data?.data[result?.data?.total - 1]?.id
 
       const formData = new FormData()
@@ -82,6 +91,18 @@ export function CreateMainPage() {
             <input {...register('content_color', { required: true })} type="color" placeholder="رنگ محتوا" />
             <label>رنگ محتوا</label>
           </InputGroup>
+
+          <FlexContainer col style={{ marginTop: '1rem' }}>
+            <InputGroup>
+              <input {...register('button_bg_color', { required: true })} type="color" />
+              <label>رنگ دکمه</label>
+            </InputGroup>
+
+            <InputGroup>
+              <input {...register('button_color', { required: true })} type="color" />
+              <label>رنگ متن دکمه</label>
+            </InputGroup>
+          </FlexContainer>
 
           <InputGroup className="mt-4">
             <label>لینک</label>

@@ -154,6 +154,18 @@ export function EditMainPage() {
             <label>رنگ محتوا</label>
           </InputGroup>
 
+          <FlexContainer col style={{ marginTop: '1rem' }}>
+            <InputGroup>
+              <input {...register('button_bg_color', { required: true })} type="color" />
+              <label>رنگ دکمه</label>
+            </InputGroup>
+
+            <InputGroup>
+              <input {...register('button_color', { required: true })} type="color" />
+              <label>رنگ متن دکمه</label>
+            </InputGroup>
+          </FlexContainer>
+
           <InputGroup className="mt-4">
             <label>لینک</label>
             <input {...register('link', { required: true })} placeholder="لینک" />

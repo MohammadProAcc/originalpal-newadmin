@@ -6,7 +6,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { Colors } from 'styles'
-import { BottomSiteColumn, BottomSiteMenu, BottomSiteRow, initialBottomSiteColumn, initialBottomSiteRow } from 'types'
+import { BottomSiteColumn, initialBottomSiteColumn, BottomSiteMenu, BottomSiteRow, initialBottomSiteRow } from 'types'
 
 interface BottomSiteMenuFormProps {
   loading?: boolean
@@ -14,7 +14,7 @@ interface BottomSiteMenuFormProps {
   defaultValues?: any
 }
 
-export const ProductsBottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ loading, callback, defaultValues }) => {
+export const BottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ loading, callback, defaultValues }) => {
   const [menu, setMenu] = useState<BottomSiteColumn[]>(defaultValues)
 
   // FIXME: temp
