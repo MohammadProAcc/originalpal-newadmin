@@ -1,12 +1,19 @@
 import { Button as _Button, Checkbox, InputGroup as _InputGroup } from '@paljs/ui'
 import { BasicModal, ModalBox } from 'components'
+import { FlexContainer } from 'components/Container'
 import produce from 'immer'
 import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { Colors } from 'styles'
-import { BottomSiteColumn, BottomSiteMenu, BottomSiteRow, initialBottomSiteColumn, initialBottomSiteRow } from 'types'
+import {
+  ProductsBottomSiteColumn,
+  BottomSiteMenu,
+  ProductsBottomSiteRow,
+  initialProductsBottomSiteColumn,
+  initialProductsBottomSiteRow,
+} from 'types'
 
 interface BottomSiteMenuFormProps {
   loading?: boolean
@@ -15,35 +22,43 @@ interface BottomSiteMenuFormProps {
 }
 
 export const ProductsBottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ loading, callback, defaultValues }) => {
-  const [menu, setMenu] = useState<BottomSiteColumn[]>(defaultValues)
+  const [menu, setMenu] = useState<ProductsBottomSiteColumn[]>(defaultValues)
 
   // FIXME: temp
   useEffect(() => console.log(menu), [menu])
 
-  const findColumnIndex = (targetColumn: BottomSiteColumn) => {
-    return menu?.findIndex((item) => item?.title === targetColumn?.title)
+  const findColumnIndex = (targetColumn: ProductsBottomSiteColumn) => {
+    return menu?.findIndex(
+      (_column) =>
+        !_column
+          ?.map(
+            (_row) =>
+              !!targetColumn?.find((_targetRow) => _targetRow?.name === _row?.name && _targetRow?.url === _row?.url),
+          )
+          ?.includes(false),
+    )
   }
 
-  const findRowIndex = (targetColumn: BottomSiteColumn, targetRow: BottomSiteRow) => {
-    return menu[findColumnIndex(targetColumn)]?.rows?.findIndex((item) => item?.title === targetRow?.title)
+  const findRowIndex = (targetColumn: ProductsBottomSiteColumn, targetRow: ProductsBottomSiteRow) => {
+    return menu[findColumnIndex(targetColumn)]?.findIndex(
+      (_row) => _row?.name === targetRow?.name && _row?.url === targetRow?.url,
+    )
   }
 
   // <<<------------ Column ------------>>>
-  const addColumn = (column: BottomSiteColumn) =>
+  const addColumn = () =>
     setMenu((current) =>
       produce(current, (draft) => {
-        draft?.push(column)
+        draft?.push(initialProductsBottomSiteColumn)
       }),
     )
 
-  const removeColumn = (column: BottomSiteColumn) =>
-    setMenu((current) =>
-      produce(current, (draft) => {
-        draft = draft?.filter((item) => item?.title !== column?.title)
-      }),
-    )
+  const removeColumn = (column: ProductsBottomSiteColumn) => {
+    const targetIndex = findColumnIndex(column)
+    setMenu((_menu) => _menu?.filter((_column, index) => index !== targetIndex))
+  }
 
-  const editColumn = (column: BottomSiteColumn, form: BottomSiteColumn) => {
+  const editColumn = (column: ProductsBottomSiteColumn, form: ProductsBottomSiteColumn) => {
     setMenu((current) =>
       produce(current, (draft) => {
         draft[findColumnIndex(column)] = form
@@ -52,30 +67,30 @@ export const ProductsBottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ 
   }
 
   // <<<------------ Row ------------>>>
-  const addRow = (column: BottomSiteColumn, row: BottomSiteRow) =>
+  const addRow = (column: ProductsBottomSiteColumn, row: ProductsBottomSiteRow) =>
     setMenu((current) =>
       produce(current, (draft) => {
-        draft[findColumnIndex(column)]?.rows?.push(row)
+        draft[findColumnIndex(column)]?.push(row)
       }),
     )
 
-  const removeRow = (column: BottomSiteColumn, row: BottomSiteRow) =>
+  const removeRow = (column: ProductsBottomSiteColumn, row: ProductsBottomSiteRow) =>
     setMenu((current) =>
       produce(current, (draft) => {
-        draft[findColumnIndex(column)]?.rows?.splice(findRowIndex(column, row), 1)
+        draft[findColumnIndex(column)]?.splice(findRowIndex(column, row), 1)
       }),
     )
 
-  const editRow = (column: BottomSiteColumn, row: BottomSiteRow, form: BottomSiteRow) =>
+  const editRow = (column: ProductsBottomSiteColumn, row: ProductsBottomSiteRow, form: ProductsBottomSiteRow) =>
     setMenu((current) =>
       produce(current, (draft) => {
-        draft[findColumnIndex(column)].rows[findRowIndex(column, row)] = form
+        draft[findColumnIndex(column)][findRowIndex(column, row)] = form
       }),
     )
 
   // <<<------------ Forms ------------>>>
-  const [selectedColumn, setSelectedColumn] = useState<BottomSiteColumn | null>(null)
-  const [selectedRow, setSelectedRow] = useState<BottomSiteRow | null>(null)
+  const [selectedColumn, setSelectedColumn] = useState<ProductsBottomSiteColumn | null>(null)
+  const [selectedRow, setSelectedRow] = useState<ProductsBottomSiteRow | null>(null)
 
   const [activeForm, setActiveForm] = useState<'column' | 'row' | null>(null)
 
@@ -95,27 +110,20 @@ export const ProductsBottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ 
     reset: rowReset,
   } = useForm()
 
-  const onColumnFormSubmit = (form: BottomSiteColumn) => {
-    selectedColumn ? editColumn(selectedColumn, form) : addColumn({ ...initialBottomSiteColumn, title: form?.title })
+  const onColumnFormSubmit = (form: ProductsBottomSiteColumn) => {
+    selectedColumn ? editColumn(selectedColumn, form) : addColumn()
     columnReset()
     setActiveForm(null)
-    toast.success(
-      <p>
-        <div>
-          <strong>"{form?.title}"</strong>
-        </div>{' '}
-        {selectedColumn ? 'بروز' : 'ساخته'} شد
-      </p>,
-    )
+    toast.success(<p>{selectedColumn ? 'بروز' : 'ساخته'} شد</p>)
   }
 
-  const onRowFormSubmit = (form: BottomSiteRow) => {
+  const onRowFormSubmit = (form: ProductsBottomSiteRow) => {
     selectedRow ? editRow(selectedColumn!, selectedRow, form) : addRow(selectedColumn!, form)
     setActiveForm(null)
     toast.success(
       <p>
         <div>
-          <strong>"{form?.title}"</strong>
+          <strong>"{form?.name}"</strong>
         </div>{' '}
         {selectedRow ? 'بروز' : 'ساخته'} شد
       </p>,
@@ -126,35 +134,28 @@ export const ProductsBottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ 
   useEffect(() => {
     selectedColumn
       ? Object.entries(selectedColumn)?.map((entry) => columnSetValue(entry[0], entry[1]))
-      : Object.entries(initialBottomSiteColumn)?.map((entry) => columnSetValue(entry[0], null))
+      : Object.entries(initialProductsBottomSiteColumn)?.map((entry) => columnSetValue(entry[0], null))
   }, [selectedColumn])
 
   useEffect(() => {
     selectedRow
       ? Object.entries(selectedRow)?.map((entry) => rowSetValue(entry[0], entry[1]))
-      : Object.entries(initialBottomSiteRow)?.map((entry) => rowSetValue(entry[0], null))
+      : Object.entries(initialProductsBottomSiteRow)?.map((entry) => rowSetValue(entry[0], null))
   }, [selectedRow])
 
-  const onColumnRemoval = (column: BottomSiteColumn) => {
+  const onColumnRemoval = (column: ProductsBottomSiteColumn) => {
     removeColumn(column)
     setActiveForm(null)
-    toast.success(
-      <p>
-        <div>
-          <strong>"{column?.title}"</strong>
-        </div>{' '}
-        حذف شد
-      </p>,
-    )
+    toast.success(<p>حذف شد</p>)
   }
 
-  const onRowRemoval = (column: BottomSiteColumn, row: BottomSiteRow) => {
+  const onRowRemoval = (column: ProductsBottomSiteColumn, row: ProductsBottomSiteRow) => {
     removeRow(column, row)
     setActiveForm(null)
     toast.success(
       <p>
         <div>
-          <strong>"{row?.title}"</strong>
+          <strong>"{row?.name}"</strong>
         </div>{' '}
         حذف شد
       </p>,
@@ -165,28 +166,29 @@ export const ProductsBottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ 
     <Component>
       <Columns>
         {menu?.map((_column) => (
-          <Column key={_column?.title}>
-            <ColumnTitle
-              title="برای ویرایش فهرست کلیک کنید"
+          <Column key={Math.random()}>
+            <Button
+              status="Danger"
+              appearance="outline"
               onClick={() => {
                 setSelectedColumn(_column)
                 setActiveForm('column')
               }}
             >
-              {_column?.title}
-            </ColumnTitle>
+              حذف ستون
+            </Button>
 
             <Rows>
-              {_column?.rows?.map((_row) => (
+              {_column?.map((_row) => (
                 <Row
-                  key={_row?.title}
+                  key={_row?.name}
                   onClick={() => {
                     setSelectedColumn(_column)
                     setSelectedRow(_row)
                     setActiveForm('row')
                   }}
                 >
-                  {_row?.title}
+                  {_row?.name}
                 </Row>
               ))}
 
@@ -204,14 +206,7 @@ export const ProductsBottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ 
             </Rows>
           </Column>
         ))}
-        <Button
-          status="Info"
-          appearance="outline"
-          onClick={() => {
-            setSelectedColumn(null)
-            setActiveForm('column')
-          }}
-        >
+        <Button status="Info" appearance="outline" onClick={addColumn}>
           افزودن ستون
         </Button>
       </Columns>
@@ -220,68 +215,69 @@ export const ProductsBottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ 
 
       <BasicModal on={!!activeForm} toggle={() => setActiveForm(null)}>
         <ModalBox>
-          <Form
-            onSubmit={
-              activeForm === 'column' ? columnHandleSubmit(onColumnFormSubmit) : rowHandleSubmit(onRowFormSubmit)
-            }
-          >
-            {activeForm === 'column' ? (
-              <>
-                <InputGroup>
-                  <label>نام فهرست</label>
-                  <input {...columnRegister('title', { required: true })} />
-                </InputGroup>
-              </>
-            ) : (
-              <>
-                <InputGroup>
-                  <label>عنوان لینک</label>
-                  <input {...rowRegister('title', { required: true })} />
-                </InputGroup>
+          {activeForm === 'column' ? (
+            <FlexContainer>
+              <P>
+                آیا از حذف ستون شماره
+                <Strong>{findColumnIndex(selectedColumn!)}</Strong>
+                اطمینان دارید؟
+              </P>
+              <FlexContainer>
+                <Button appearance="outline" onClick={() => setActiveForm(null)}>
+                  انصراف
+                </Button>
 
-                <InputGroup>
-                  <label>لینک</label>
-                  <input {...rowRegister('href', { required: true })} />
-                </InputGroup>
+                <Button status="Danger" appearance="outline" onClick={() => removeColumn(selectedColumn!)}>
+                  بله
+                </Button>
+              </FlexContainer>
+            </FlexContainer>
+          ) : (
+            <Form onSubmit={rowHandleSubmit(onRowFormSubmit)}>
+              <InputGroup>
+                <label>عنوان لینک</label>
+                <input {...rowRegister('name', { required: true })} />
+              </InputGroup>
 
-                <InputGroup>
-                  <Controller
-                    control={rowControl}
-                    name="bold"
-                    render={({ field }) => (
-                      <Checkbox {...field} checked={field?.value}>
-                        برجسته
-                      </Checkbox>
-                    )}
-                  />
-                </InputGroup>
-              </>
-            )}
-            <Container>
-              <Button onClick={() => setActiveForm(null)} type="button" className="form">
-                انصراف
-              </Button>
+              <InputGroup>
+                <label>لینک</label>
+                <input {...rowRegister('url', { required: true })} />
+              </InputGroup>
 
-              <Button status="Success" appearance="outline">
-                ثبت
-              </Button>
+              <InputGroup>
+                <Controller
+                  control={rowControl}
+                  name="bold"
+                  render={({ field }) => (
+                    <Checkbox {...field} checked={field?.value}>
+                      برجسته
+                    </Checkbox>
+                  )}
+                />
+              </InputGroup>
 
-              <Button
-                disabled={activeForm === 'column' ? !selectedColumn : !selectedRow}
-                type="button"
-                className="form"
-                status="Danger"
-                appearance="outline"
-                onClick={() =>
-                  activeForm === 'column'
-                    ? onColumnRemoval(selectedColumn!)
-                    : onRowRemoval(selectedColumn!, selectedRow!)
-                }
-              >
-                حذف
-              </Button>
-            </Container>
-          </Form>
+              <Container>
+                <Button onClick={() => setActiveForm(null)} type="button" className="form">
+                  انصراف
+                </Button>
+
+                <Button status="Success" appearance="outline">
+                  ثبت
+                </Button>
+
+                <Button
+                  disabled={!selectedRow}
+                  type="button"
+                  className="form"
+                  status="Danger"
+                  appearance="outline"
+                  onClick={() => onRowRemoval(selectedColumn!, selectedRow!)}
+                >
+                  حذف
+                </Button>
+              </Container>
+            </Form>
+          )}
         </ModalBox>
       </BasicModal>
       <Button status="Success" appearance="hero" className="submit" onClick={() => callback(menu)} disabled={loading}>
@@ -356,7 +352,7 @@ const Button = styled(_Button)`
   }
 
   &.add-menu {
-    margin-botto: 1rem;
+    margin-bottom: 1rem;
   }
 
   &.submit {
@@ -372,4 +368,14 @@ const Form = styled.form`
 
 const InputGroup = styled(_InputGroup)`
   margin-bottom: 1rem;
+`
+
+const P = styled.p`
+  margin-bottom: 1.5rem;
+`
+
+const Strong = styled.strong`
+  margin: 0 0.25rem;
+
+  font-family: IRANSansWebBold;
 `

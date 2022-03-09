@@ -70,7 +70,7 @@ export const EditMenuPage: React.FC = () => {
           />
         )
 
-      case 'bottom-site-descriptions':
+      case 'bottom-site-descrpitions':
         return (
           <BottomSiteDescriptionForm
             loading={loading}

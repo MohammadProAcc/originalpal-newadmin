@@ -1,375 +1,365 @@
-import { Button as _Button, Checkbox, InputGroup as _InputGroup } from '@paljs/ui'
+import {
+  Button as _Button,
+  Card as _Card,
+  CardHeader as _CardHeader,
+  CardBody as _CardBody,
+  InputGroup as _InputGroup,
+} from '@paljs/ui'
 import { BasicModal, ModalBox } from 'components'
+import { FlexContainer as _FlexContainer } from 'components/Container/FlexContainer'
+import { useNonInitialEffect } from 'hooks'
 import produce from 'immer'
-import React, { useEffect, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
-import styled from 'styled-components'
-import { Colors } from 'styles'
-import { BottomSiteColumn, BottomSiteMenu, BottomSiteRow, initialBottomSiteColumn, initialBottomSiteRow } from 'types'
+import _ from 'lodash'
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import styled, { css } from 'styled-components'
+import { BottomSiteDescription, BottomSiteDescriptionMenu, initialBottomSiteDescription } from 'types'
 
-interface BottomSiteMenuFormProps {
+const modalContentStyle = css`
+  width: 50%;
+`
+
+interface IBottomSiteDescriptionFormProps {
   loading?: boolean
   callback: any
   defaultValues?: any
 }
+export const BottomSiteDescriptionForm: React.FC<IBottomSiteDescriptionFormProps> = ({
+  loading,
+  callback,
+  defaultValues,
+}) => {
+  const [menu, setMenu] = useState<BottomSiteDescriptionMenu>(defaultValues)
 
-export const BottomSiteDescriptionForm: React.FC<BottomSiteMenuFormProps> = ({ loading, callback, defaultValues }) => {
-  const [menu, setMenu] = useState<BottomSiteColumn[]>(defaultValues)
+  const findDescriptionIndex = (description: BottomSiteDescription) =>
+    menu?.findIndex((_menu) => _menu?.title === description?.title)
 
-  // FIXME: temp
-  useEffect(() => console.log(menu), [menu])
-
-  const findColumnIndex = (targetColumn: BottomSiteColumn) => {
-    return menu?.findIndex((item) => item?.title === targetColumn?.title)
+  const findParagraphIndex = (description: BottomSiteDescription, paragraph: string) => {
+    console.log('selected descriotion >', description)
+    const descIndex = findDescriptionIndex(description)
+    console.log('desc index :', descIndex)
+    const paragraphIndex = menu[descIndex]?.paragraphs?.findIndex((_paragraph) => _paragraph === paragraph)
+    console.log('paragraph index :', paragraphIndex)
+    return paragraphIndex
   }
 
-  const findRowIndex = (targetColumn: BottomSiteColumn, targetRow: BottomSiteRow) => {
-    return menu[findColumnIndex(targetColumn)]?.rows?.findIndex((item) => item?.title === targetRow?.title)
+  const { register, handleSubmit, setValue } = useForm()
+
+  // WARN: not a pure function
+  const onEditDescriptionSubmit = (form: any) => {
+    setMenu((_menu) =>
+      produce(_menu, (draft) => {
+        const index = findDescriptionIndex(selectedDescription!)
+        if (index >= 0) {
+          draft[index].title = form?.title
+        }
+      }),
+    )
+    closeModal()
   }
 
-  // <<<------------ Column ------------>>>
-  const addColumn = (column: BottomSiteColumn) =>
-    setMenu((current) =>
-      produce(current, (draft) => {
-        draft?.push(column)
-      }),
-    )
+  // WARN: not a pure function
+  const onEditParagraphSubmit = (form: any) => {
+    setMenu((_menu) =>
+      produce(_menu, (draft) => {
+        const descriptionIndex = findDescriptionIndex(selectedDescription!)
+        const paragraphIndex = findParagraphIndex(selectedDescription!, selectedParagraph!)
+        console.log('description index >', descriptionIndex)
+        console.log('paragraph index >', paragraphIndex)
 
-  const removeColumn = (column: BottomSiteColumn) =>
-    setMenu((current) =>
-      produce(current, (draft) => {
-        draft = draft?.filter((item) => item?.title !== column?.title)
+        if (descriptionIndex >= 0) {
+          if (paragraphIndex >= 0) {
+            draft[descriptionIndex].paragraphs[paragraphIndex] = form?.paragraph
+          }
+        }
       }),
     )
-
-  const editColumn = (column: BottomSiteColumn, form: BottomSiteColumn) => {
-    setMenu((current) =>
-      produce(current, (draft) => {
-        draft[findColumnIndex(column)] = form
-      }),
-    )
+    closeModal()
   }
 
-  // <<<------------ Row ------------>>>
-  const addRow = (column: BottomSiteColumn, row: BottomSiteRow) =>
-    setMenu((current) =>
-      produce(current, (draft) => {
-        draft[findColumnIndex(column)]?.rows?.push(row)
+  const [selectedDescription, setSelectedDescription] = useState<BottomSiteDescription | null>(null)
+  const [selectedParagraph, setSelectedParagraph] = useState<string | null>(null)
+
+  useNonInitialEffect(() => {
+    setValue('title', selectedDescription?.title)
+  }, [selectedDescription])
+
+  useNonInitialEffect(() => {
+    setValue('paragraph', selectedParagraph)
+  }, [selectedParagraph])
+
+  type Mode = 'remove' | 'edit' | null
+
+  const [mode, setMode] = useState<Mode>(null)
+
+  const addDescription = () => {
+    setMenu((_menu) =>
+      produce(_menu, (draft) => {
+        draft?.push(initialBottomSiteDescription)
       }),
-    )
-
-  const removeRow = (column: BottomSiteColumn, row: BottomSiteRow) =>
-    setMenu((current) =>
-      produce(current, (draft) => {
-        draft[findColumnIndex(column)]?.rows?.splice(findRowIndex(column, row), 1)
-      }),
-    )
-
-  const editRow = (column: BottomSiteColumn, row: BottomSiteRow, form: BottomSiteRow) =>
-    setMenu((current) =>
-      produce(current, (draft) => {
-        draft[findColumnIndex(column)].rows[findRowIndex(column, row)] = form
-      }),
-    )
-
-  // <<<------------ Forms ------------>>>
-  const [selectedColumn, setSelectedColumn] = useState<BottomSiteColumn | null>(null)
-  const [selectedRow, setSelectedRow] = useState<BottomSiteRow | null>(null)
-
-  const [activeForm, setActiveForm] = useState<'column' | 'row' | null>(null)
-
-  const {
-    register: columnRegister,
-    handleSubmit: columnHandleSubmit,
-    control: columnControl,
-    setValue: columnSetValue,
-    reset: columnReset,
-  } = useForm()
-
-  const {
-    register: rowRegister,
-    handleSubmit: rowHandleSubmit,
-    control: rowControl,
-    setValue: rowSetValue,
-    reset: rowReset,
-  } = useForm()
-
-  const onColumnFormSubmit = (form: BottomSiteColumn) => {
-    selectedColumn ? editColumn(selectedColumn, form) : addColumn({ ...initialBottomSiteColumn, title: form?.title })
-    columnReset()
-    setActiveForm(null)
-    toast.success(
-      <p>
-        <div>
-          <strong>"{form?.title}"</strong>
-        </div>{' '}
-        {selectedColumn ? 'بروز' : 'ساخته'} شد
-      </p>,
     )
   }
 
-  const onRowFormSubmit = (form: BottomSiteRow) => {
-    selectedRow ? editRow(selectedColumn!, selectedRow, form) : addRow(selectedColumn!, form)
-    setActiveForm(null)
-    toast.success(
-      <p>
-        <div>
-          <strong>"{form?.title}"</strong>
-        </div>{' '}
-        {selectedRow ? 'بروز' : 'ساخته'} شد
-      </p>,
-    )
-    rowReset()
-  }
-
-  useEffect(() => {
-    selectedColumn
-      ? Object.entries(selectedColumn)?.map((entry) => columnSetValue(entry[0], entry[1]))
-      : Object.entries(initialBottomSiteColumn)?.map((entry) => columnSetValue(entry[0], null))
-  }, [selectedColumn])
-
-  useEffect(() => {
-    selectedRow
-      ? Object.entries(selectedRow)?.map((entry) => rowSetValue(entry[0], entry[1]))
-      : Object.entries(initialBottomSiteRow)?.map((entry) => rowSetValue(entry[0], null))
-  }, [selectedRow])
-
-  const onColumnRemoval = (column: BottomSiteColumn) => {
-    removeColumn(column)
-    setActiveForm(null)
-    toast.success(
-      <p>
-        <div>
-          <strong>"{column?.title}"</strong>
-        </div>{' '}
-        حذف شد
-      </p>,
+  const addParagrapgh = (description: BottomSiteDescription) => {
+    setMenu((_menu) =>
+      produce(_menu, (draft) => {
+        draft[findDescriptionIndex(description)]?.paragraphs?.push('بند')
+      }),
     )
   }
 
-  const onRowRemoval = (column: BottomSiteColumn, row: BottomSiteRow) => {
-    removeRow(column, row)
-    setActiveForm(null)
-    toast.success(
-      <p>
-        <div>
-          <strong>"{row?.title}"</strong>
-        </div>{' '}
-        حذف شد
-      </p>,
+  const deleteDescription = (description: BottomSiteDescription) => {
+    console.log(findDescriptionIndex(description))
+    setMenu((_menu) =>
+      produce(_menu, (draft) => {
+        draft?.splice(findDescriptionIndex(description), 1)
+      }),
     )
+    closeModal()
+  }
+  const deleteParagraph = (description: BottomSiteDescription, paragraph: string) => {
+    setMenu((_menu) =>
+      produce(_menu, (draft) => {
+        draft[findDescriptionIndex(description)]?.paragraphs?.splice(findParagraphIndex(description, paragraph), 1)
+      }),
+    )
+    closeModal()
+  }
+
+  const closeModal = () => {
+    setMode(null)
+    setSelectedDescription(null)
+    setSelectedParagraph(null)
+    setValue('description', null)
+    setValue('paragraph', null)
+  }
+
+  const renderModalContent = (mode: Mode) => {
+    switch (mode) {
+      case 'remove':
+        return (
+          <FlexContainer className="col">
+            {selectedParagraph ? (
+              <>
+                <P>آیا از حذف بند</P>
+                <P className="my-2">
+                  <strong>{selectedParagraph}</strong>
+                </P>
+                <P>مربوط به بخش :</P>
+                <P className="my-2">
+                  <strong>{selectedDescription?.title}</strong>
+                </P>
+                <P>اطمینان دارید؟</P>
+
+                <FlexContainer className="my-2">
+                  <Button status="Info" onClick={() => setMode(null)}>
+                    انصراف
+                  </Button>
+                  <Button
+                    status="Danger"
+                    className="action"
+                    onClick={() => deleteParagraph(selectedDescription!, selectedParagraph)}
+                  >
+                    بله
+                  </Button>
+                </FlexContainer>
+              </>
+            ) : (
+              <>
+                آیا از حذف بخش
+                <P>
+                  <strong>{selectedDescription?.title}</strong>
+                </P>
+                اطمینان دارید؟
+                <FlexContainer className="mt-2">
+                  <Button status="Info" onClick={() => setMode(null)}>
+                    انصراف
+                  </Button>
+                  <Button status="Danger" className="action" onClick={() => deleteDescription(selectedDescription!)}>
+                    بله
+                  </Button>
+                </FlexContainer>
+              </>
+            )}
+          </FlexContainer>
+        )
+      case 'edit':
+        return selectedParagraph ? (
+          <Form onSubmit={handleSubmit(onEditParagraphSubmit)}>
+            <InputGroup className="col">
+              <label>بند :</label>
+              <textarea {...register('paragraph')} className="full-width" />
+            </InputGroup>
+
+            <FlexContainer className="mt-3">
+              <Button status="Danger" appearance="outline" className="ml-2" type="button" onClick={closeModal}>
+                انصراف
+              </Button>
+              <Button status="Info" appearance="outline">
+                ویرایش
+              </Button>
+            </FlexContainer>
+          </Form>
+        ) : (
+          <Form onSubmit={handleSubmit(onEditDescriptionSubmit)}>
+            <InputGroup className="col">
+              <label>نام بخش: </label>
+              <input className="full-width" {...register('title')} />
+            </InputGroup>
+
+            <FlexContainer className="mt-3">
+              <Button status="Danger" appearance="outline" className="ml-2" type="button" onClick={closeModal}>
+                انصراف
+              </Button>
+              <Button status="Info" appearance="outline">
+                ویرایش
+              </Button>
+            </FlexContainer>
+          </Form>
+        )
+      case null:
+        return <div>null</div>
+    }
   }
 
   return (
     <Component>
-      <Columns>
-        {menu?.map((_column) => (
-          <Column key={_column?.title}>
-            <ColumnTitle
-              title="برای ویرایش فهرست کلیک کنید"
+      <Button status="Success" appearance="outline" className="mb-3" onClick={addDescription}>
+        افزودن توضیجات
+      </Button>
+      {menu?.map((_menu) => (
+        <Card>
+          <DescriptionTitle>
+            {_menu?.title}
+            <Button
+              status="Danger"
+              appearance="outline"
+              className="action"
               onClick={() => {
-                setSelectedColumn(_column)
-                setActiveForm('column')
+                setSelectedParagraph(null)
+                setSelectedDescription(_menu)
+                setMode('remove')
               }}
             >
-              {_column?.title}
-            </ColumnTitle>
-
-            <Rows>
-              {_column?.rows?.map((_row) => (
-                <Row
-                  key={_row?.title}
-                  onClick={() => {
-                    setSelectedColumn(_column)
-                    setSelectedRow(_row)
-                    setActiveForm('row')
-                  }}
-                >
-                  {_row?.title}
-                </Row>
-              ))}
-
-              <Button
-                onClick={() => {
-                  setSelectedColumn(_column)
-                  setSelectedRow(null)
-                  setActiveForm('row')
-                }}
-                status="Info"
-                appearance="outline"
-              >
-                افزودن لینک
-              </Button>
-            </Rows>
-          </Column>
-        ))}
-        <Button
-          status="Info"
-          appearance="outline"
-          onClick={() => {
-            setSelectedColumn(null)
-            setActiveForm('column')
-          }}
-        >
-          افزودن ستون
-        </Button>
-      </Columns>
-
-      {/* =========================== MODAL =========================== */}
-
-      <BasicModal on={!!activeForm} toggle={() => setActiveForm(null)}>
-        <ModalBox>
-          <Form
-            onSubmit={
-              activeForm === 'column' ? columnHandleSubmit(onColumnFormSubmit) : rowHandleSubmit(onRowFormSubmit)
-            }
-          >
-            {activeForm === 'column' ? (
-              <>
-                <InputGroup>
-                  <label>نام فهرست</label>
-                  <input {...columnRegister('title', { required: true })} />
-                </InputGroup>
-              </>
-            ) : (
-              <>
-                <InputGroup>
-                  <label>عنوان لینک</label>
-                  <input {...rowRegister('title', { required: true })} />
-                </InputGroup>
-
-                <InputGroup>
-                  <label>لینک</label>
-                  <input {...rowRegister('href', { required: true })} />
-                </InputGroup>
-
-                <InputGroup>
-                  <Controller
-                    control={rowControl}
-                    name="bold"
-                    render={({ field }) => (
-                      <Checkbox {...field} checked={field?.value}>
-                        برجسته
-                      </Checkbox>
-                    )}
-                  />
-                </InputGroup>
-              </>
-            )}
-            <Container>
-              <Button onClick={() => setActiveForm(null)} type="button" className="form">
-                انصراف
-              </Button>
-
-              <Button status="Success" appearance="outline">
-                ثبت
-              </Button>
+              حذف توضیحات
+            </Button>
+            <Button
+              status="Info"
+              appearance="outline"
+              className="action"
+              onClick={() => {
+                setSelectedParagraph(null)
+                setSelectedDescription(_menu)
+                setMode('edit')
+              }}
+            >
+              ویرایش توضیحات
+            </Button>
+            <Button status="Success" appearance="outline" className="action" onClick={() => addParagrapgh(_menu)}>
+              افزودن بند
+            </Button>
+          </DescriptionTitle>
+          {_menu?.paragraphs?.map((_paragraph) => (
+            <CardBody>
+              {_paragraph}
 
               <Button
-                disabled={activeForm === 'column' ? !selectedColumn : !selectedRow}
-                type="button"
-                className="form"
                 status="Danger"
                 appearance="outline"
-                onClick={() =>
-                  activeForm === 'column'
-                    ? onColumnRemoval(selectedColumn!)
-                    : onRowRemoval(selectedColumn!, selectedRow!)
-                }
+                className="action"
+                onClick={() => {
+                  setSelectedDescription(_menu)
+                  setSelectedParagraph(_paragraph)
+                  setMode('remove')
+                }}
               >
-                حذف
+                حذف بند
               </Button>
-            </Container>
-          </Form>
-        </ModalBox>
-      </BasicModal>
-      <Button status="Success" appearance="hero" className="submit" onClick={() => callback(menu)} disabled={loading}>
-        بروزرسانی منو
+              <Button
+                status="Info"
+                appearance="outline"
+                className="action"
+                onClick={() => {
+                  setSelectedDescription(_menu)
+                  setSelectedParagraph(_paragraph)
+                  setMode('edit')
+                }}
+              >
+                ویرایش بند
+              </Button>
+            </CardBody>
+          ))}
+        </Card>
+      ))}
+
+      <Button status="Success" appearance="hero" onClick={() => callback(menu)} disabled={loading}>
+        اعمال تغییرات
       </Button>
+
+      {/* MODALS */}
+      <BasicModal on={!!mode} toggle={closeModal} contentStyles={modalContentStyle}>
+        <ModalBox>{renderModalContent(mode)}</ModalBox>
+      </BasicModal>
     </Component>
   )
 }
 
 const Component = styled.div``
 
-const Columns = styled.div`
-  display: flex;
-`
+const Card = styled(_Card)``
 
-interface IMenuColumnProps {
-  highlight?: boolean
-}
-const Column = styled.div<IMenuColumnProps>`
-  flex: 1;
-  padding: 1rem;
-  border: ${(props) => (props.highlight ? '0.175rem' : '0.125rem')} solid
-    ${(props) => (props?.highlight ? Colors.grayDark : Colors.grayBorder)};
-  border-radius: 0.5rem;
-  margin: 1rem 0 0 1rem;
-
-  display: flex;
-  flex-direction: column;
-
-  &:hover {
-    border-color: ${Colors.Danger};
-  }
-`
-
-const ColumnTitle = styled.h4`
+const DescriptionTitle = styled(_CardHeader).attrs({
+  title: 'ویرایش عنوان بند',
+})`
   &:hover {
     cursor: pointer;
-    color: ${Colors.Danger};
+
+    background-color: rgba(0, 0, 0, 0.1);
   }
 `
-const Rows = styled.div`
-  margin-top: 1rem;
 
-  display: flex;
-  flex-direction: column;
-`
-
-interface IMenuRowProps {
-  footer?: boolean
-  invalid?: boolean
-}
-const Row = styled.div<IMenuRowProps>`
-  padding: 1rem;
-  border: 2px solid
-    ${(props) => (props.footer ? Colors.grayDark : props.invalid ? Colors.MaterialRed : Colors.grayBorder)};
-  border-radius: 0.5rem;
-  margin: 0 0 1rem 0;
+const CardBody = styled(_CardBody).attrs({
+  title: 'ویرایش بند',
+})`
+  line-height: 1.875rem;
 
   &:hover {
     cursor: pointer;
-    background-color: ${Colors.grayBorder};
-  }
-`
 
-const Container = styled.div`
-  display: flex;
+    background-color: rgba(0, 0, 0, 0.1);
+  }
 `
 
 const Button = styled(_Button)`
-  &.form {
-    margin: 0 1rem;
-  }
-
-  &.add-menu {
-    margin-botto: 1rem;
-  }
-
-  &.submit {
-    margin-top: 1rem;
+  &.action {
+    margin-right: 1rem;
   }
 `
 
 const Form = styled.form`
-  label {
-    min-width: 5rem;
+  width: 100%;
+  display: inline-flex;
+  flex-direction: column;
+`
+
+const P = styled.p`
+  display: flex;
+  margin: 0 0.125rem;
+`
+
+const FlexContainer = styled(_FlexContainer)`
+  &.col {
+    flex-direction: column;
   }
 `
 
 const InputGroup = styled(_InputGroup)`
-  margin-bottom: 1rem;
+  input.full-width {
+    min-width: 100%;
+  }
+
+  textarea.full-width {
+    min-width: 100%;
+    height: 20rem;
+  }
 `

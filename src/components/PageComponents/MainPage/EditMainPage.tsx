@@ -7,7 +7,7 @@ import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
-import { admin, removeItem, useStore } from 'utils'
+import { removeItem, useStore } from 'utils'
 import { deleteBanner, uploadBannerImage } from 'utils/api/REST/actions/banners'
 import { updateBanner } from 'utils/api/REST/actions/banners/updateBanner'
 
@@ -29,22 +29,13 @@ export function EditMainPage() {
 
   const [loading, setLoading] = useState(false)
   const [active, setActive] = useState(!!banner?.active)
+  const [video, setVideo] = useState(banner?.media?.u?.includes('mp4'))
 
   const { register, handleSubmit, control } = useForm({
     defaultValues: {
       ...(banner ?? null),
     },
   })
-
-  const updateImage = async (image: File) => {
-    const formData = new FormData()
-    formData.append('media[]', image)
-
-    const { data: response } = await admin().post(`/banners/image/${banner?.id}`, {
-      image: formData,
-    })
-    console.log(response)
-  }
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
@@ -55,24 +46,6 @@ export function EditMainPage() {
       'حذف بنر موفقیت آمیز نبود',
     ])
   }
-
-  // called every time a file's `status` changes
-  // const handleChangeStatus = ({ meta, file }: any, status: any) => {
-  //   if (status === 'done') {
-  //     const formData = new FormData();
-  //     formData.append('media[]', file);
-
-  //     axios.post(`${process.env.API}/admin/banners/image/${banner?.id}`,
-  //       formData,
-  //       {
-  //         headers: {
-  //           'Content-Type': 'multipart/form-data',
-  //           Authorization: `Bearer 693|4ESmFZNsaQbSt8eNPV9CQwqcl1rGjOQVgaeI1swF`
-  //         }
-  //       }
-  //     ).then(result => console.log(result))
-  //   }
-  // };
 
   const onSubmit = async (form: any) => {
     setLoading(true)
@@ -97,7 +70,7 @@ export function EditMainPage() {
       const formData = new FormData()
       formData.append('image', image[0])
 
-      const uploadResponse = await uploadBannerImage(banner?.id, formData)
+      const uploadResponse = await uploadBannerImage(banner?.id, formData, video)
       console.log('Upload Response >>>', uploadResponse)
 
       toast.info('بنر با موفقیت بروزرسانی شد')
@@ -185,7 +158,12 @@ export function EditMainPage() {
 
         <InputGroup className="mt-4">
           <label>فعال بودن</label>
-          <Checkbox style={{ color: 'transparent' }} checked={active} onChange={(e: any) => setActive(e)} />
+          <Checkbox checked={active} style={{ color: 'transparent' }} onChange={(e: any) => setActive(e)} />
+        </InputGroup>
+
+        <InputGroup className="mt-4">
+          <label>ویدیو</label>
+          <Checkbox checked={video} style={{ color: 'transparent' }} onChange={(e: any) => setVideo(e)} />
         </InputGroup>
 
         <InputGroup className="d-flex align-items-center">
@@ -201,17 +179,17 @@ export function EditMainPage() {
             </InputGroup>
 
             <InputGroup>
-              <label style={{ width: '6rem' }}>تگ آلت تصویر</label>
+              <label style={{ width: '6rem' }}>تگ آلت</label>
               <input {...register('media.a')} placeholder="a" />
             </InputGroup>
 
             <InputGroup>
-              <label style={{ width: '6rem' }}>تگ تایتل تصویر</label>
+              <label style={{ width: '6rem' }}>تگ تایتل</label>
               <input {...register('media.t')} placeholder="t" />
             </InputGroup>
 
             <InputGroup>
-              <label style={{ width: '6rem' }}>اولویت تصویر</label>
+              <label style={{ width: '6rem' }}>اولویت</label>
               <input {...register('media.p')} type="number" placeholder="p" />
             </InputGroup>
           </InputGroup>

@@ -1,22 +1,22 @@
-import Cookies from 'js-cookie';
-import { AppProps } from 'next/app';
-import { useRouter } from 'next/router';
-import { useLayoutEffect } from 'react';
-import { ToastContainer } from 'react-toastify';
-import NextNprogress from 'nextjs-progressbar';
-import 'react-toastify/dist/ReactToastify.css';
-import { StoreProvider, useHydrate } from 'utils';
-import 'styles/global.css';
-import 'styles/bootstrap.css';
+import Cookies from 'js-cookie'
+import { AppProps } from 'next/app'
+import { useRouter } from 'next/router'
+import NextNprogress from 'nextjs-progressbar'
+import { useLayoutEffect } from 'react'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import 'styles/bootstrap.css'
+import 'styles/global.css'
+import { StoreProvider, useHydrate } from 'utils'
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
-  const router = useRouter();
+  const router = useRouter()
 
   useLayoutEffect(() => {
-    !router.route.includes('/auth') && !Cookies.get('token') && router.push('/auth/login');
-  }, [router]);
+    !router.route.includes('/auth') && !Cookies.get('token') && router.push('/auth/login')
+  }, [router])
 
-  const store = useHydrate(pageProps.initialState);
+  const store = useHydrate(pageProps.initialState)
 
   return (
     <StoreProvider store={store}>
@@ -24,7 +24,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
       <NextNprogress />
       <Component {...pageProps} />
     </StoreProvider>
-  );
-};
+  )
+}
 
-export default MyApp;
+export default MyApp

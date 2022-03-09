@@ -124,6 +124,9 @@ const dictionary = {
   'top-site': 'بالای صفحه',
   ad: 'تبلیغات',
   'bottom-site': 'پایین صفحه',
+  'bottom-site-descriptions': 'توضیحات پایین صفحه',
+  'bottom-site-descrpitions': 'توضیحات پایین صفحه',
+  'products-bottom-site-menu': 'منوی پایین صفحه (مختص صفحه محصولات)',
 }
 
 export const translator = (target: string) => {
