@@ -12,6 +12,7 @@ import {
 } from '@paljs/ui'
 import axios from 'axios'
 import { BasicEditor, Button, FlexContainer, ModalBox, ProductImageCard, StockItem } from 'components'
+import { ProductImage } from 'components/Table/OrderInvoice/components/ItemsTable/components'
 import { useNonInitialEffect } from 'hooks'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
@@ -541,7 +542,10 @@ export const EditProductPage: React.FC = () => {
             overflow: 'scroll',
           }}
         >
-          {images?.map((media: Media, index: number) => (
+          {product?.main_site_picture && (
+            <ProductImageCard index={0} media={product?.main_site_picture} removalCallback={setItemToRemove} />
+          )}
+          {product?.media?.map((media: Media, index: number) => (
             <ProductImageCard index={index} media={media} removalCallback={setItemToRemove} />
           ))}
         </CardBody>
