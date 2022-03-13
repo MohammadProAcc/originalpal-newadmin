@@ -348,7 +348,12 @@ export const EditSingleOrderPage: React.FC = () => {
             order['order_items']?.map((orderItem: any, orderItemIndex: number) => (
               <Card style={{ position: 'relative' }}>
                 <Button
-                  style={{ padding: '0.125rem', position: 'absolute', top: '1rem', left: '1rem' }}
+                  style={{
+                    padding: '0.125rem',
+                    position: 'absolute',
+                    top: '1rem',
+                    left: '1rem',
+                  }}
                   status="Danger"
                   appearance="outline"
                   onClick={() => setStockToRemove(orderItem)}
@@ -381,16 +386,16 @@ export const EditSingleOrderPage: React.FC = () => {
             جمع کل :{' '}
             {numeralize(
               order['order_items'] &&
-              order['order_items'].length > 0 &&
-              order['order_items']
-                ?.map((orderItem: any) => Number(orderItem?.price))
-                ?.reduce((prev: number, curr: number) => curr + prev),
+                order['order_items'].length > 0 &&
+                order['order_items']
+                  ?.map((orderItem: any) => Number(orderItem?.price))
+                  ?.reduce((prev: number, curr: number) => curr + prev),
             )}{' '}
             تومان
           </p>
         </CardBody>
       </Card>
-      {/* 
+      {/*
       <Card>
         <CardHeader>کاربر</CardHeader>
         <CardBody>
@@ -446,15 +451,20 @@ export const EditSingleOrderPage: React.FC = () => {
         <CardHeader>فاکتور ها</CardHeader>
         <CardBody>
           <Container>
-            <Button status="Info" appearance="hero" className="ml-1 mb-1"
+            <Button
+              status="Info"
+              appearance="hero"
+              className="ml-1 mb-1"
               onClick={() => setShowOrderDetailsFormModal(true)}
             >
               پرینت فاکتور سفارش
             </Button>
 
-            <Button status="Info" appearance="hero" className="ml-1 mb-1">
-              پرینت پشت فاکتور
-            </Button>
+            <Link href="/orders/return-form">
+              <Button status="Info" appearance="hero" className="ml-1 mb-1">
+                پرینت پشت فاکتور
+              </Button>
+            </Link>
           </Container>
 
           <Container>
@@ -499,10 +509,7 @@ export const EditSingleOrderPage: React.FC = () => {
 
       {/* -==>>> Modals <<<==- */}
 
-      <WriteOrderDetailsModal
-        on={showOrderDetailsFormModal}
-        toggle={() => setShowOrderDetailsFormModal(false)}
-      />
+      <WriteOrderDetailsModal on={showOrderDetailsFormModal} toggle={() => setShowOrderDetailsFormModal(false)} />
 
       <Modal on={stockToRemove} toggle={() => setStockToRemove(null)}>
         <Card>
