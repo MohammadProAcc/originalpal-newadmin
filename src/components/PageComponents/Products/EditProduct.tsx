@@ -1,5 +1,3 @@
-import { deleteProductMedia, deleteStock, editProduct, getSingleProduct, toLocalDate, useStore } from 'utils'
-import Layout from 'Layouts'
 import {
   Accordion,
   AccordionItem,
@@ -12,21 +10,22 @@ import {
   Popover,
   Select as _Select,
 } from '@paljs/ui'
+import axios from 'axios'
 import { BasicEditor, Button, FlexContainer, ModalBox, ProductImageCard, StockItem } from 'components'
-import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
-import { Media, ProductBrand } from 'types'
-import styled from 'styled-components'
+import { useNonInitialEffect } from 'hooks'
 import Cookies from 'js-cookie'
+import Layout from 'Layouts'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import Dropzone from 'react-dropzone-uploader'
-import axios from 'axios'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import styled from 'styled-components'
+import { Media, ProductBrand } from 'types'
+import { deleteProductMedia, deleteStock, editProduct, getSingleProduct, toLocalDate, useStore } from 'utils'
 import { StockForm } from '../Stock/components'
-import { useNonInitialEffect } from 'hooks'
 
 // TODO: add search brand mechanism
-
 export const EditProductPage: React.FC = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -56,7 +55,7 @@ export const EditProductPage: React.FC = () => {
           ? [product?.site_main_picture]
           : [null],
       ),
-    product,
+    [product],
   )
 
   const [showAddStockModal, setShowAddStockModal] = useState(false)

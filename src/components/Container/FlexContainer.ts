@@ -4,12 +4,14 @@ interface IFlexContainerProps {
   col?: boolean
   jc?: string
   ai?: string
+  fullWidth?: boolean
   Style?: FlattenSimpleInterpolation
 }
 
 export const FlexContainer = styled.div<IFlexContainerProps>`
+  width: ${(props) => props.fullWidth && '100%'};
   display: flex;
   flex-direction: ${(p) => p.col && 'column'};
   justify-content: ${(p) => p.jc};
-  align-item: ${(p) => p.ai} ${(p) => p.Style};
+  align-items: ${(p) => p.ai} ${(p) => p.Style};
 `

@@ -1,8 +1,11 @@
 import { Add, Close } from '@material-ui/icons'
 import { Alert, Button, Card, CardBody, CardHeader, Checkbox, Container, InputGroup, Modal, Select } from '@paljs/ui'
 import { BasicEditor, FlexContainer, HeaderButton, ModalBox } from 'components'
+import { BasicModal } from 'components/Modal'
+import { WriteOrderDetailsModal } from 'components/Modal/derived/WriteOrderDetails'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -45,8 +48,6 @@ export const EditSingleOrderPage: React.FC = () => {
     reload('order', updatedOrder)
   }
 
-  console.log(order)
-
   const [stockOptions, setStockOptions] = useState(
     stocks?.map((stock: any) => ({
       label: `شناسه انبار: ${stock?.id}, سایز: ${stock?.size} شناسه محصول: ${stock?.product_id}`,
@@ -76,6 +77,8 @@ export const EditSingleOrderPage: React.FC = () => {
   const [stockToRemove, setStockToRemove] = useState<any>(null)
 
   const [loading, setLoading] = useState(false)
+
+  const [showOrderDetailsFormModal, setShowOrderDetailsFormModal] = useState(false)
 
   const { register: addStockRegister, handleSubmit: addStockHandleSubmit, control: addStockControl } = useForm()
 
@@ -378,10 +381,10 @@ export const EditSingleOrderPage: React.FC = () => {
             جمع کل :{' '}
             {numeralize(
               order['order_items'] &&
-                order['order_items'].length > 0 &&
-                order['order_items']
-                  ?.map((orderItem: any) => Number(orderItem?.price))
-                  ?.reduce((prev: number, curr: number) => curr + prev),
+              order['order_items'].length > 0 &&
+              order['order_items']
+                ?.map((orderItem: any) => Number(orderItem?.price))
+                ?.reduce((prev: number, curr: number) => curr + prev),
             )}{' '}
             تومان
           </p>
@@ -443,7 +446,9 @@ export const EditSingleOrderPage: React.FC = () => {
         <CardHeader>فاکتور ها</CardHeader>
         <CardBody>
           <Container>
-            <Button status="Info" appearance="hero" className="ml-1 mb-1">
+            <Button status="Info" appearance="hero" className="ml-1 mb-1"
+              onClick={() => setShowOrderDetailsFormModal(true)}
+            >
               پرینت فاکتور سفارش
             </Button>
 
@@ -493,6 +498,12 @@ export const EditSingleOrderPage: React.FC = () => {
       </Card>
 
       {/* -==>>> Modals <<<==- */}
+
+      <WriteOrderDetailsModal
+        on={showOrderDetailsFormModal}
+        toggle={() => setShowOrderDetailsFormModal(false)}
+      />
+
       <Modal on={stockToRemove} toggle={() => setStockToRemove(null)}>
         <Card>
           <CardHeader>

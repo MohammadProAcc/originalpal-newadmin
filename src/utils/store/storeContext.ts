@@ -1,3 +1,4 @@
+import { OrderInvoiceDetails } from 'components/PageComponents/Orders/types'
 import produce from 'immer'
 import { useMemo } from 'react'
 import { initialLoginResponseUser, LoginResponseUser, Media, Product, User, UserSlice } from 'types'
@@ -24,6 +25,11 @@ export type InitialState = any
 export const initialState: InitialState = {
   user: initialLoginResponseUser,
   cache: {},
+  orderDetails: {
+    description: '',
+    postDescription: '',
+    nextCoupon: '',
+  },
 }
 
 function initStore(preloadedState = initialState) {
@@ -61,6 +67,8 @@ function initStore(preloadedState = initialState) {
                 (item: any) => item?.id !== orderItemId,
               )),
           ),
+        setOrderDetails: (orderDetails: OrderInvoiceDetails) =>
+          set((state: any) => void (state.orderDetails = orderDetails)),
         // -===>>> Product <<<===-
         updateProduct: (product: Product) =>
           set((state: any) => {
