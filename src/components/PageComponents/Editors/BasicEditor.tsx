@@ -1,42 +1,26 @@
-import React from 'react';
-import { Card, CardBody } from '@paljs/ui/Card';
-import { Editor } from '@tinymce/tinymce-react';
+import { Card, CardBody } from '@paljs/ui/Card'
+import dynamic from 'next/dynamic'
+import React, { useEffect, useState } from 'react'
+
+const RichTextEditor = dynamic<any>(() => import('@mantine/rte').then((mod) => mod.RichTextEditor), { ssr: false })
 
 export function BasicEditor({
   callback,
   initialValue,
   title,
 }: {
-  callback: Function;
-  initialValue?: string;
-  title?: string;
+  callback: Function
+  initialValue?: string
+  title?: string
 }) {
-  const handleEditorChange = (content: any, _editor: any) => {
-    callback(content);
-  };
+  const [content, setContent] = useState(initialValue)
+  useEffect(() => callback(content), [content])
   return (
     <Card>
       <header>{title ?? 'ویرایشگر'}</header>
       <CardBody>
-        <Editor
-          initialValue={initialValue}
-          init={{
-            height: 500,
-            menubar: false,
-
-            plugins: [
-              'advlist autolink lists link image charmap print preview anchor',
-              'searchreplace visualblocks code fullscreen',
-              'insertdatetime media table paste code help wordcount',
-            ],
-            toolbar:
-              'undo redo | formatselect | bold italic backcolor | \
-            alignleft aligncenter alignright alignjustify | \
-            bullist numlist outdent indent | removeformat | help',
-          }}
-          onEditorChange={handleEditorChange}
-        />
+        <RichTextEditor value={content} onChange={setContent} />
       </CardBody>
     </Card>
-  );
+  )
 }

@@ -125,7 +125,10 @@ export const StockForm: React.FC<IStockFormProps> = ({ defaultValues, callback }
   )
 }
 
-export const Component = styled.div``
+export const Component = styled.div`
+  overflow-y: scroll;
+  height: 90vh;
+`
 
 const Form = styled.form`
   width: 100%;

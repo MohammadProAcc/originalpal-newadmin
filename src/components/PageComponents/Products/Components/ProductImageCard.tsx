@@ -1,14 +1,14 @@
 import { Close } from '@material-ui/icons'
 import { Alert, Badge, Button, Card, CardBody, CardHeader, Container, InputGroup as _InputGroup } from '@paljs/ui'
+import Cookies from 'js-cookie'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { Media } from 'types'
-import Cookies from 'js-cookie'
 import { deleteProductMedia, editProductImage, editProductMainImage, getSingleProduct, useStore } from 'utils'
-import { toast } from 'react-toastify'
 
 interface ProductImageCardProps {
   media: Media
@@ -70,7 +70,12 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({ media, index
         ) : (
           <>
             <Button
-              style={{ padding: '0.125rem', position: 'absolute', top: '1rem', left: '1rem' }}
+              style={{
+                padding: '0.125rem',
+                position: 'absolute',
+                top: '1rem',
+                left: '1rem',
+              }}
               status="Danger"
               appearance="outline"
               onClick={() => removalCallback(media)}
@@ -104,8 +109,15 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({ media, index
                 </Button>
               </Form>
             </Container>
-            <InputGroup style={{ width: '100%', marginLeft: '3rem', display: 'flex', justifyContent: 'flex-end' }}>
-              <Image width="264px" height="264px" src={`http://api.originalpal.co.uk/images/${media?.u}`} />
+            <InputGroup
+              style={{
+                width: '100%',
+                marginLeft: '3rem',
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <ProductImage src={`http://api.originalpal.co.uk/images/${media?.u}`} />
             </InputGroup>
           </>
         )}
@@ -124,3 +136,10 @@ const InputGroup = styled(_InputGroup)`
 `
 
 const Form = styled.form``
+
+const ProductImage = styled.img`
+  width: 16rem;
+  height: 16rem;
+
+  object-fit: cover;
+`

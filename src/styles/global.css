@@ -74,6 +74,10 @@ label {
   margin: 0.5rem;
 }
 
+strong {
+  font-family: IRANSansBold;
+}
+
 .flex {
   display: flex;
 }

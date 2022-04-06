@@ -1,12 +1,12 @@
-import { Button, Checkbox, InputGroup, Select } from '@paljs/ui'
+import { Button, InputGroup } from '@paljs/ui'
+import Cookies from 'js-cookie'
 import Layout from 'Layouts'
+import router from 'next/router'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import styled from 'styled-components'
-import Cookies from 'js-cookie'
 import { toast } from 'react-toastify'
+import styled from 'styled-components'
 import { createBrand } from 'utils'
-import router from 'next/router'
 
 export function CreateBrand() {
   const [loading, setLoading] = useState(false)

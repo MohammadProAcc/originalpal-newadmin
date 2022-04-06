@@ -12,13 +12,11 @@ import {
 } from '@paljs/ui'
 import axios from 'axios'
 import { BasicEditor, Button, FlexContainer, ModalBox, ProductImageCard, StockItem } from 'components'
-import { ProductImage } from 'components/Table/OrderInvoice/components/ItemsTable/components'
 import { useNonInitialEffect } from 'hooks'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
-import Dropzone from 'react-dropzone-uploader'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
@@ -209,6 +207,18 @@ export const EditProductPage: React.FC = () => {
     }
   }
 
+  const handleImageUpload = async (type: 'media' | 'site_main_picture', file: File) => {
+    const formData = new FormData()
+    formData?.append(type, file)
+
+    const { data: response } = await axios.post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('token')}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+  }
+
   const [itemToRemove, setItemToRemove] = useState<any>(null)
 
   const removeProductMedia = async (media: Media) => {
@@ -239,8 +249,8 @@ export const EditProductPage: React.FC = () => {
   }
 
   return (
-    <Layout title={`${product?.id}`}>
-      <h1 style={{ marginBottom: '4rem' }}>محصول {product?.name}</h1>
+    <Layout title={`ویرایش محصول ${product?.id}`}>
+      <h1 style={{ marginBottom: '4rem' }}>محصول "{product?.name}"</h1>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Card>
           <CardHeader>َUrl منحصر به فرد</CardHeader>
@@ -390,7 +400,7 @@ export const EditProductPage: React.FC = () => {
             </Card>
           </CardBody>
         </Card>
-        {/* 
+        {/*
         <Card>
           <CardHeader>نوع</CardHeader>
           <CardBody style={{ overflow: 'initial' }}>
@@ -529,11 +539,11 @@ export const EditProductPage: React.FC = () => {
           </h3>
           <DropZoneWrapper>
             <label>تصویر اصلی</label>
-            <Dropzone onChangeStatus={handleMainChangeStatus} accept="image/*,audio/*,video/*" inputContent="" />
+            <input type="file" onChange={(e: any) => handleImageUpload('site_main_picture', e?.target?.files[0])} />
           </DropZoneWrapper>
           <DropZoneWrapper>
             <label>تصویر</label>
-            <Dropzone onChangeStatus={handleChangeStatus} accept="image/*,audio/*,video/*" inputContent="" />
+            <input type="file" onChange={(e: any) => handleImageUpload('media', e?.target?.files[0])} />
           </DropZoneWrapper>
         </CardHeader>
         <CardBody
