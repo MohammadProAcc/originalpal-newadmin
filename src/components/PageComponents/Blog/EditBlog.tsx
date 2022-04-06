@@ -1,13 +1,13 @@
-import { deleteBlog, editBlog, getSingleBlog, removeItem, uploadBlogImage, useStore } from 'utils'
-import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, Checkbox, InputGroup, Modal } from '@paljs/ui'
 import { BasicEditor, Button, FlexContainer, HeaderButton, ModalBox } from 'components'
+import { MediaCard } from 'components/Card'
+import Layout from 'Layouts'
+import router from 'next/router'
+import React, { useLayoutEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
-import React, { useState, useLayoutEffect } from 'react'
 import styled from 'styled-components'
-import { MediaCard } from 'components/Card'
-import router from 'next/router'
+import { deleteBlog, editBlog, getSingleBlog, removeItem, uploadBlogImage, useStore } from 'utils'
 
 export const EditBlogPage: React.FC = () => {
   const { blog, reload } = useStore((state: any) => ({
@@ -290,18 +290,18 @@ export const EditBlogPage: React.FC = () => {
                         )}
                     />
                 </InputGroup>
-*/}
+          */}
 
-        <InputGroup className="col" fullWidth>
-          <label>فایل ویدیویی</label>
-          <video controls src={`https://api.originalpal.co.uk/images/${blog.srcvideo?.u}`}></video>
-          <label>برای جایگزینی فایل ویدیویی، فایل خود را از طریق ورودی زیر بارگذاری کنید</label>
-          <input
-            type="file"
-            placeholder="فایل ویدیویی"
-            onChange={(e: any) => replaceMedia('srcvideo', e?.target?.files[0])}
-          />
-        </InputGroup>
+        {/* <InputGroup className="col" fullWidth> */}
+        {/*   <label>فایل ویدیویی</label> */}
+        {/*   <video controls src={`https://api.originalpal.co.uk/images/${blog.srcvideo?.u}`}></video> */}
+        {/*   <label>برای جایگزینی فایل ویدیویی، فایل خود را از طریق ورودی زیر بارگذاری کنید</label> */}
+        {/*   <input */}
+        {/*     type="file" */}
+        {/*     placeholder="فایل ویدیویی" */}
+        {/*     onChange={(e: any) => replaceMedia('srcvideo', e?.target?.files[0])} */}
+        {/*   /> */}
+        {/* </InputGroup> */}
 
         <Button disabled={loading} style={{ width: 'auto', margin: '3rem 0' }} status="Info" appearance="outline">
           {loading ? '...' : 'بروزرسانی وبلاگ'}

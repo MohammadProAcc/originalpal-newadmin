@@ -1,13 +1,13 @@
 import { Button, Card, CardBody, CardHeader, Checkbox, InputGroup, Radio, Select } from '@paljs/ui'
+import { BasicEditor } from 'components'
+import Cookies from 'js-cookie'
 import Layout from 'Layouts'
+import router from 'next/router'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import styled from 'styled-components'
-import Cookies from 'js-cookie'
 import { toast } from 'react-toastify'
+import styled from 'styled-components'
 import { createBlog, editBlog, search_in, uploadBlogImage } from 'utils'
-import { BasicEditor } from 'components'
-import router from 'next/router'
 
 export function CreateBlog() {
   const [loading, setLoading] = useState(false)
@@ -29,18 +29,32 @@ export function CreateBlog() {
 
     const response = await createBlog(form, Cookies.get('token'))
     if (response !== null) {
-      const { data: blogs } = await search_in('blog', { key: 'title', type: '=', value: form?.title }, router?.query)
+      const { data: blogs } = await search_in(
+        'blog',
+        {
+          key: 'title',
+          type: '=',
+          value: form?.title,
+        },
+        router?.query,
+      )
       const blogId = blogs?.data[blogs?.total - 1]?.id
       console.log('blogId', blogId)
 
       const thumbUploadResponse = await uploadBlogImage(blogId, 'thumb', thumb)
-      if (thumbUploadResponse?.status === 'success') toast.success('تصویر بنر وبلاگ آپلود شد')
+      if (thumbUploadResponse?.status === 'success') {
+        toast.success('تصویر بنر وبلاگ آپلود شد')
+      }
 
       const endimageUploadResponse = await uploadBlogImage(blogId, 'endimage', endImage)
-      if (endimageUploadResponse?.status === 'success') toast.success('تصویر پایانی وبلاگ آپلود شد')
+      if (endimageUploadResponse?.status === 'success') {
+        toast.success('تصویر پایانی وبلاگ آپلود شد')
+      }
 
       const srcvideoUploadResponse = await uploadBlogImage(blogId, 'srcvideo', srcvideo)
-      if (srcvideoUploadResponse?.status === 'success') toast.success('ویدیو وبلاگ آپلود شد')
+      if (srcvideoUploadResponse?.status === 'success') {
+        toast.success('ویدیو وبلاگ آپلود شد')
+      }
 
       toast.success('وبلاگ با موفقیت ساخته شد')
       router.push(`/blog/edit/${blogId}`)
@@ -216,15 +230,15 @@ export function CreateBlog() {
           />
         </InputGroup>
 
-        <InputGroup className="col" fullWidth>
-          <label>فایل ویدیویی</label>
-          <input type="file" {...register('srcvideo')} placeholder="فایل ویدیویی" />
-        </InputGroup>
-
-        <InputGroup className="col" fullWidth>
-          <label>هدر ها</label>
-          <input {...register('headers')} placeholder="هدر ها" />
-        </InputGroup>
+        {/* <InputGroup className="col" fullWidth> */}
+        {/*   <label>فایل ویدیویی</label> */}
+        {/*   <input type="file" {...register('srcvideo')} placeholder="فایل ویدیویی" /> */}
+        {/* </InputGroup> */}
+        {/**/}
+        {/* <InputGroup className="col" fullWidth> */}
+        {/*   <label>هدر ها</label> */}
+        {/*   <input {...register('headers')} placeholder="هدر ها" /> */}
+        {/* </InputGroup> */}
 
         <InputGroup className="col" fullWidth>
           <label>ترند</label>
