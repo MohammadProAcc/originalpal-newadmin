@@ -1,7 +1,7 @@
 module.exports = {
   env: {
     API: 'https://api.originalpal.co.uk',
-    SRC: 'https://originalpal.com/panel',
+    SRC: 'http://api.originalpal.co.uk/images',
     _SRC: 'http://api.originalpal.co.uk/images'
   },
   images: {
