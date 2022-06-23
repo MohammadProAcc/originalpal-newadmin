@@ -6,56 +6,71 @@ const items: MenuItemType[] = [
     link: { href: '/dashboard' },
   },
   {
-    title: 'بخش های صفحه اصلی',
-    link: { href: '/main-page-sections' },
+    title: 'مدیریت عمومی',
+    children: [
+      {
+        title: 'منو',
+        link: { href: '/menu' },
+      },
+      {
+        title: 'بخش های صفحه اصلی',
+        link: { href: '/main-page-sections' },
+      },
+      {
+        title: 'بنر ها',
+        link: { href: '/banners' },
+      },
+      {
+        title: 'بنر های اسلایدر صفحه اصلی',
+        link: { href: '/main-page' },
+      },
+    ],
   },
   {
-    title: 'بنر های اسلایدر صفحه اصلی',
-    link: { href: '/main-page' },
-  },
-  {
-    title: 'بنر ها',
-    link: { href: '/banners' },
-  },
-  {
-    title: 'سفارشات',
-    link: { href: '/orders' },
-  },
-  {
-    title: 'برند ها',
-    link: { href: '/brands' },
-  },
-  {
-    title: 'برچسب ها',
-    link: { href: '/tags' },
-  },
-  {
-    title: 'محصولات',
-    link: { href: '/products' },
-  },
-  {
-    title: 'انبار',
-    link: { href: '/stock' },
+    title: 'مدیریت انبار',
+    children: [
+      {
+        title: 'برند ها',
+        link: { href: '/brands' },
+      },
+      {
+        title: 'برچسب ها',
+        link: { href: '/tags' },
+      },
+      {
+        title: 'محصولات',
+        link: { href: '/products' },
+      },
+      {
+        title: 'انبار',
+        link: { href: '/stock' },
+      },
+      {
+        title: 'کوپن ها',
+        link: { href: '/coupons' },
+      },
+      {
+        title: 'سفارشات',
+        link: { href: '/orders' },
+      },
+    ],
   },
   {
     title: 'کاربران',
-    link: { href: '/users' },
-  },
-  {
-    title: 'نظرات',
-    link: { href: '/comments' },
-  },
-  {
-    title: 'کوپن ها',
-    link: { href: '/coupons' },
+    children: [
+      {
+        title: 'کاربران',
+        link: { href: '/users' },
+      },
+      {
+        title: 'نظرات',
+        link: { href: '/comments' },
+      },
+    ],
   },
   {
     title: 'وبلاگ',
     link: { href: '/blog' },
-  },
-  {
-    title: 'منو',
-    link: { href: '/menu' },
   },
   {
     title: 'ابزار',

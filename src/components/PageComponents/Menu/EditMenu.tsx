@@ -47,7 +47,8 @@ export const EditMenuPage: React.FC = () => {
         return (
           <TopSiteMenuForm
             loading={loading}
-            callback={(menu: TopSiteMenu) => updateMenuCallback('top-site', menu)}
+            // callback={(menu: TopSiteMenu) => updateMenuCallback('top-site', JSON.parse(JSON.stringify(menu)))}
+            callback={(menu: TopSiteMenu) => console.log(JSON.parse(JSON.stringify(menu)))}
             defaultValues={defaultValues}
           />
         )
