@@ -12,6 +12,7 @@ import {
 } from '@paljs/ui'
 import axios from 'axios'
 import { BasicEditor, Button, FlexContainer, ModalBox, ProductImageCard, StockItem } from 'components'
+import { UploadProductImage } from 'components/Input'
 import { useNonInitialEffect } from 'hooks'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
@@ -37,13 +38,21 @@ export const EditProductPage: React.FC = () => {
     reload: state?.reload,
   }))
 
-  const [images, setImages] = useState<any>(
-    product?.site_main_picture && product?.media?.length > 0
-      ? [product?.site_main_picture, ...product?.media]
-      : product?.site_main_picture
-      ? [product?.site_main_picture]
-      : [null],
-  )
+  const [mainImage, setMainImage] = useState(product?.site_main_picture)
+  function upadteMainImage(image: any) {
+    setMainImage(mainImage)
+    toast.success('تصویر اصلی محصول با موفقیت افزوده شد')
+  }
+
+  const [images, setImages] = useState(product?.media?.length > 0 ? [...product?.media] : [])
+
+  function appendImage(image: Media) {
+    setImages((_curr) => ({
+      ..._curr,
+      image,
+    }))
+    toast.success('تصویر محصول با موفقیت افزوده شد')
+  }
 
   useNonInitialEffect(
     () =>
@@ -208,6 +217,7 @@ export const EditProductPage: React.FC = () => {
   }
 
   const handleImageUpload = async (type: 'media' | 'site_main_picture', file: File) => {
+    setLoading(true)
     const formData = new FormData()
     formData?.append(type, file)
 
@@ -217,6 +227,7 @@ export const EditProductPage: React.FC = () => {
         'Content-Type': 'multipart/form-data',
       },
     })
+    setLoading(false)
   }
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
@@ -394,7 +405,7 @@ export const EditProductPage: React.FC = () => {
               <CardHeader>توضیح متا (meta_description)</CardHeader>
               <CardBody>
                 <InputGroup>
-                  <textarea style={{ minWidth: '100%', height: '8rem' }} {...register('meta_keywords')} />
+                  <textarea style={{ minWidth: '100%', height: '8rem' }} {...register('meta_description')} />
                 </InputGroup>
               </CardBody>
             </Card>
@@ -537,14 +548,15 @@ export const EditProductPage: React.FC = () => {
               </Button>
             )}
           </h3>
-          <DropZoneWrapper>
+          <InputGroup>
             <label>تصویر اصلی</label>
-            <input type="file" onChange={(e: any) => handleImageUpload('site_main_picture', e?.target?.files[0])} />
-          </DropZoneWrapper>
-          <DropZoneWrapper>
+            <UploadProductImage productId={product?.id} type="site_main_picture" callback={upadteMainImage} />
+            <ProductImageCard index={0} media={mainImage} removalCallback={setItemToRemove} />
+          </InputGroup>
+          <InputGroup>
             <label>تصویر</label>
-            <input type="file" onChange={(e: any) => handleImageUpload('media', e?.target?.files[0])} />
-          </DropZoneWrapper>
+            <UploadProductImage productId={product?.id} type="media" callback={appendImage} />
+          </InputGroup>
         </CardHeader>
         <CardBody
           style={{
@@ -552,9 +564,9 @@ export const EditProductPage: React.FC = () => {
             overflow: 'scroll',
           }}
         >
-          {product?.main_site_picture && (
+          {/* {product?.main_site_picture && (
             <ProductImageCard index={0} media={product?.main_site_picture} removalCallback={setItemToRemove} />
-          )}
+          )} */}
           {product?.media?.map((media: Media, index: number) => (
             <ProductImageCard index={index} media={media} removalCallback={setItemToRemove} />
           ))}

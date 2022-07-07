@@ -75,6 +75,7 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({ media, index
                 position: 'absolute',
                 top: '1rem',
                 left: '1rem',
+                display: index === 0 ? 'none' : '',
               }}
               status="Danger"
               appearance="outline"
