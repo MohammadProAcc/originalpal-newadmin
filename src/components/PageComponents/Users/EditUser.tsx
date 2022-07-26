@@ -18,11 +18,6 @@ export const EditUserPage: React.FC = () => {
     updateUser: state?.updateUser,
   }))
 
-  const [newPassword, setNewPassword] = useState('')
-  const changePassword = (password: string) => {
-    console.log(password)
-  }
-
   const {
     register,
     handleSubmit,
@@ -118,21 +113,10 @@ export const EditUserPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>
-            رمز عبور{' '}
-            <Button
-              disabled
-              style={{ display: 'inline-flex', marginRight: '1rem' }}
-              type="button"
-              appearance="outline"
-              onClick={() => changePassword(newPassword)}
-            >
-              تغییر دادن رمز عبور
-            </Button>
-          </CardHeader>
+          <CardHeader>رمز عبور </CardHeader>
           <CardBody>
             <InputGroup>
-              <input disabled placeholder="تغییر رمز عبور" onChange={(e: any) => setNewPassword(e?.target?.value)} />
+              <input placeholder="تغییر رمز عبور" {...register('password')} />
             </InputGroup>
           </CardBody>
         </Card>

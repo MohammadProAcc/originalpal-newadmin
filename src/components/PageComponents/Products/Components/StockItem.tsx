@@ -1,11 +1,10 @@
 import { Button, InputGroup, Select } from '@paljs/ui'
 import Cookies from 'js-cookie'
-import router from 'next/router'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { ProductStock } from 'types'
-import { editStock, translator } from 'utils'
+import { editStock, toLocalDate, translator } from 'utils'
 
 const discoutTypeOptions = [
   { label: 'نقدی', value: 'cash' },
@@ -21,6 +20,7 @@ export const StockItem: React.FC<IStockItemProps> = ({ stock, callback }) => {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { dirtyFields },
     control,
   } = useForm({
@@ -96,12 +96,17 @@ export const StockItem: React.FC<IStockItemProps> = ({ stock, callback }) => {
       </InputGroup>
 
       <InputGroup fullWidth style={{ flexDirection: 'column' }}>
-        <label>شروع تخفیف</label>
+        <label>
+          شروع تخفیف : <span>{toLocalDate(getValues('discount_start')) ?? ''}</span>
+        </label>
+
         <input type="date" {...register('discount_start')} placeholder="شروع تخفیف" />
       </InputGroup>
 
       <InputGroup fullWidth style={{ flexDirection: 'column' }}>
-        <label>پایان تخفیف</label>
+        <label>
+          پایان تخفیف : <span>{toLocalDate(getValues('discount_end')) ?? ''}</span>
+        </label>
         <input type="date" {...register('discount_end')} placeholder="پایان تخفیف" />
       </InputGroup>
 

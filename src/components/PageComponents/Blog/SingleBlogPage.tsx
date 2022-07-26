@@ -116,7 +116,7 @@ export const SingleBlogPage: React.FC = () => {
 
       <Card>
         <CardHeader>تصویر پوستر</CardHeader>
-        <CardBody dangerouslySetInnerHTML={{ __html: blog?.thumb ?? '-' }} />
+        <CardBody></CardBody>
       </Card>
 
       <Card>

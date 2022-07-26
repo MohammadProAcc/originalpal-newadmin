@@ -50,7 +50,7 @@ export const EditStockPage: React.FC = () => {
         </ModalBox>
       </Modal>
 
-      <StockItem stock={stock} />
+      <StockItem stock={stock} callback={() => {}} />
     </Layout>
   )
 }

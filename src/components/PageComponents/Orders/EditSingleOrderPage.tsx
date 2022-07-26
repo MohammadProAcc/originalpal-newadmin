@@ -36,8 +36,9 @@ const statusOptions = [
 export const EditSingleOrderPage: React.FC = () => {
   const router = useRouter()
 
-  const { order, stocks, clearOrderItems, reload } = useStore((state: any) => ({
+  const { order, updateOrder, stocks, clearOrderItems, reload } = useStore((state: any) => ({
     order: state?.order,
+    updateOrder: state?.updateOrder,
     stocks: state?.stocks,
     clearOrderItems: state?.clearOrderItems,
     reload: state?.reload,
@@ -89,6 +90,8 @@ export const EditSingleOrderPage: React.FC = () => {
     }
     const response = await add_stock_option(router?.query?.order_id as string, finalForm, Cookies.get('token') ?? '')
     if (response?.status === 'success') {
+      const updatedOrder = await getSingleOrder(order?.id)
+      updateOrder(updatedOrder.data)
       toast.success('محصول با موفقیت اضافه شد')
     } else {
       toast.error('افزودن محصول موفقیت آمیز نبود')
@@ -226,7 +229,7 @@ export const EditSingleOrderPage: React.FC = () => {
           <CardHeader>شماره پرداخت</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('payment_id')} />
+              <input {...register('payment_id')} disabled />
             </InputGroup>
           </CardBody>
         </Card>
@@ -420,7 +423,7 @@ export const EditSingleOrderPage: React.FC = () => {
         </CardBody>
       </Card> */}
 
-      <Card>
+      {/* <Card>
         <CardHeader>ارسال پیامک</CardHeader>
         <CardBody>
           <Form smsForm onSubmit={smsHandleSubmit(submitSmsForm)}>
@@ -445,7 +448,7 @@ export const EditSingleOrderPage: React.FC = () => {
             </Button>
           </Form>
         </CardBody>
-      </Card>
+      </Card> */}
 
       <Card>
         <CardHeader>فاکتور ها</CardHeader>

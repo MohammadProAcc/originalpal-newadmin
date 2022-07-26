@@ -47,6 +47,11 @@ export function CreateTag() {
         </InputGroup>
 
         <InputGroup className="col mt-4">
+          <label>توضیحات</label>
+          <input {...register('description', { required: true })} placeholder="توضیحات" />
+        </InputGroup>
+
+        <InputGroup className="col mt-4">
           <label>عنوان متا</label>
           <input {...register('meta_title', { required: true })} placeholder="عنوان متا" />
         </InputGroup>
@@ -57,9 +62,18 @@ export function CreateTag() {
         </InputGroup>
 
         <InputGroup className="col mt-4">
+          <label>اولویت</label>
+          <input
+            {...register('priority', { required: true, valueAsNumber: true })}
+            placeholder="اولویت"
+            type="number"
+          />
+        </InputGroup>
+
+        {/* <InputGroup className="col mt-4">
           <label>عنوان صفحه</label>
           <input {...register('title_page', { required: true })} placeholder="عنوان صفحه" />
-        </InputGroup>
+        </InputGroup> */}
 
         <Button disabled={loading} style={{ width: '10rem', marginTop: '3rem' }} status="Success" appearance="outline">
           {loading ? '...' : 'ساخت برچسب'}

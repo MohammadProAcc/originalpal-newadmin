@@ -16,6 +16,7 @@ import { UploadProductImage } from 'components/Input'
 import { useNonInitialEffect } from 'hooks'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
+import _ from 'lodash'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -40,18 +41,32 @@ export const EditProductPage: React.FC = () => {
 
   const [mainImage, setMainImage] = useState(product?.site_main_picture)
   function upadteMainImage(image: any) {
-    setMainImage(mainImage)
-    toast.success('تصویر اصلی محصول با موفقیت افزوده شد')
+    setMainImage(image)
+    toast.success('تصویر اصلی با موفقیت بارگذاری شد')
   }
 
   const [images, setImages] = useState(product?.media?.length > 0 ? [...product?.media] : [])
 
-  function appendImage(image: Media) {
-    setImages((_curr) => ({
-      ..._curr,
-      image,
-    }))
-    toast.success('تصویر محصول با موفقیت افزوده شد')
+  function appendImage(image: any) {
+    console.log(image)
+    setImages((_curr) => [..._curr, image])
+    toast.success('تصویر با موفقیت بارگذاری شد')
+  }
+
+  function updateMediaCallback(media: any, isMain: boolean) {
+    if (isMain) {
+      setMainImage(media)
+    } else {
+      setImages((_curr) =>
+        _curr?.map((_media) => {
+          if (_media.u === media.u) {
+            return media
+          } else {
+            return _media
+          }
+        }),
+      )
+    }
   }
 
   useNonInitialEffect(
@@ -235,9 +250,9 @@ export const EditProductPage: React.FC = () => {
   const removeProductMedia = async (media: Media) => {
     const response = await deleteProductMedia(router?.query?.product_id as string, media?.u, Cookies.get('token') ?? '')
     if (response?.includes('operation done successfully')) {
-      updateProductAfterMediaRemoval(media)
+      setImages((_curr) => _curr.filter((_image) => !_.isEqual(_image, media)))
       setItemToRemove(null)
-      await resetProduct()
+      // await resetProduct()
       toast.success('تصویر با موفقیت حذف شد')
     } else {
       toast.error('حذف تصویر موفیت آمیز نبود')
@@ -254,7 +269,6 @@ export const EditProductPage: React.FC = () => {
     }
 
     setRemoveAllImagesModal(false)
-    router.reload()
 
     setLoading(false)
   }
@@ -551,7 +565,12 @@ export const EditProductPage: React.FC = () => {
           <InputGroup>
             <label>تصویر اصلی</label>
             <UploadProductImage productId={product?.id} type="site_main_picture" callback={upadteMainImage} />
-            <ProductImageCard index={0} media={mainImage} removalCallback={setItemToRemove} />
+            <ProductImageCard
+              index={0}
+              media={mainImage}
+              removalCallback={setItemToRemove}
+              updateCallback={updateMediaCallback}
+            />
           </InputGroup>
           <InputGroup>
             <label>تصویر</label>
@@ -567,8 +586,13 @@ export const EditProductPage: React.FC = () => {
           {/* {product?.main_site_picture && (
             <ProductImageCard index={0} media={product?.main_site_picture} removalCallback={setItemToRemove} />
           )} */}
-          {product?.media?.map((media: Media, index: number) => (
-            <ProductImageCard index={index} media={media} removalCallback={setItemToRemove} />
+          {images?.map((media: Media, index: number) => (
+            <ProductImageCard
+              index={index + 1}
+              media={media}
+              removalCallback={setItemToRemove}
+              updateCallback={updateMediaCallback}
+            />
           ))}
         </CardBody>
       </Card>

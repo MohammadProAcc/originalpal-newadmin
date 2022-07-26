@@ -56,6 +56,7 @@ export const ProductsBottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ 
   const removeColumn = (column: ProductsBottomSiteColumn) => {
     const targetIndex = findColumnIndex(column)
     setMenu((_menu) => _menu?.filter((_column, index) => index !== targetIndex))
+    setActiveForm(null)
   }
 
   const editColumn = (column: ProductsBottomSiteColumn, form: ProductsBottomSiteColumn) => {

@@ -1,6 +1,7 @@
 import { Button as _Button, Checkbox, InputGroup as _InputGroup } from '@paljs/ui'
 import { BasicModal, ModalBox } from 'components'
 import produce from 'immer'
+import _ from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
@@ -33,12 +34,16 @@ export const BottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ loading,
       }),
     )
 
-  const removeColumn = (column: BottomSiteColumn) =>
+  const removeColumn = (column: BottomSiteColumn) => {
     setMenu((current) =>
       produce(current, (draft) => {
-        draft = draft?.filter((item) => item?.title !== column?.title)
+        console.log(draft?.filter((item) => !_.isEqual(item, column)))
+        draft = draft?.filter((item) => {
+          return !_.isEqual(item, column)
+        })
       }),
     )
+  }
 
   const editColumn = (column: BottomSiteColumn, form: BottomSiteColumn) => {
     setMenu((current) =>

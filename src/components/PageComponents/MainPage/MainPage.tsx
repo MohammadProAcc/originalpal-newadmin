@@ -4,7 +4,7 @@ import { Alert, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Button, Dot, FlexContainer, HeaderButton, ModalBox } from 'components'
-import Image from 'next/image'
+import _Image from 'next/image'
 import { deleteBanner } from 'utils/api/REST/actions/banners'
 import router from 'next/router'
 
@@ -112,7 +112,7 @@ export const MainPage: React.FC = () => {
       <Card>
         <CardHeader>تصویر بنر</CardHeader>
         <CardBody>
-          <Image layout="fill" src={`${process?.env.SRC}/${banner?.media?.u ?? ''}`} />
+          <Image width="1600" height="900" src={`${process?.env.SRC}/${banner?.media?.u ?? ''}`} />
         </CardBody>
       </Card>
 
@@ -127,8 +127,6 @@ export const MainPage: React.FC = () => {
   )
 }
 
-const Form = styled.form`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+const Image = styled(_Image)`
+  object-fit: cover;
 `

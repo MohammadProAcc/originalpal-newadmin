@@ -59,9 +59,14 @@ export const SingleTagPage: React.FC = () => {
         <CardBody>{tag?.name}</CardBody>
       </Card>
 
-      <Card>
+      {/* <Card>
         <CardHeader>عنوان صفحه</CardHeader>
         <CardBody>{tag?.title_page ?? '-'}</CardBody>
+      </Card> */}
+
+      <Card>
+        <CardHeader>توضیحات</CardHeader>
+        <CardBody>{tag?.description ?? '-'}</CardBody>
       </Card>
 
       <Card>
@@ -75,8 +80,8 @@ export const SingleTagPage: React.FC = () => {
       </Card>
 
       <Card>
-        <CardHeader>کلمات کلیدی متا</CardHeader>
-        <CardBody>{tag?.meta_keywords ?? '-'}</CardBody>
+        <CardHeader>اولویت</CardHeader>
+        <CardBody>{tag?.priority ?? '-'}</CardBody>
       </Card>
 
       <Card>

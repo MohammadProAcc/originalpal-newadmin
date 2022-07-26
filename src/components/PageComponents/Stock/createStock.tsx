@@ -15,15 +15,20 @@ const discoutTypeOptions = [
 export function CreateStock() {
   const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, control } = useForm()
+  const { register, handleSubmit, control, reset } = useForm()
 
   const onSubmit = async (form: any) => {
     setLoading(true)
     const response = await createStock(form, Cookies.get('token'))
     if (response?.status === 'success') {
       toast.success('انبار با موفقیت ساخته شد')
+      reset()
     } else {
-      toast.error('ساخت انبار موفقیت آمیز نبود')
+      if (JSON.stringify(response).includes('The code has already been taken.')) {
+        toast.error('کد قبلا استفاده شده است')
+      } else {
+        toast.error('ساخت انبار موفقیت آمیز نبود')
+      }
     }
     setLoading(false)
   }

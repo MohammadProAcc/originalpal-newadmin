@@ -321,9 +321,7 @@ export const EditBlogPage: React.FC = () => {
               placeholder="تصویر پایانی"
             />
             <MediaCard
-              media={
-                typeof blog?.endimage === 'string' ? { a: null, t: null, p: null, u: blog?.endimage } : blog?.endimage
-              }
+              media={typeof blog?.endimage === 'string' ? JSON.parse(blog?.endimage) : blog?.endimage}
               removalCallback={console.log}
               updateCallback={(form: any) => updateBlogImage(form, 'endimage')}
               index={0}
@@ -360,7 +358,7 @@ export const EditBlogPage: React.FC = () => {
             />
 
             <MediaCard
-              media={typeof blog?.thumb === 'string' ? { a: null, t: null, p: null, u: blog?.thumb } : blog?.thumb}
+              media={typeof blog?.thumb === 'string' ? JSON.parse(blog?.thumb) : blog?.thumb}
               removalCallback={console.log}
               updateCallback={(form: any) => updateBlogImage(form, 'thumb')}
               index={0}

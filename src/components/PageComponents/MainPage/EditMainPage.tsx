@@ -9,13 +9,15 @@ import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { removeItem, useStore } from 'utils'
 import { deleteBanner, uploadBannerImage } from 'utils/api/REST/actions/banners'
+import { getSingleBanner } from 'utils/api/REST/actions/banners/getSingleBanner'
 import { updateBanner } from 'utils/api/REST/actions/banners/updateBanner'
 
 export function EditMainPage() {
   const router = useRouter()
 
-  const { banner } = useStore((state: any) => ({
+  const { banner, reload } = useStore((state: any) => ({
     banner: state?.banner,
+    reload: state?.reload,
   }))
 
   const platformOptions = [
@@ -77,6 +79,10 @@ export function EditMainPage() {
     } else {
       toast.error('بروزرسانی بنر موفقیت آمیز نبود')
     }
+
+    const updatedBanner = await getSingleBanner(banner.id)
+    reload('banner', updatedBanner)
+
     setLoading(false)
   }
 

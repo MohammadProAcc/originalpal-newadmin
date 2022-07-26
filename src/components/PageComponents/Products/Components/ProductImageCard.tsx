@@ -14,8 +14,14 @@ interface ProductImageCardProps {
   media: Media
   index: number
   removalCallback: Function
+  updateCallback: (media: any, isMain: boolean) => void
 }
-export const ProductImageCard: React.FC<ProductImageCardProps> = ({ media, index, removalCallback }) => {
+export const ProductImageCard: React.FC<ProductImageCardProps> = ({
+  media,
+  index,
+  removalCallback,
+  updateCallback,
+}) => {
   const router = useRouter()
 
   const { productId, updateProduct } = useStore((state: any) => ({
@@ -41,8 +47,7 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({ media, index
     }
 
     if (response.status === 'success') {
-      const updatedProduct = await getSingleProduct(productId)
-      updateProduct(updatedProduct)
+      updateCallback({ ...media, ...form }, index === 0)
       toast.success('اطلاعات تصویر با موفقیت بروز شد')
     } else {
       toast.error('بروزرسانی اطلاعات تصویر موفقیت آمیز نبود')

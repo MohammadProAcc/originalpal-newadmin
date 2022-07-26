@@ -1,7 +1,7 @@
 import { OrderInvoiceDetails } from 'components/PageComponents/Orders/types'
 import produce from 'immer'
 import { useMemo } from 'react'
-import { initialLoginResponseUser, LoginResponseUser, Media, Product, User, UserSlice } from 'types'
+import { initialLoginResponseUser, IOrder, LoginResponseUser, Media, Product, User, UserSlice } from 'types'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { userActions } from './slices'
@@ -69,6 +69,7 @@ function initStore(preloadedState = initialState) {
           ),
         setOrderDetails: (orderDetails: OrderInvoiceDetails) =>
           set((state: any) => void (state.orderDetails = orderDetails)),
+        updateOrder: (order: IOrder) => set((state: any) => void (state.order = order)),
         // -===>>> Product <<<===-
         updateProduct: (product: Product) =>
           set((state: any) => {

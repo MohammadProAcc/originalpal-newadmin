@@ -115,19 +115,19 @@ export const MenuPage = () => {
       <h1>منو ها</h1>
 
       <FlexContainer>
-        <Link href="/menu/create">
-          <Button
-            style={{
-              margin: '1rem 0 1rem 1rem',
-              display: 'flex',
-            }}
-            status="Success"
-            appearance="outline"
-          >
-            افزودن منو
-            <Add />
-          </Button>
-        </Link>
+        {/* <Link href="/menu/create"> */}
+        {/*   <Button */}
+        {/*     style={{ */}
+        {/*       margin: '1rem 0 1rem 1rem', */}
+        {/*       display: 'flex', */}
+        {/*     }} */}
+        {/*     status="Success" */}
+        {/*     appearance="outline" */}
+        {/*   > */}
+        {/*     افزودن منو */}
+        {/*     <Add /> */}
+        {/*   </Button> */}
+        {/* </Link> */}
         {tableSelections?.length > 0 && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده

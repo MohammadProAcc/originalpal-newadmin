@@ -31,7 +31,6 @@ export function CreateBanner() {
 
     try {
       const bannerCreationResponse = await createBanner(finalForm, Cookies.get('token'))
-      console.log('banner creation response', bannerCreationResponse)
       const result = await search_in('banners', { key: 'content', type: '=', value: form?.content }, router?.query)
       const bannerId = result?.data?.data[0]?.id
 
