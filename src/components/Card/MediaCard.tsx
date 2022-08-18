@@ -12,8 +12,18 @@ interface MediaCardProps {
   removalCallback: Function
   updateCallback: Function
 }
-export const MediaCard: React.FC<MediaCardProps> = ({ media, index, removalCallback, updateCallback }) => {
+export const MediaCard: React.FC<MediaCardProps> = ({ media: mediaRaw, index, removalCallback, updateCallback }) => {
   const [loading, setLoading] = useState(false)
+
+  const media = typeof mediaRaw === "string"
+    ? {
+      t: "",
+      a: "",
+      s: 1,
+      u: mediaRaw,
+      p: 1,
+    }
+    : mediaRaw;
 
   const { register, handleSubmit } = useForm({
     defaultValues: media,

@@ -3,7 +3,7 @@ import { BasicEditor, Button, FlexContainer, HeaderButton, ModalBox } from 'comp
 import { MediaCard } from 'components/Card'
 import Layout from 'Layouts'
 import router from 'next/router'
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
@@ -14,6 +14,8 @@ export const EditBlogPage: React.FC = () => {
     blog: state?.blog,
     reload: state?.reload,
   }))
+
+  const endimage = blog.endimage.includes('{') ? JSON.parse(blog.endimage) : blog.endimage;
 
   const reloadBlog = async () => {
     const reloadedBlog = await getSingleBlog(blog?.id)
@@ -321,7 +323,7 @@ export const EditBlogPage: React.FC = () => {
               placeholder="تصویر پایانی"
             />
             <MediaCard
-              media={typeof blog?.endimage === 'string' ? JSON.parse(blog?.endimage) : blog?.endimage}
+              media={endimage}
               removalCallback={console.log}
               updateCallback={(form: any) => updateBlogImage(form, 'endimage')}
               index={0}
@@ -358,7 +360,7 @@ export const EditBlogPage: React.FC = () => {
             />
 
             <MediaCard
-              media={typeof blog?.thumb === 'string' ? JSON.parse(blog?.thumb) : blog?.thumb}
+              media={endimage}
               removalCallback={console.log}
               updateCallback={(form: any) => updateBlogImage(form, 'thumb')}
               index={0}
