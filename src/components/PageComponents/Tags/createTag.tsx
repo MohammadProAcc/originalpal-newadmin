@@ -61,14 +61,14 @@ export function CreateTag() {
           <input {...register('meta_description', { required: true })} placeholder="توصیحات متا" />
         </InputGroup>
 
-        <InputGroup className="col mt-4">
-          <label>اولویت</label>
-          <input
-            {...register('priority', { required: true, valueAsNumber: true })}
-            placeholder="اولویت"
-            type="number"
-          />
-        </InputGroup>
+        {/* <InputGroup className="col mt-4"> */}
+        {/*   <label>اولویت</label> */}
+        {/*   <input */}
+        {/*     {...register('priority', { required: true, valueAsNumber: true })} */}
+        {/*     placeholder="اولویت" */}
+        {/*     type="number" */}
+        {/*   /> */}
+        {/* </InputGroup> */}
 
         {/* <InputGroup className="col mt-4">
           <label>عنوان صفحه</label>

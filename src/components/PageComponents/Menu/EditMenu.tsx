@@ -91,7 +91,7 @@ export const EditMenuPage: React.FC = () => {
   }
 
   return (
-    <Layout title={`${menu?.id}`}>
+    <Layout title={`ویرایش منوی ${menu?.id}`}>
       <h1 style={{ marginBottom: '4rem' }}>
         ویرایش منو شماره {menu?.id}
         <HeaderButton status="Info" href={`/menu/${menu?.id}`}>

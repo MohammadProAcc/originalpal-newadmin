@@ -121,14 +121,14 @@ export const EditTagPage: React.FC = () => {
           </CardBody>
         </Card>
 
-        <Card>
-          <CardHeader>اولویت</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input type="number" {...register('priority')} />
-            </InputGroup>
-          </CardBody>
-        </Card>
+        {/* <Card> */}
+        {/*   <CardHeader>اولویت</CardHeader> */}
+        {/*   <CardBody> */}
+        {/*     <InputGroup> */}
+        {/*       <input type="number" {...register('priority')} /> */}
+        {/*     </InputGroup> */}
+        {/*   </CardBody> */}
+        {/* </Card> */}
 
         <Button status="Info" type="submit" appearance="outline">
           بروزرسانی برچسب

@@ -22,9 +22,9 @@ export const SingleMainPageSectionPage: React.FC = () => {
   }
 
   return (
-    <Layout title={`${mainPageSection?.id}`}>
+    <Layout title={`بخش صفحه اصلی ${mainPageSection?.id}`}>
       <h1 style={{ marginBottom: '4rem' }}>
-        مشاهده بخش صقحه اصلی {mainPageSection?.id}
+        مشاهده بخش صفحه اصلی {mainPageSection?.id}
         <HeaderButton status="Info" href={`/mainPageSection/edit/${mainPageSection?.id}`}>
           ویرایش
         </HeaderButton>

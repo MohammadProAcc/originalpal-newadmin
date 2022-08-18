@@ -20,6 +20,7 @@ export function CreateUser() {
 
   const onSubmit = async (form: any) => {
     setLoading(true)
+    console.log(form)
     const response = await createUser(form, Cookies.get('token'))
     if (response?.status === 'success') {
       reset()
@@ -53,7 +54,7 @@ export function CreateUser() {
 
         <InputGroup className="col">
           <label>رمز عبور</label>
-          <input type="password" {...register('password', { required: true })} placeholder="ایمیل" />
+          <input type="password" {...register('password', { required: true })} placeholder="رمز عبور" />
         </InputGroup>
 
         <InputGroup fullWidth style={{ display: 'flex', flexDirection: 'column' }}>

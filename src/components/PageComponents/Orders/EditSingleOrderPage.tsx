@@ -1,7 +1,6 @@
 import { Add, Close } from '@material-ui/icons'
 import { Alert, Button, Card, CardBody, CardHeader, Checkbox, Container, InputGroup, Modal, Select } from '@paljs/ui'
 import { BasicEditor, FlexContainer, HeaderButton, ModalBox } from 'components'
-import { BasicModal } from 'components/Modal'
 import { WriteOrderDetailsModal } from 'components/Modal/derived/WriteOrderDetails'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
@@ -15,6 +14,7 @@ import {
   add_stock_option,
   admin,
   deleteOrder,
+  editOrder,
   editOrderAddress,
   getSingleOrder,
   numeralize,
@@ -107,6 +107,27 @@ export const EditSingleOrderPage: React.FC = () => {
     },
   })
 
+  const {
+    register: userRegister,
+    handleSubmit: userHandleSubmit
+  } = useForm({
+    defaultValues: {
+      phone: order.user.phone,
+      name: order.user.name,
+      lastname: order.user.lastname,
+      email: order.user.email,
+    },
+  })
+
+  async function onUserFormSubmit(form: any) {
+    const response = await editOrder(order.id, { user: form });
+    if (response.status === "success") {
+      toast.success("تغییرات کاربر اعمال شد");
+    } else {
+      toast.error("اعمال تغییرات کاربر موفقیت آمیز نبود");
+    }
+  }
+
   const { register: addressRegister, handleSubmit: addressHandleSubmit } = useForm({
     defaultValues: {
       ...order?.address,
@@ -137,11 +158,11 @@ export const EditSingleOrderPage: React.FC = () => {
     setLoading(false)
   }
 
-  const { register: smsRegister, handleSubmit: smsHandleSubmit } = useForm()
+  // const { register: smsRegister, handleSubmit: smsHandleSubmit } = useForm()
 
-  const submitSmsForm = async (form: any) => {
-    console.log(form)
-  }
+  // const submitSmsForm = async (form: any) => {
+  //   console.log(form)
+  // }
 
   const removeStock = async (stock: any) => {
     setLoading(true)
@@ -194,9 +215,30 @@ export const EditSingleOrderPage: React.FC = () => {
         </ModalBox>
       </Modal>
 
-      <p>نام کاربر : {order?.user?.name}</p>
-      <p>شماره همراه کاربر : {order?.user?.phone_number ?? '?'}</p>
-      <p>شماره سفارش : {order?.id}</p>
+      <form onSubmit={userHandleSubmit(onUserFormSubmit)}>
+        <InputGroup fullWidth>
+          <label htmlFor="user-name">نام کاربر : </label>
+          <input id="user-name" {...userRegister('name')} disabled />
+        </InputGroup>
+
+        <InputGroup fullWidth>
+          <label htmlFor="user-lastname">نام خانوادگی  کاربر : </label>
+          <input {...userRegister('lastname')} disabled />
+        </InputGroup>
+        <InputGroup fullWidth>
+          <label htmlFor="user-phone">شماره همراه کاربر : </label>
+          <input id="user-phone" {...userRegister('phone')} disabled />
+        </InputGroup>
+        <InputGroup fullWidth>
+          <label htmlFor="user-email">ایمیل </label>
+          <input id="user-email" {...userRegister('email')} disabled />
+        </InputGroup>
+
+        <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline" disabled>
+          اعمال تغییرات کاربر
+        </Button>
+
+      </form>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card>
           <CardHeader style={{ display: 'flex', alignItems: 'center' }}>
@@ -259,7 +301,6 @@ export const EditSingleOrderPage: React.FC = () => {
             <BasicEditor callback={field.onChange} initialValue={order?.notes} title="یادداشت ها" />
           )}
         />
-
         <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline">
           اعمال تغییرات
         </Button>
@@ -389,10 +430,10 @@ export const EditSingleOrderPage: React.FC = () => {
             جمع کل :{' '}
             {numeralize(
               order['order_items'] &&
-                order['order_items'].length > 0 &&
-                order['order_items']
-                  ?.map((orderItem: any) => Number(orderItem?.price))
-                  ?.reduce((prev: number, curr: number) => curr + prev),
+              order['order_items'].length > 0 &&
+              order['order_items']
+                ?.map((orderItem: any) => Number(orderItem?.price))
+                ?.reduce((prev: number, curr: number) => curr + prev),
             )}{' '}
             تومان
           </p>

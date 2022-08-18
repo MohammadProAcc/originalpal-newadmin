@@ -6,7 +6,7 @@ const items: MenuItemType[] = [
     link: { href: '/dashboard' },
   },
   {
-    title: 'مدیریت عمومی',
+    title: 'عمومی',
     children: [
       {
         title: 'منو',
@@ -16,18 +16,24 @@ const items: MenuItemType[] = [
         title: 'بخش های صفحه اصلی',
         link: { href: '/main-page-sections' },
       },
-      {
-        title: 'بنر ها',
-        link: { href: '/banners' },
-      },
-      {
-        title: 'بنر های اسلایدر صفحه اصلی',
-        link: { href: '/main-page' },
-      },
+
     ],
   },
   {
-    title: 'مدیریت انبار',
+    title: 'بنر ها',
+    children: [
+      {
+        title: 'تمامی بنر ها',
+        link: { href: '/banners' },
+      },
+      {
+        title: 'اسلایدر ها',
+        link: { href: '/main-page' },
+      },
+    ]
+  },
+  {
+    title: 'انبار',
     children: [
       {
         title: 'برند ها',
@@ -49,10 +55,6 @@ const items: MenuItemType[] = [
         title: 'کوپن ها',
         link: { href: '/coupons' },
       },
-      {
-        title: 'سفارشات',
-        link: { href: '/orders' },
-      },
     ],
   },
   {
@@ -63,6 +65,18 @@ const items: MenuItemType[] = [
         link: { href: '/users' },
       },
       {
+        title: 'سفارشات',
+        link: { href: '/orders' },
+      },
+      {
+        title: 'پرداخت ها',
+        link: { href: '/payments' },
+      },
+      {
+        title: 'آدرس ها',
+        link: { href: '/address' },
+      },
+      {
         title: 'نظرات',
         link: { href: '/comments' },
       },
@@ -71,15 +85,6 @@ const items: MenuItemType[] = [
   {
     title: 'وبلاگ',
     link: { href: '/blog' },
-  },
-  {
-    title: 'ابزار',
-    children: [
-      {
-        title: 'منو ساز',
-        link: { target: 'blank', href: 'https://www.jqueryscript.net/demo/Drag-Drop-Menu-Builder-For-Bootstrap/' },
-      },
-    ],
   },
   // {
   //   title: 'FEATURES',

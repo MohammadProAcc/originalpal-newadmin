@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardHeader, Checkbox, InputGroup, Radio, Select } from '@paljs/ui'
+import { Button, Card, CardBody, CardHeader, Checkbox, InputGroup } from '@paljs/ui'
 import { BasicEditor } from 'components'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
@@ -7,7 +7,7 @@ import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
-import { createBlog, editBlog, search_in, uploadBlogImage } from 'utils'
+import { createBlog, search_in, uploadBlogImage } from 'utils'
 
 export function CreateBlog() {
   const [loading, setLoading] = useState(false)
@@ -86,7 +86,7 @@ export function CreateBlog() {
         </h1>
 
         <InputGroup className="col mb-4" fullWidth>
-          <label>عنوان</label>
+          <label>عنوان (H1)</label>
           <input {...register('title', { required: true })} placeholder="عنوان" />
         </InputGroup>
 
@@ -154,7 +154,7 @@ export function CreateBlog() {
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
-              <label>عنوان صفحه</label>
+              <label>عنوان صفحه (title)</label>
               <input {...register('title_page')} placeholder="عنوان" />
             </InputGroup>
           </CardBody>

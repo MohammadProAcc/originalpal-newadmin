@@ -48,8 +48,9 @@ export const MainPageSectionPage = () => {
       const deletions = selections?.map(async (id) => {
         const response = await deleteMainPageSection(id)
 
+        console.log("delete section response >>> ", response);
         if (response?.status === 'success') {
-          clearList('mainPageSections', id)
+          clearList(id);
 
           toast.success(`مورد با شناسه ${id} حذف شد`)
         }

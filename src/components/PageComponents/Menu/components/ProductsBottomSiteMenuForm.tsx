@@ -7,7 +7,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { Colors } from 'styles'
-import { BottomSiteColumn, BottomSiteMenu, BottomSiteRow, initialBottomSiteColumn, initialBottomSiteRow } from 'types'
+import { BottomSiteColumn, BottomSiteRow, initialBottomSiteColumn, initialBottomSiteRow } from 'types'
 
 interface BottomSiteMenuFormProps {
   loading?: boolean
@@ -35,15 +35,9 @@ export const BottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ loading,
     )
 
   const removeColumn = (column: BottomSiteColumn) => {
-    setMenu((current) =>
-      produce(current, (draft) => {
-        console.log(draft?.filter((item) => !_.isEqual(item, column)))
-        draft = draft?.filter((item) => {
-          return !_.isEqual(item, column)
-        })
-      }),
-    )
+    setMenu((current) => current.filter(_column => _column.title !== column.title));
   }
+
 
   const editColumn = (column: BottomSiteColumn, form: BottomSiteColumn) => {
     setMenu((current) =>
