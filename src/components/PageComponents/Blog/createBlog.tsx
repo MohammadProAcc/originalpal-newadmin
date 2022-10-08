@@ -1,5 +1,5 @@
 import { Button, Card, CardBody, CardHeader, Checkbox, InputGroup } from '@paljs/ui'
-import { BasicEditor } from 'components'
+import { BasicEditor, UploadBlogVideo } from 'components'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
 import router from 'next/router'
@@ -7,7 +7,7 @@ import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
-import { createBlog, search_in, uploadBlogImage } from 'utils'
+import { createBlog, search_in, uploadBlogImage, uploadBlogVideo } from 'utils'
 
 export function CreateBlog() {
   const [loading, setLoading] = useState(false)
@@ -16,6 +16,9 @@ export function CreateBlog() {
 
   const onSubmit = async (form: any) => {
     setLoading(true)
+
+    const video = form.video
+    delete form.video
 
     // FIXME: temporary
     const srcvideo = form?.srcvideo
@@ -51,8 +54,9 @@ export function CreateBlog() {
         toast.success('تصویر پایانی وبلاگ آپلود شد')
       }
 
-      const srcvideoUploadResponse = await uploadBlogImage(blogId, 'srcvideo', srcvideo)
-      if (srcvideoUploadResponse?.status === 'success') {
+      const videoUploadResponse = await uploadBlogVideo(blogId, video[0])
+      console.log(videoUploadResponse)
+      if (videoUploadResponse?.status === 'success') {
         toast.success('ویدیو وبلاگ آپلود شد')
       }
 
@@ -222,12 +226,8 @@ export function CreateBlog() {
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
-          <label>ویدیو دارد؟</label>
-          <Controller
-            control={control}
-            name="isvideo"
-            render={({ field }) => <Checkbox style={{ color: 'transparent' }} checked={field?.value} {...field} />}
-          />
+          <label>ویدیو</label>
+          <input type="file" placeholder="ویدیو بنر" {...register('video')} />
         </InputGroup>
 
         {/* <InputGroup className="col" fullWidth> */}

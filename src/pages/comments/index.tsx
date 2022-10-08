@@ -9,7 +9,6 @@ export default PageName;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context?.req?.cookies?.token) {
     const comments = await getCommentsList(context?.query, context?.req?.cookies?.token);
-    console.log(comments);
     return {
       props: {
         initialState: {

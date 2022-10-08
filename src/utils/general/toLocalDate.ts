@@ -1,4 +1,9 @@
 export const toLocalDate = (date: string) => {
   const d = new Date(date)
-  return d.toLocaleDateString('fa-IR')
+  const finalDate = d.toLocaleDateString('fa-IR');
+  if (finalDate === "Invalid Date") {
+    return "";
+  } else {
+    return finalDate;
+  }
 }

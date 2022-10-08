@@ -103,6 +103,19 @@ export const CouponsPage = () => {
             <Add />
           </Button>
         </Link>
+
+        <Link href="/coupons/aggregate">
+          <Button
+            style={{
+              margin: '1rem 0 1rem 1rem',
+              display: 'flex',
+            }}
+            status="Info"
+            appearance="outline"
+          >
+            فهرست  تخفیف محصولات
+          </Button>
+        </Link>
         {tableSelections?.length > 0 && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده

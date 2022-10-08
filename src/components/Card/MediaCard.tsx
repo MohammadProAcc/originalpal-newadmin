@@ -11,19 +11,27 @@ interface MediaCardProps {
   index: number
   removalCallback: Function
   updateCallback: Function
+  isVideo?: boolean
 }
-export const MediaCard: React.FC<MediaCardProps> = ({ media: mediaRaw, index, removalCallback, updateCallback }) => {
+export const MediaCard: React.FC<MediaCardProps> = ({
+  media: mediaRaw,
+  index,
+  removalCallback,
+  updateCallback,
+  isVideo,
+}) => {
   const [loading, setLoading] = useState(false)
 
-  const media = typeof mediaRaw === "string"
-    ? {
-      t: "",
-      a: "",
-      s: 1,
-      u: mediaRaw,
-      p: 1,
-    }
-    : mediaRaw;
+  const media =
+    typeof mediaRaw === 'string'
+      ? {
+          t: '',
+          a: '',
+          s: 1,
+          u: mediaRaw,
+          p: 1,
+        }
+      : mediaRaw
 
   const { register, handleSubmit } = useForm({
     defaultValues: media,
@@ -40,7 +48,9 @@ export const MediaCard: React.FC<MediaCardProps> = ({ media: mediaRaw, index, re
   return (
     <Card style={{ maxHeight: '40rem' }}>
       <CardHeader style={{ position: 'relative' }}>
-        {index === 0 ? (
+        {isVideo ? (
+          <Alert status="Info">ویدیو</Alert>
+        ) : index === 0 ? (
           media === null ? (
             <Alert status="Danger">تصویر وجود ندارد</Alert>
           ) : (
@@ -91,7 +101,11 @@ export const MediaCard: React.FC<MediaCardProps> = ({ media: mediaRaw, index, re
               </Form>
             </Container>
             <InputGroup style={{ width: '100%', marginLeft: '3rem', display: 'flex', justifyContent: 'flex-end' }}>
-              <Image width="264px" height="264px" src={`https://api.originalpal.co.uk/images/${media?.u}`} />
+              {isVideo ? (
+                <Video src={`${process.env.VID_SRC}/${media?.u}`} controls />
+              ) : (
+                <Image width="264px" height="264px" src={`https://api.originalpal.co.uk/images/${media?.u}`} />
+              )}
             </InputGroup>
           </>
         )}
@@ -110,3 +124,8 @@ const InputGroup = styled(_InputGroup)`
 `
 
 const Form = styled.form``
+
+const Video = styled.video`
+  width: 16.5rem;
+  height: 16.5rem;
+`

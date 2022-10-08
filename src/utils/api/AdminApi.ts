@@ -24,7 +24,7 @@ export const admin = (token?: string) => {
         Cookies.remove('token')
         router.push('/auth/login')
       }
-      console.log('>>>>> Axios Api >>>>> Error ', Object.keys(error), error)
+      console.log('>>>>> Axios Api >>>>> Error ', error)
     },
   )
 

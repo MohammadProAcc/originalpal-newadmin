@@ -14,6 +14,7 @@ import {
   TopSiteMenu,
   TopSiteRow,
 } from 'types'
+import { uploadMediaFile, updateMedia } from 'utils'
 
 interface TopSiteMenuFormProps {
   loading?: boolean
@@ -23,6 +24,28 @@ interface TopSiteMenuFormProps {
 
 export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callback, defaultValues }) => {
   const [menu, setMenu] = useState<TopSiteMenu[]>(defaultValues)
+
+  async function uploadColumnBanner(file: File, column: any) {
+    const response = await uploadMediaFile(file)
+    if (response !== null) {
+      const updateResponse = await updateMedia(response.data.data.id, {
+        type: 'top-site-menu',
+        reference_id: column.menuTitle,
+        meta: {
+          a: `نمایه فهرست ${column.menuTitle}`,
+          t: `نمایه فهرست ${column.menuTitle}`,
+        },
+      })
+      if (updateResponse !== null) {
+        console.log(updateResponse)
+        return updateResponse.data.data
+      } else {
+        toast.error('بارگذاری تصویر موفقیت آمیز نبود')
+      }
+    } else {
+      toast.error('بارگذاری تصویر موفقیت آمیز نبود')
+    }
+  }
 
   // FIXME: temp
   useEffect(() => console.log(menu), [menu])
@@ -192,7 +215,11 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
     )
   }
 
-  const onColumnFormSubmit = (form: TopSiteColumn) => {
+  const onColumnFormSubmit = async (form: TopSiteColumn) => {
+    if (form.thumb) {
+      const response = await uploadColumnBanner(form.thumb[0], selectedColumn)
+      form.thumb = response
+    }
     selectedColumn
       ? editColumn(selectedMenu, selectedColumn, form)
       : addColumn(selectedMenu, { ...initialTopSiteMenuColumn, columnTitle: form?.columnTitle })
@@ -312,6 +339,11 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
     )
   }
 
+  function removeColumnBanner() {
+    columnSetValue('thumb', null)
+    toast.success('بنر فهرست حذف شد, پس از ثبت موارد اعمال خواهد شد')
+  }
+
   return (
     <Component>
       <Menus>
@@ -353,7 +385,7 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
 
                   {_column?.thumb && (
                     <ThumbContainer>
-                      <ColumnThumb src={_column?.thumb} />
+                      <ColumnThumb src={`${process.env.MED_SRC}${_column?.thumb?.url}`} />
                     </ThumbContainer>
                   )}
 
@@ -486,11 +518,12 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
 
                 <InputGroup>
                   <label>تصویر فهرست</label>
-                  <input type="file" disabled />
+                  <input type="file" {...columnRegister('...thumb')} />
                 </InputGroup>
                 {selectedColumn?.thumb && (
                   <ThumbContainer>
-                    <ColumnThumb src={selectedColumn?.thumb} />
+                    <ColumnThumbDeleteButton onClick={removeColumnBanner}>حذف تصویر</ColumnThumbDeleteButton>
+                    <ColumnThumb src={`${process.env.MED_SRC}${selectedColumn?.thumb?.url}`} />
                   </ThumbContainer>
                 )}
 
@@ -732,4 +765,13 @@ const H3 = styled.h3`
   &.column-footer {
     margin-bottom: 2rem;
   }
+`
+
+const ColumnThumbDeleteButton = styled.button.attrs({
+  type: 'button',
+})`
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
 `

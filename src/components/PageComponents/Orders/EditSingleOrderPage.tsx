@@ -51,7 +51,7 @@ export const EditSingleOrderPage: React.FC = () => {
 
   const [stockOptions, setStockOptions] = useState(
     stocks?.map((stock: any) => ({
-      label: `شناسه انبار: ${stock?.id}, سایز: ${stock?.size} شناسه محصول: ${stock?.product_id}`,
+      label: ` شناسه محصول: ${stock?.product_id} سایز: ${stock?.size}`,
       value: stock,
     })),
   )

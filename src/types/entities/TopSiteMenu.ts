@@ -8,7 +8,7 @@ export interface TopSiteColumn {
   columnTitle: string
   href: string
   highlight?: boolean
-  thumb?: string
+  thumb?: any
   footer?: TopSiteRow
   rows: TopSiteRow[]
 }

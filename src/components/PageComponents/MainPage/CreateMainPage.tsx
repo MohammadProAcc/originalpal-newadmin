@@ -174,6 +174,31 @@ export function CreateMainPage() {
             <input {...register('media.p')} type="number" placeholder="p" />
           </InputGroup>
         </InputGroup>
+        
+        <InputGroup className="col m-4">
+          <label>موقعیت متن بنر</label>
+
+          <label style={{ width: '100%' }}>top</label>
+          <InputGroup>
+            <input {...register('position.top')} placeholder="top" defaultValue={'auto'} />
+          </InputGroup>
+
+          <label style={{ width: '100%' }}>right</label>
+          <InputGroup>
+            <input {...register('position.right')} placeholder="right" defaultValue={'auto'} />
+          </InputGroup>
+
+          <label style={{ width: '100%' }}>bottom</label>
+          <InputGroup>
+            <input {...register('position.bottom')} placeholder="bottom" defaultValue={'auto'} />
+          </InputGroup>
+
+          <label style={{ width: '100%' }}>left</label>
+          <InputGroup>
+            <input {...register('position.left')} placeholder="left" defaultValue={'auto'} />
+          </InputGroup>
+        </InputGroup>
+
 
         <InputGroup status="Success">
           <Button disabled={loading} status="Success" type="submit">

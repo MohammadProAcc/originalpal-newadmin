@@ -15,3 +15,4 @@ export * from './User'
 export * from './Order'
 export * from './Address'
 export * from './Payment'
+export * from "./OwnMedia"

@@ -57,11 +57,11 @@ export const AddressesPage = () => {
         setItemsToRemove(null)
       },
       // TODO: add a proper error callback
-      () => {},
+      () => { },
     )
   }
 
-  const columns: string[] = ['شماره آدرس', 'شناسه کاربر', 'استان', 'شهر', 'کد پستی', 'فعالیت ها']
+  const columns: string[] = ['شماره آدرس', 'شناسه کاربر', 'استان', 'شهر', 'آدرس', 'کد پستی', 'فعالیت ها']
 
   const data = addresses?.data?.data?.map((address: Address) => [
     address?.id,
@@ -70,6 +70,7 @@ export const AddressesPage = () => {
     </Link>,
     address?.province,
     address?.city,
+    address?.address,
     address?.postalcode,
     <Container>
       <Link href={`/address/${address?.id}`}>

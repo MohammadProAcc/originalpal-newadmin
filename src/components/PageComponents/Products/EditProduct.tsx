@@ -11,8 +11,8 @@ import {
   Select as _Select,
 } from '@paljs/ui'
 import axios from 'axios'
-import { BasicEditor, Button, FlexContainer, ModalBox, ProductImageCard, StockItem } from 'components'
-import { UploadProductImage } from 'components/Input'
+import { BasicEditor, Button, FlexContainer, ModalBox, ProductImageCard, ProductVideoCard, StockItem } from 'components'
+import { UploadProductImage, UploadProductVideo } from 'components/Input'
 import { useNonInitialEffect } from 'hooks'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
@@ -23,7 +23,15 @@ import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { Media, ProductBrand } from 'types'
-import { deleteProductMedia, deleteStock, editProduct, getSingleProduct, toLocalDate, useStore } from 'utils'
+import {
+  deleteProductMedia,
+  deleteProductVideo,
+  deleteStock,
+  editProduct,
+  getSingleProduct,
+  toLocalDate,
+  useStore,
+} from 'utils'
 import { StockForm } from '../Stock/components'
 
 // TODO: add search brand mechanism
@@ -46,16 +54,31 @@ export const EditProductPage: React.FC = () => {
   }
 
   const [images, setImages] = useState(product?.media?.length > 0 ? [...product?.media] : [])
+  const [videos, setVideos] = useState(product.video ? [...product?.video] : [])
 
   function appendImage(image: any) {
-    console.log(image)
     setImages((_curr) => [..._curr, image])
     toast.success('تصویر با موفقیت بارگذاری شد')
   }
 
-  function updateMediaCallback(media: any, isMain: boolean) {
+  function appendVideo(video: any) {
+    setVideos((_curr) => [..._curr, video])
+    toast.success('فایل تصویری با موفقیت بارگذاری شد')
+  }
+
+  function updateMediaCallback(media: any, isMain?: boolean, isVideo?: boolean) {
     if (isMain) {
       setMainImage(media)
+    } else if (isVideo) {
+      setVideos((_curr) =>
+        _curr?.map((_media) => {
+          if (_media.u === media.u) {
+            return media
+          } else {
+            return _media
+          }
+        }),
+      )
     } else {
       setImages((_curr) =>
         _curr?.map((_media) => {
@@ -245,18 +268,34 @@ export const EditProductPage: React.FC = () => {
     setLoading(false)
   }
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const [imageToRemove, setImageToRemove] = useState<any>(null)
 
-  const removeProductMedia = async (media: Media) => {
+  const removeProductImage = async (media: Media) => {
     const response = await deleteProductMedia(router?.query?.product_id as string, media?.u, Cookies.get('token') ?? '')
     if (response?.includes('operation done successfully')) {
       setImages((_curr) => _curr.filter((_image) => !_.isEqual(_image, media)))
-      setItemToRemove(null)
+      setImageToRemove(null)
       // await resetProduct()
       toast.success('تصویر با موفقیت حذف شد')
     } else {
       toast.error('حذف تصویر موفیت آمیز نبود')
     }
+  }
+
+  const [videoToRemove, setVideoToRemove] = useState<any>(null)
+
+  // TODO: complete video remove process
+  const removeProductVideo = async (media: Media) => {
+    const response = await deleteProductVideo(router?.query?.product_id as string, media?.u, Cookies.get('token') ?? '')
+    console.error(response);
+    // if (response?.includes('operation done successfully')) {
+    //   setVideos((_curr) => _curr.filter((_image) => !_.isEqual(_image, media)))
+    //   setVideoToRemove(null)
+    //   // await resetProduct()
+    //   toast.success('ویدیو با موفقیت حذف شد')
+    // } else {
+    //   toast.error('حذف ویدیو موفقیت آمیز نبود')
+    // }
   }
 
   const [removeAllImageModal, setRemoveAllImagesModal] = useState(false)
@@ -265,7 +304,7 @@ export const EditProductPage: React.FC = () => {
     setLoading(true)
 
     for (let i = 0; i < images?.length; i++) {
-      await removeProductMedia(images[i])
+      await removeProductImage(images[i])
     }
 
     setRemoveAllImagesModal(false)
@@ -281,7 +320,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>َUrl منحصر به فرد</CardHeader>
           <CardBody>
             <InputGroup>
-              <input disabled value={product?.url} />
+              <input value={product?.url} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -322,11 +361,12 @@ export const EditProductPage: React.FC = () => {
         <Card>
           <CardHeader>برچسب ها : {product?.tags?.map((tag: any) => tag?.name)?.join('-') ?? '-'}</CardHeader>
           <CardBody>
-            <InputGroup>
+            <InputGroup fullWidth>
               <Popover
                 trigger="focus"
                 overlay="شناسه برچسب ها را با فاصله(space) وارد کنید. مثال: 1 12 9"
                 placement="top"
+                style={{ width: '100%' }}
               >
                 <input {...register('tags')} placeholder="برجسب ها" />
               </Popover>
@@ -389,7 +429,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>SEO</CardHeader>
           <CardBody>
             <Card>
-              <CardHeader>عنوان صفحه</CardHeader>
+              <CardHeader>عنوان صفحه (tag title)</CardHeader>
               <CardBody>
                 <InputGroup>
                   <input {...register('title_page')} />
@@ -398,7 +438,7 @@ export const EditProductPage: React.FC = () => {
             </Card>
 
             <Card>
-              <CardHeader>عنوان سئو (tag title)</CardHeader>
+              <CardHeader>عنوان سئو (meta title)</CardHeader>
               <CardBody>
                 <InputGroup>
                   <input {...register('meta_title')} placeholder="عنوان سئو (tag title)" />
@@ -568,7 +608,7 @@ export const EditProductPage: React.FC = () => {
             <ProductImageCard
               index={0}
               media={mainImage}
-              removalCallback={setItemToRemove}
+              removalCallback={setImageToRemove}
               updateCallback={updateMediaCallback}
             />
           </InputGroup>
@@ -590,7 +630,35 @@ export const EditProductPage: React.FC = () => {
             <ProductImageCard
               index={index + 1}
               media={media}
-              removalCallback={setItemToRemove}
+              removalCallback={setImageToRemove}
+              updateCallback={updateMediaCallback}
+            />
+          ))}
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <h3 style={{ marginBottom: '1rem' }}>ویدیو ها</h3>
+          <InputGroup>
+            <label>تصویر</label>
+            <UploadProductVideo productId={product.id} callback={appendVideo} />
+          </InputGroup>
+        </CardHeader>
+        <CardBody
+          style={{
+            maxHeight: '100vh',
+            overflow: 'scroll',
+          }}
+        >
+          {/* {product?.main_site_picture && (
+            <ProductImageCard index={0} media={product?.main_site_picture} removalCallback={setItemToRemove} />
+          )} */}
+          {videos?.map((media: Media, index: number) => (
+            <ProductVideoCard
+              index={index + 1}
+              media={media}
+              removalCallback={setVideoToRemove}
               updateCallback={updateMediaCallback}
             />
           ))}
@@ -635,19 +703,36 @@ export const EditProductPage: React.FC = () => {
       </Card>
 
       {/* -===>>> Modals <<<===- */}
-      <Modal on={!!itemToRemove} toggle={() => setItemToRemove((current: boolean) => !current)}>
+      <Modal on={!!imageToRemove} toggle={() => setImageToRemove((current: boolean) => !current)}>
         <Card>
           <CardHeader>آیا از حذف تصویر زیر اطمینان دارید؟</CardHeader>
           <CardBody className="flex">
             <div className="flex col justify-content-between">
-              <Button onClick={() => removeProductMedia(itemToRemove)} status="Danger">
+              <Button onClick={() => removeProductImage(imageToRemove)} status="Danger">
                 بله، حذف شود
               </Button>
-              <Button onClick={() => setItemToRemove(null)} status="Info">
+              <Button onClick={() => setImageToRemove(null)} status="Info">
                 انصراف
               </Button>
             </div>
-            {<img className="mb-2" width="100px" height="100px" src={`${process.env.SRC}/${itemToRemove?.u}`} />}{' '}
+            {<img className="mb-2" width="100px" height="100px" src={`${process.env.SRC}/${imageToRemove?.u}`} />}{' '}
+          </CardBody>
+        </Card>
+      </Modal>
+
+      <Modal on={!!videoToRemove} toggle={() => setVideoToRemove((current: boolean) => !current)}>
+        <Card>
+          <CardHeader>آیا از حذف ویدیو زیر اطمینان دارید؟</CardHeader>
+          <CardBody className="flex">
+            <div className="flex col justify-content-between">
+              <Button onClick={() => removeProductVideo(videoToRemove)} status="Danger">
+                بله، حذف شود
+              </Button>
+              <Button onClick={() => setVideoToRemove(null)} status="Info">
+                انصراف
+              </Button>
+            </div>
+            {<video controls className="mb-2" width="100px" height="100px" src={`${process.env.VID_SRC}/${videoToRemove?.u}`} />}{' '}
           </CardBody>
         </Card>
       </Modal>

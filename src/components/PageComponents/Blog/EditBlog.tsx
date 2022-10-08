@@ -7,7 +7,7 @@ import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
-import { deleteBlog, editBlog, getSingleBlog, removeItem, uploadBlogImage, useStore } from 'utils'
+import { deleteBlog, editBlog, getSingleBlog, removeItem, uploadBlogImage, uploadBlogVideo, useStore } from 'utils'
 
 export const EditBlogPage: React.FC = () => {
   const { blog, reload } = useStore((state: any) => ({
@@ -15,7 +15,7 @@ export const EditBlogPage: React.FC = () => {
     reload: state?.reload,
   }))
 
-  const endimage = blog.endimage.includes('{') ? JSON.parse(blog.endimage) : blog.endimage;
+  const endimage = blog.endimage?.includes('{') ? JSON.parse(blog.endimage) : blog.endimage
 
   const reloadBlog = async () => {
     const reloadedBlog = await getSingleBlog(blog?.id)
@@ -59,7 +59,7 @@ export const EditBlogPage: React.FC = () => {
     setLoading(false)
   }
 
-  const updateBlogImage = async (form: any, source: 'endimage' | 'thumb') => {
+  const updateBlogMedia = async (form: any, source: 'endimage' | 'thumb' | 'video') => {
     setLoading(true)
 
     const response = await editBlog(blog?.id, {
@@ -86,14 +86,19 @@ export const EditBlogPage: React.FC = () => {
     ])
   }
 
-  const replaceMedia = async (source: 'thumb' | 'endimage' | 'srcvideo', file: File) => {
+  const replaceMedia = async (source: 'thumb' | 'endimage' | 'video', file: File) => {
     setLoading(true)
-    const response = await uploadBlogImage(blog?.id, source, file)
+    let response
+    if (source === 'video') {
+      response = await uploadBlogVideo(blog?.id, file)
+    } else {
+      response = await uploadBlogImage(blog?.id, source, file)
+    }
     if (response?.status === 'success') {
       await reloadBlog()
       toast.success('وبلاگ با موفقیت بروز شد')
     } else {
-      toast.error('بروزرسانی وبلاگ موفقیت آمیز منبود')
+      toast.error('بروزرسانی وبلاگ موفقیت آمیز نبود')
     }
     setLoading(false)
   }
@@ -325,7 +330,7 @@ export const EditBlogPage: React.FC = () => {
             <MediaCard
               media={endimage}
               removalCallback={console.log}
-              updateCallback={(form: any) => updateBlogImage(form, 'endimage')}
+              updateCallback={(form: any) => updateBlogMedia(form, 'endimage')}
               index={0}
             />
           </InputGroup>
@@ -362,8 +367,31 @@ export const EditBlogPage: React.FC = () => {
             <MediaCard
               media={endimage}
               removalCallback={console.log}
-              updateCallback={(form: any) => updateBlogImage(form, 'thumb')}
+              updateCallback={(form: any) => updateBlogMedia(form, 'thumb')}
               index={0}
+            />
+          </InputGroup>
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <label>ویدیوی بنر</label>
+        </CardHeader>
+        <CardBody>
+          <InputGroup className="col" fullWidth>
+            <input
+              type="file"
+              onChange={(e: any) => replaceMedia('video', e?.target?.files[0])}
+              placeholder="ویدیوی بنر"
+            />
+
+            <MediaCard
+              media={blog.video[0]}
+              removalCallback={console.log}
+              updateCallback={(form: any) => updateBlogMedia(form, 'video')}
+              index={0}
+              isVideo
             />
           </InputGroup>
         </CardBody>

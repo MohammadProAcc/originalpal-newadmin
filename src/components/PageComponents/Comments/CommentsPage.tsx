@@ -3,10 +3,9 @@ import styled from 'styled-components'
 import { useStore, deleteComment, editComment, toLocalDate, pluralRemove } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
-import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
+import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar, AnswerCommentFormModal } from 'components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Add } from '@material-ui/icons'
 import { toast } from 'react-toastify'
 
 export const CommentsPage = () => {
@@ -23,6 +22,12 @@ export const CommentsPage = () => {
   const [itemToRemove, setItemToRemove] = useState<any>(null)
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([])
+
+  const [commentToReply, setShowCommentToReply] = useState<any>(null)
+
+  function closeReplyModal() {
+    setShowCommentToReply(null)
+  }
 
   const toggleModal = () => setItemToRemove(null)
 
@@ -74,7 +79,7 @@ export const CommentsPage = () => {
   const columns: any[] = [
     'شناسه نظر',
     'شناسه کاربر',
-    'شناسه محصول',
+    'شناسه محصول / مقاله',
     'متن',
     'تاریخ ایجاد',
     'تاریخ بروزسانی',
@@ -85,19 +90,31 @@ export const CommentsPage = () => {
     // =====>> Table Columns <<=====
     comment?.id ?? '-',
     `کاربر ${comment?.user_id}` ?? '-',
-    `محصول ${comment?.product_id}` ?? '-',
+    comment?.article_id ? `مقاله ${comment?.article_id}` : `محصول ${comment?.product_id}` ?? '-',
     comment?.content ?? '-',
     toLocalDate(comment?.created_at) ?? '-',
     toLocalDate(comment?.updated_at) ?? '-',
-    <Container>
-      {comment?.admin_check ? (
+    <Div>
+      {comment?.parent_id === null && (
+        <Button
+          style={{ marginLeft: '1rem' }}
+          status="Success"
+          appearance="outline"
+          onClick={() => {
+            setShowCommentToReply(comment)
+          }}
+        >
+          پاسخ دادن {comment?.parent_id ? "پاسخ" : "نظر"}
+        </Button>
+      )}
+      {comment?.admin_check == 1 ? (
         <Button
           style={{ marginLeft: '1rem' }}
           status="Warning"
           appearance="outline"
           onClick={() => checkToggle(comment?.id, 0)}
         >
-          سلب تایید از نظر
+          سلب تایید از {comment?.parent_id ? "پاسخ" : "نظر"}
         </Button>
       ) : (
         <Button
@@ -106,7 +123,7 @@ export const CommentsPage = () => {
           appearance="outline"
           onClick={() => checkToggle(comment?.id, 1)}
         >
-          تایید نظر
+          تایید {comment?.parent_id ? "پاسخ" : "نظر"}
         </Button>
       )}
       <Link href={`/comments/${comment?.id}`}>
@@ -122,11 +139,11 @@ export const CommentsPage = () => {
       <Button status="Danger" onClick={() => setItemToRemove(comment)}>
         حذف
       </Button>
-    </Container>,
+    </Div>,
   ])
 
   return (
-    <Layout title="بنر های صفحه اصلی">
+    <Layout title="نظرات">
       <h1>نظر ها</h1>
 
       <FlexContainer>
@@ -186,6 +203,8 @@ export const CommentsPage = () => {
           </ButtonGroup>
         </ModalBox>
       </Modal>
+
+      <AnswerCommentFormModal show={!!commentToReply} toggle={closeReplyModal} comment={commentToReply} />
     </Layout>
   )
 }
@@ -199,4 +218,10 @@ const ModalBox = styled(Container)`
 const ButtonGroup = styled.div`
   margin-top: 1rem;
   display: flex;
+`
+
+const Div = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  row-gap: 1rem;
 `

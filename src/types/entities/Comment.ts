@@ -9,6 +9,9 @@ export interface Comment {
   width: string;
   user_id: number;
   product_id: number;
+  blog_id: number;
+  parent_id: number;
+  replies?: Comment[];
   purchased: number;
   created_at: string;
   updated_at: string;

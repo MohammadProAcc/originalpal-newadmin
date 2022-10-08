@@ -7,3 +7,5 @@ export * from './editProductImage';
 export * from './deleteProduct';
 export * from './sendNotifyOnStock';
 export * from './deleteProductMedia';
+export * from "./editProductVideo"
+export * from "./deleteProductVideo"
