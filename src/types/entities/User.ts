@@ -29,6 +29,6 @@ export const initialUser = {
   points: 0,
   created_at: '',
   updated_at: '',
-  role: '',
+  role: [''],
   last_login_at: '',
 };

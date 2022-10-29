@@ -100,7 +100,7 @@ export const RolesPage = () => {
         )}
       </FlexContainer>
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+      <BasicTable getSelections={setTableSelections} columns={columns} rows={data ?? []} />
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

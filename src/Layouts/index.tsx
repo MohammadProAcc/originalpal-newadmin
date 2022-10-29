@@ -13,6 +13,8 @@ import { Menu, MenuRefObject } from '@paljs/ui/Menu';
 import Link from 'next/link';
 import menuItems from './menuItem';
 import SEO, { SEOProps } from 'components/SEO';
+import { useUserStore } from "utils"
+import { applyMenuFilter } from './applyMenuFilter';
 
 const getDefaultTheme = (): DefaultTheme['name'] => {
   if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
@@ -31,6 +33,8 @@ const LayoutPage: React.FC<SEOProps> = ({ children, ...rest }) => {
   const [menuState, setMenuState] = useState(false);
   const menuRef = useRef<MenuRefObject>(null);
   const [seeHeader, setSeeHeader] = useState(true);
+
+  const userStore = useUserStore();
 
   const getState = (state?: 'hidden' | 'visible' | 'compacted' | 'expanded') => {
     setSeeHeader(state !== 'compacted');
@@ -101,7 +105,7 @@ const LayoutPage: React.FC<SEOProps> = ({ children, ...rest }) => {
                       className="sidebar-menu"
                       Link={Link}
                       ref={menuRef}
-                      items={menuItems}
+                      items={applyMenuFilter(menuItems, [])}
                       currentPath={router.pathname}
                       toggleSidebar={() => sidebarRef.current?.hide()}
                     />
