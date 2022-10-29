@@ -80,7 +80,7 @@ const items: MenuItemType[] = [
         link: { href: "/comments" },
       },
       {
-        title: "نثش ها",
+        title: "نقش ها",
         link: { href: "/roles" },
       },
     ],

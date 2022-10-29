@@ -54,7 +54,7 @@ export function SendSmsForm() {
     const content = (!form.content || form.content === "") ? template : form.content;
     const tokens = form.tokens
       ? Object.entries(form.tokens).map(([key, value]) => ({ [key]: value }))
-      : [] 
+      : []
     const finalForm = {
       tokens,
       type,
@@ -101,7 +101,7 @@ export function SendSmsForm() {
         </InputGroup>
       </_InputGroup>
 
-      <InputGroup>
+      <InputGroup fullWidth>
         <Select
           options={templateOptions}
           placeholder="قالب پیامک"
@@ -160,6 +160,7 @@ const BadgeList = styled.div`
 `;
 
 const Select = styled(_Select)`
+  min-width: 10rem;
   margin: 1rem 0;
 `;
 
