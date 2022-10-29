@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { deleteOrder, pluralRemove, toLocalDate, toLocalTime, translator, useStore } from 'utils'
-import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, HeaderButton, PaginationBar, SearchBar } from 'components'
+import Layout from 'Layouts'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
+import styled from 'styled-components'
+import { deleteOrder, pluralRemove, toLocalDate, toLocalTime, translator, useStore } from 'utils'
+import { OrderNotes } from './OrderNotes'
 
 export const OrdersPage = () => {
   const router = useRouter()
@@ -52,14 +53,24 @@ export const OrdersPage = () => {
         toast.success(`مورد با شناسه ${id} حذف شد`)
       },
       async () => {
-        setTableSelections([]);
-        setItemsToRemove(null);
+        setTableSelections([])
+        setItemsToRemove(null)
       },
       (id: number) => toast.error(`حذف  سقارش با  شناسه ${id} موفقیت آمیز نبود`),
     )
   }
 
-  const columns: any[] = ['شماره سفارش', 'وضعیت', 'کاربر', 'شماره پرداخت', 'آدرس', 'تاریخ ثبت سفارش', 'فعالیت ها']
+  const columns: any[] = [
+    'شماره سفارش',
+    'وضعیت',
+    'کاربر',
+    'شماره پرداخت',
+    'آدرس',
+    'یادداشت ها',
+    'تاریخ ثبت سفارش',
+    'آخرین بروزرسانی',
+    'فعالیت ها',
+  ]
 
   const data = orders?.data?.data?.map((order: any) => [
     order?.id,
@@ -67,7 +78,9 @@ export const OrdersPage = () => {
     `${order?.user?.name ?? '?'} ${order?.user?.lastnam ?? ''}`,
     'در پاسخ درخواست از سرور برنمیگردد',
     order?.address?.address,
-    toLocalDate(order.created_at) + " - " + toLocalTime(order.created_at),
+    <OrderNotes notes={order.notes} />,
+    toLocalDate(order.created_at) + ' - ' + toLocalTime(order.created_at),
+    toLocalDate(order.updated_at) + ' - ' + toLocalTime(order.updated_at),
     <Container>
       <Link href={`/orders/${order?.id}`}>
         <Button style={{ marginLeft: '1rem' }} status="Info">

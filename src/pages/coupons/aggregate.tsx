@@ -8,12 +8,12 @@ export default function Page() {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
-  const { data: stocks } = await admin(context?.req?.cookies?.token).get('/stock/select');
+  const stocks = await admin(context?.req?.cookies?.token).get('/stock/select');
 
   return {
     props: {
       initialState: {
-        stocks: stocks.data
+        stocks: stocks.data.data
       }
     }
   }

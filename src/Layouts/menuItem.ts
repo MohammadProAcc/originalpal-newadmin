@@ -1,91 +1,110 @@
-import { MenuItemType } from '@paljs/ui/types'
+import { MenuItemType } from "@paljs/ui/types";
 
 const items: MenuItemType[] = [
   {
-    title: 'داشبورد',
-    link: { href: '/dashboard' },
+    title: "داشبورد",
+    link: { href: "/dashboard" },
   },
   {
-    title: 'عمومی',
+    title: "عمومی",
     children: [
       {
-        title: 'منو',
-        link: { href: '/menu' },
+        title: "منو",
+        link: { href: "/menu" },
       },
       {
-        title: 'بخش های صفحه اصلی',
-        link: { href: '/main-page-sections' },
-      },
-
-    ],
-  },
-  {
-    title: 'بنر ها',
-    children: [
-      {
-        title: 'تمامی بنر ها',
-        link: { href: '/banners' },
-      },
-      {
-        title: 'اسلایدر ها',
-        link: { href: '/main-page' },
-      },
-    ]
-  },
-  {
-    title: 'انبار',
-    children: [
-      {
-        title: 'برند ها',
-        link: { href: '/brands' },
-      },
-      {
-        title: 'برچسب ها',
-        link: { href: '/tags' },
-      },
-      {
-        title: 'محصولات',
-        link: { href: '/products' },
-      },
-      {
-        title: 'انبار',
-        link: { href: '/stock' },
-      },
-      {
-        title: 'کوپن ها',
-        link: { href: '/coupons' },
+        title: "بخش های صفحه اصلی",
+        link: { href: "/main-page-sections" },
       },
     ],
   },
   {
-    title: 'کاربران',
+    title: "بنر ها",
     children: [
       {
-        title: 'کاربران',
-        link: { href: '/users' },
+        title: "تمامی بنر ها",
+        link: { href: "/banners" },
       },
       {
-        title: 'سفارشات',
-        link: { href: '/orders' },
-      },
-      {
-        title: 'پرداخت ها',
-        link: { href: '/payments' },
-      },
-      {
-        title: 'آدرس ها',
-        link: { href: '/address' },
-      },
-      {
-        title: 'نظرات',
-        link: { href: '/comments' },
+        title: "اسلایدر ها",
+        link: { href: "/main-page" },
       },
     ],
   },
   {
-    title: 'وبلاگ',
-    link: { href: '/blog' },
+    title: "انبار",
+    children: [
+      {
+        title: "برند ها",
+        link: { href: "/brands" },
+      },
+      {
+        title: "برچسب ها",
+        link: { href: "/tags" },
+      },
+      {
+        title: "محصولات",
+        link: { href: "/products" },
+      },
+      {
+        title: "انبار",
+        link: { href: "/stock" },
+      },
+      {
+        title: "کوپن ها",
+        link: { href: "/coupons" },
+      },
+    ],
   },
+  {
+    title: "کاربران",
+    children: [
+      {
+        title: "کاربران",
+        link: { href: "/users" },
+      },
+      {
+        title: "سفارشات",
+        link: { href: "/orders" },
+      },
+      {
+        title: "پرداخت ها",
+        link: { href: "/payments" },
+      },
+      {
+        title: "آدرس ها",
+        link: { href: "/address" },
+      },
+      {
+        title: "نظرات",
+        link: { href: "/comments" },
+      },
+      {
+        title: "نثش ها",
+        link: { href: "/roles" },
+      },
+    ],
+  },
+  {
+    title: "وبلاگ",
+    link: { href: "/blog" },
+  },
+  {
+    title: "فهرست تخفیفات",
+    link: { href: "/coupons/aggregate" },
+  },
+  {
+    title: "ارسال پیامک",
+    link: { href: "/sms" },
+  },
+  {
+    title: "جستجوی کاربران",
+    link: { href: "/user-details" },
+  },
+  {
+    title: "گرفتن خروجی",
+    link: { href: "/export" },
+  }
   // {
   //   title: 'FEATURES',
   //   group: true,
@@ -240,6 +259,6 @@ const items: MenuItemType[] = [
   //     },
   //   ],
   // },
-]
+];
 
-export default items
+export default items;

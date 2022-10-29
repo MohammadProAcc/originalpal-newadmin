@@ -1,50 +1,52 @@
-import { InputGroup } from '@paljs/ui'
-import React, { useCallback, useRef, useState } from 'react'
+import { InputGroup as _InputGroup } from '@paljs/ui'
+import _Select from 'react-select'
+import React, { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import styled from 'styled-components'
-import { Product } from 'types'
-import { getSingleProduct, numeralize, toLocalDate, toLocalTime } from 'utils'
+import { Product, Stock } from 'types'
+import { numeralize, toLocalDate, toLocalTime } from 'utils'
+
+const percentageSelectOptions = [
+  { label: 'درصدی', value: 'percent' },
+  { label: 'نقدی', value: 'cash' },
+]
 
 export function DiscountListCard(props: DiscountListCardProps) {
-  const [status, setStatus] = useState<'loading' | 'success' | 'failed'>('loading')
-  const [product, setProduct] = useState<Product | null>(null)
+  const [product, setProduct] = useState<Product | null>(props.stock.product)
+  const fieldName = `${props.stock.id}:${props.stock.product_id}`
 
-  async function fetchProduct() {
-    getSingleProduct(props.stock.product_id)
-      .then((res) => {
-        setProduct(res)
-        setStatus('success')
-      })
-      .catch(() => {
-        setStatus('failed')
-      })
-  }
-
-  const observer = useRef<any>(null)
-  const connector = useCallback((node) => {
-    if (observer.current) if (typeof observer.current.disconnect === 'object') observer.current.disconncet()
-
-    observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        fetchProduct()
-      }
-    })
-    if (node) observer.current.observe(node)
-  }, [])
-
-  const formMethods = useFormContext();
+  const formMethods = useFormContext()
 
   function discountMutationObserver(e: any) {
-    const fieldName = `${props.stock.id}:${props.stock.product_id}`;
     if (e.target.value == Number(e.target.value)) {
-      formMethods.setValue(fieldName, { ...formMethods.getValues(fieldName), discount: e.target.value })
+      formMethods.setValue(fieldName, {
+        ...props.stock,
+        ...formMethods.getValues(fieldName),
+        discount_amout: e.target.value,
+      })
     } else {
-      formMethods.setValue(fieldName, { ...formMethods.getValues(fieldName), discount_exp: e.target.value })
+      formMethods.setValue(fieldName, {
+        ...props.stock,
+        ...formMethods.getValues(fieldName),
+        discount_end: e.target.value,
+      })
     }
   }
 
+  function discountStartMutation(e: any) {
+    formMethods.setValue(fieldName, {
+      ...props.stock,
+      ...formMethods.getValues(fieldName),
+      discount_start: e.target.value,
+    })
+  }
+
+  function discountTypeMutationObserver(e: any) {
+    formMethods.setValue(fieldName, { ...props.stock, ...formMethods.getValues(fieldName), discount_type: e.value })
+  }
+
   return (
-    <Li ref={connector}>
+    <Li>
       <div className="col info">
         <strong className="strong">
           <span className="product-id">شناسه محصول :‌ {props.stock.product_id}</span>
@@ -52,46 +54,56 @@ export function DiscountListCard(props: DiscountListCardProps) {
         <span>سایز محصول : {props.stock.size}</span>
         <span className="product-id">شناسه انبار :‌ {props.stock.id}</span>
       </div>
-      {status === 'success' ? (
-        <>
-          <ImageContainer>
-            <ProductImage src={`${process.env.SRC}/${product?.media?.[0]?.u}`} />
-          </ImageContainer>
-          <span className="product-name">{product?.name}</span>
-          <div className="col price relative">
-            <span>قیمت : {numeralize(product?.price ?? 0)}</span>
-            <span>
-              تاریخ پایان تخفیف :{' '}
-              {toLocalTime(product?.discount_exp as any) + ' - ' + toLocalDate(product?.discount_exp as any)}
-              <InputGroup>
-                <input type="date" onChange={discountMutationObserver} />
-              </InputGroup>
-            </span>
-          </div>
-          <div className="col price discount">
-            <span>قیمت با تخفیف :</span> <InputGroup>
-              <input defaultValue={product?.discount_price} type="number" onChange={discountMutationObserver} />
-            </InputGroup>
 
-          </div>
-        </>
-      ) : status === 'loading' ? (
-        'در حال بارگذاری محصول...'
-      ) : (
-        ''
-      )}
-    </Li >
+      <ImageContainer>
+        <ProductImage src={`${process.env.SRC}/${product?.site_main_picture?.u}`} />
+      </ImageContainer>
+      <span className="product-name">{product?.name}</span>
+      <div className="col price date">
+        <FlexBox className="price">قیمت : <strong>{numeralize(props.stock?.price ?? 0)}</strong> تومان</FlexBox>
+        <FlexBox col>
+          تاریخ شروع تخفیف :{' '}
+          {props.stock.discount_start &&
+            toLocalTime(props.stock?.discount_start as any) +
+            ' - ' +
+            toLocalDate(props.stock?.discount_start as any)}
+          <InputGroup>
+            <input type="date" onChange={discountStartMutation} />
+          </InputGroup>
+        </FlexBox>
+        <FlexBox col>
+          تاریخ پایان تخفیف :{' '}
+          {props.stock.discount_end &&
+            toLocalTime(props.stock?.discount_end as any) + ' - ' + toLocalDate(props.stock?.discount_end as any)}
+          <InputGroup>
+            <input type="date" onChange={discountMutationObserver} />
+          </InputGroup>
+        </FlexBox>
+      </div>
+      <div className="col price discount">
+        <FlexBox className="discount">
+          <InputGroup column>
+            <label>نوع تخفیف :</label>
+            <Select
+              options={percentageSelectOptions}
+              onChange={discountTypeMutationObserver}
+              defaultValue={percentageSelectOptions.find((item) => item.value === props.stock.discount_type)}
+            />
+          </InputGroup>
+
+          <InputGroup column>
+            <label>مقدار تخفیف :</label>
+            <input defaultValue={props.stock?.discount_amout} type="number" onChange={discountMutationObserver} />
+          </InputGroup>
+        </FlexBox>
+      </div>
+
+    </Li>
   )
 }
 
 interface DiscountListCardProps {
-  stock: {
-    id: number
-    size: string
-    product_id: number
-    priceAfterDiscount: number
-    product: Product
-  }
+  stock: Stock
 }
 
 const Li = styled.li`
@@ -113,13 +125,16 @@ const Li = styled.li`
       max-width: 12rem;
     }
     &.price {
-      max-width: 20rem;
-      &.discount {
-        max-width: 12rem;
+      &.date {
+        display: flex;
+        flex-direction: row;
+        column-gap: 1rem;
       }
-    }
-    &.relative {
-      position: relative;
+
+      &.discount {
+        max-width: 20rem;
+        height: 100%;
+      }
     }
     flex-direction: column;
     display: inline-flex;
@@ -142,11 +157,11 @@ const Li = styled.li`
     margin-left: auto;
   }
 
-  input[type="number"] {
+  input[type='number'] {
     max-width: 10rem;
   }
 
-  input[type="date"] {
+  input[type='date'] {
     height: 1.5rem;
     padding: 0;
     margin-top: 0.125rem;
@@ -171,4 +186,31 @@ const ProductImage = styled.img`
   margin-left: 1rem;
 
   object-fit: cover;
+`
+
+const Select = styled(_Select)`
+  height: 2rem;
+`
+
+const FlexBox = styled.div<{ col?: boolean }>`
+  &.discount {
+    min-width: 40rem;
+  }
+
+  &.price {
+    white-space: nowrap;
+
+    strong {
+      margin: 0 0.25rem;
+      font-weight: bolder;
+    }
+  }
+
+  display: flex;
+  flex-direction: ${(props) => props.col && 'column'};
+`
+
+const InputGroup = styled(_InputGroup) <{ column?: boolean }>`
+  display: flex;
+  flex-direction: ${(props) => props.column && 'column'};
 `

@@ -98,8 +98,8 @@ export const EditProductPage: React.FC = () => {
         product?.site_main_picture && product?.media?.length > 0
           ? [product?.site_main_picture, ...product?.media]
           : product?.site_main_picture
-          ? [product?.site_main_picture]
-          : [null],
+            ? [product?.site_main_picture]
+            : [null],
       ),
     [product],
   )
@@ -785,16 +785,16 @@ interface CardFamilyProps {
   overflow?: boolean
 }
 
-const Card = styled(_Card)<CardFamilyProps>`
+const Card = styled(_Card) <CardFamilyProps>`
   overflow: ${(props) => props.overflow && 'initial'};
   overflow: initial;
 `
 
-const CardBody = styled(_CardBody)<CardFamilyProps>`
+const CardBody = styled(_CardBody) <CardFamilyProps>`
   overflow: initial;
 `
 
-const CardHeader = styled(_CardHeader)<CardFamilyProps>`
+const CardHeader = styled(_CardHeader) <CardFamilyProps>`
   overflow: ${(props) => props.overflow && 'initial'};
   overflow: initial;
 `

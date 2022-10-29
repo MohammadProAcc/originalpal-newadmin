@@ -2,6 +2,7 @@ import { OrderInvoiceDetails } from 'components/PageComponents/Orders/types'
 import produce from 'immer'
 import { useMemo } from 'react'
 import { initialLoginResponseUser, IOrder, LoginResponseUser, Media, Product, User, UserSlice } from 'types'
+import { $_get_roles_list, reqSucceed } from 'utils'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { userActions } from './slices'
@@ -109,6 +110,15 @@ function initStore(preloadedState = initialState) {
           set((state: any) => {
             state.coupon = coupon
           }),
+        // -==>>> roles <<<==-
+        reloadRoles: async () => {
+          const response = await $_get_roles_list();
+          if (reqSucceed(response)) {
+            set((state: any) => {
+              state.roles = response;
+            })
+          }
+        }
       })),
     ),
   )

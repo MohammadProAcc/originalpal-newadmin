@@ -79,11 +79,18 @@ export const EditBlogPage: React.FC = () => {
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
 
+  const [videoToRemove, setVideoToRemove] = useState<any>(null)
+  const closeVideoRemovalModal = () => setVideoToRemove(null)
+
   const remove = async (removeId: any) => {
     await removeItem('blog', removeId, deleteBlog, () => router.push('/blog'), [
       `وبلاگ ${removeId} با موفقیت حذف شد`,
       'حذف وبلاگ موفقیت آمیز نبود',
     ])
+  }
+
+  const removeVideo = async (videoToRemove: any) => {
+    console.log(videoToRemove)
   }
 
   const replaceMedia = async (source: 'thumb' | 'endimage' | 'video', file: File) => {
@@ -145,6 +152,19 @@ export const EditBlogPage: React.FC = () => {
             <FlexContainer jc="space-between">
               <Button onClick={closeRemovalModal}>انصراف</Button>
               <Button onClick={() => remove(itemToRemove?.id)} status="Danger">
+                حذف
+              </Button>
+            </FlexContainer>
+          </ModalBox>
+        </Modal>
+
+        <Modal on={videoToRemove} toggle={closeVideoRemovalModal}>
+          <ModalBox>
+            <div style={{ marginBottom: '1rem' }}>آیا از حذف ویدیو زیر اطمینان دارید؟</div>
+            <video src={`${process.env.VID_SRC}/${videoToRemove?.u}`} controls />
+            <FlexContainer jc="space-between">
+              <Button onClick={closeVideoRemovalModal}>انصراف</Button>
+              <Button onClick={() => removeVideo(videoToRemove)} status="Danger">
                 حذف
               </Button>
             </FlexContainer>
@@ -386,13 +406,19 @@ export const EditBlogPage: React.FC = () => {
               placeholder="ویدیوی بنر"
             />
 
-            <MediaCard
-              media={blog.video[0]}
-              removalCallback={console.log}
-              updateCallback={(form: any) => updateBlogMedia(form, 'video')}
-              index={0}
-              isVideo
-            />
+            {blog?.video?.length > 0 && (
+              <>
+                {blog?.video.map((video: any, index: number) => (
+                  <MediaCard
+                    media={video}
+                    removalCallback={setVideoToRemove}
+                    updateCallback={(form: any) => updateBlogMedia(form, 'video')}
+                    index={index}
+                    isVideo
+                  />
+                ))}
+              </>
+            )}
           </InputGroup>
         </CardBody>
       </Card>

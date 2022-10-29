@@ -86,7 +86,7 @@ export const CouponsPage = () => {
   ])
 
   return (
-    <Layout title="بنر های صفحه اصلی">
+    <Layout title="کوپن ها">
       <h1>کوپن ها</h1>
 
       <FlexContainer>

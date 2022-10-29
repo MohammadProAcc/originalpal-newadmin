@@ -3,3 +3,4 @@ export * from './getSingleUser';
 export * from './createUser';
 export * from './editUser';
 export * from './deleteUser';
+export * from './searchUserDetails'

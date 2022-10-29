@@ -37,6 +37,8 @@ export const MediaCard: React.FC<MediaCardProps> = ({
     defaultValues: media,
   })
 
+  const url = isVideo ? `${process.env.VID_SRC}/${media?.u}` : `https://api.originalpal.co.uk/images/${media?.u}`
+
   const onSubmit = async (form: any) => {
     setLoading(true)
 
@@ -101,11 +103,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
               </Form>
             </Container>
             <InputGroup style={{ width: '100%', marginLeft: '3rem', display: 'flex', justifyContent: 'flex-end' }}>
-              {isVideo ? (
-                <Video src={`${process.env.VID_SRC}/${media?.u}`} controls />
-              ) : (
-                <Image width="264px" height="264px" src={`https://api.originalpal.co.uk/images/${media?.u}`} />
-              )}
+              {isVideo ? <Video src={url} controls /> : <Image width="264px" height="264px" src={url} />}
             </InputGroup>
           </>
         )}

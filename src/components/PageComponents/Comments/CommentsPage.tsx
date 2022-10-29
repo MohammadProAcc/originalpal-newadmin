@@ -90,7 +90,7 @@ export const CommentsPage = () => {
     // =====>> Table Columns <<=====
     comment?.id ?? '-',
     `کاربر ${comment?.user_id}` ?? '-',
-    comment?.article_id ? `مقاله ${comment?.article_id}` : `محصول ${comment?.product_id}` ?? '-',
+    comment?.blog_id ? `مقاله ${comment?.blog_id}` : `محصول ${comment?.product_id}` ?? '-',
     comment?.content ?? '-',
     toLocalDate(comment?.created_at) ?? '-',
     toLocalDate(comment?.updated_at) ?? '-',

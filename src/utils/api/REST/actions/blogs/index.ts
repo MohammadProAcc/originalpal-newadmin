@@ -4,4 +4,5 @@ export * from './createBlog'
 export * from './editBlog'
 export * from './deleteBlog'
 export * from './uploadBlogImage'
-export * from "./uploadBlogVideo"
+export * from './uploadBlogVideo'
+export * from './removeBlogVideo'

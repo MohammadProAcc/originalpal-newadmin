@@ -1,3 +1,5 @@
+import { Address, IOrder } from "types";
+
 export interface User {
   id: number;
   phone: string;
@@ -10,6 +12,11 @@ export interface User {
   updated_at: string;
   role: string;
   last_login_at: string;
+}
+
+export interface UserDetails extends User {
+  orders: IOrder[],
+  addresses: Address[]
 }
 
 export const initialUser = {

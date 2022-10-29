@@ -1,5 +1,16 @@
 import { Add, Close } from '@material-ui/icons'
-import { Alert, Button, Card, CardBody, CardHeader, Checkbox, Container, InputGroup, Modal, Select } from '@paljs/ui'
+import {
+  Alert,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Checkbox,
+  Container,
+  InputGroup as _InputGroup,
+  Modal,
+  Select,
+} from '@paljs/ui'
 import { BasicEditor, FlexContainer, HeaderButton, ModalBox } from 'components'
 import { WriteOrderDetailsModal } from 'components/Modal/derived/WriteOrderDetails'
 import Cookies from 'js-cookie'
@@ -107,10 +118,7 @@ export const EditSingleOrderPage: React.FC = () => {
     },
   })
 
-  const {
-    register: userRegister,
-    handleSubmit: userHandleSubmit
-  } = useForm({
+  const { register: userRegister, handleSubmit: userHandleSubmit } = useForm({
     defaultValues: {
       phone: order.user.phone,
       name: order.user.name,
@@ -120,11 +128,11 @@ export const EditSingleOrderPage: React.FC = () => {
   })
 
   async function onUserFormSubmit(form: any) {
-    const response = await editOrder(order.id, { user: form });
-    if (response.status === "success") {
-      toast.success("تغییرات کاربر اعمال شد");
+    const response = await editOrder(order.id, { user: form })
+    if (response.status === 'success') {
+      toast.success('تغییرات کاربر اعمال شد')
     } else {
-      toast.error("اعمال تغییرات کاربر موفقیت آمیز نبود");
+      toast.error('اعمال تغییرات کاربر موفقیت آمیز نبود')
     }
   }
 
@@ -216,20 +224,20 @@ export const EditSingleOrderPage: React.FC = () => {
       </Modal>
 
       <form onSubmit={userHandleSubmit(onUserFormSubmit)}>
-        <InputGroup fullWidth>
+        <InputGroup fullWidth className='user'>
           <label htmlFor="user-name">نام کاربر : </label>
           <input id="user-name" {...userRegister('name')} disabled />
         </InputGroup>
 
-        <InputGroup fullWidth>
-          <label htmlFor="user-lastname">نام خانوادگی  کاربر : </label>
+        <InputGroup fullWidth className='user'>
+          <label htmlFor="user-lastname">نام خانوادگی کاربر : </label>
           <input {...userRegister('lastname')} disabled />
         </InputGroup>
-        <InputGroup fullWidth>
+        <InputGroup fullWidth className='user'>
           <label htmlFor="user-phone">شماره همراه کاربر : </label>
           <input id="user-phone" {...userRegister('phone')} disabled />
         </InputGroup>
-        <InputGroup fullWidth>
+        <InputGroup fullWidth className='user'>
           <label htmlFor="user-email">ایمیل </label>
           <input id="user-email" {...userRegister('email')} disabled />
         </InputGroup>
@@ -237,7 +245,6 @@ export const EditSingleOrderPage: React.FC = () => {
         <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline" disabled>
           اعمال تغییرات کاربر
         </Button>
-
       </form>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card>
@@ -255,9 +262,12 @@ export const EditSingleOrderPage: React.FC = () => {
               </Button>
             )}{' '}
             {status && status !== order?.status && (
-              <Checkbox style={{ color: 'transparent', marginRight: '2rem' }} checked={sms} onChange={setSms}>
-                پیامک تغییر وضعیت ارسال شود؟
-              </Checkbox>
+              // <Checkbox style={{ color: 'transparent', marginRight: '2rem' }} checked={sms} onChange={setSms}>
+              //   پیامک تغییر وضعیت ارسال شود؟
+              // </Checkbox>
+              <Button status="Info">
+                ارسال پیامک
+              </Button>
             )}
           </CardHeader>
           <Select
@@ -430,10 +440,10 @@ export const EditSingleOrderPage: React.FC = () => {
             جمع کل :{' '}
             {numeralize(
               order['order_items'] &&
-              order['order_items'].length > 0 &&
-              order['order_items']
-                ?.map((orderItem: any) => Number(orderItem?.price))
-                ?.reduce((prev: number, curr: number) => curr + prev),
+                order['order_items'].length > 0 &&
+                order['order_items']
+                  ?.map((orderItem: any) => Number(orderItem?.price))
+                  ?.reduce((prev: number, curr: number) => curr + prev),
             )}{' '}
             تومان
           </p>
@@ -600,7 +610,7 @@ const AddressForm = styled.form`
   }
 `
 
-const AddressInputGroup = styled(InputGroup)`
+const AddressInputGroup = styled(_InputGroup)`
   margin-bottom: 1rem;
 
   input {
@@ -609,5 +619,13 @@ const AddressInputGroup = styled(InputGroup)`
 
   textarea {
     width: 100%;
+  }
+`
+
+const InputGroup = styled(_InputGroup)`
+  &.user {
+    label {
+      min-width: 8rem;
+    }
   }
 `

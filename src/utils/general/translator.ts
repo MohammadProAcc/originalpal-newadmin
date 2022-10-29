@@ -127,6 +127,10 @@ const dictionary = {
   'bottom-site-descriptions': 'توضیحات پایین صفحه',
   'bottom-site-descrpitions': 'توضیحات پایین صفحه',
   'products-bottom-site-menu': 'منوی پایین صفحه (مختص صفحه محصولات)',
+  invoice: 'شماره فاکتور',
+  item: 'موارد',
+  'post-code': 'کد پستی',
+  'verification-code': 'کد تایید'
 }
 
 export const translator = (target: string) => {
