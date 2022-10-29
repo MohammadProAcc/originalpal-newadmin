@@ -189,7 +189,7 @@ const Header: React.FC<HeaderProps> = (props) => {
                   <User
                     image="url('/icons/icon-72x72.png')"
                     name={`${user?.user.name} ${user?.user?.lastname}`}
-                    title={translator(user?.user.role)}
+                    title={translator(user?.user.role?.[0] ?? "")}
                     size="Medium"
                   />
                 </ContextMenu>

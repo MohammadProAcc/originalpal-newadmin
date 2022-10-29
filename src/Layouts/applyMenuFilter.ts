@@ -1,4 +1,4 @@
-export function applyMenuFilter(menuItem: any) {
+export function applyMenuFilter(menuItem: any, permissions: string[]) {
   const filtered: any = [];
-  return filtered;
+  return menuItem;
 }
