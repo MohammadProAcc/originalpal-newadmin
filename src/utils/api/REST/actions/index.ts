@@ -18,3 +18,4 @@ export * from './address'
 export * from './payments'
 export * from './media'
 export * from './roles'
+export * from "./blog-category"

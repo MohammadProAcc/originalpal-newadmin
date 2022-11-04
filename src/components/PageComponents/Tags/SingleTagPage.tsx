@@ -1,14 +1,16 @@
-import { deleteTag, removeItem, useStore } from 'utils'
+import { deleteTag, has, removeItem, useStore, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import { useState } from 'react'
 import router from 'next/router'
 import { FlexContainer, HeaderButton, ModalBox } from 'components'
+import { PermissionEnum } from 'types'
 
 export const SingleTagPage: React.FC = () => {
   const { tag } = useStore((state: any) => ({
     tag: state?.tag,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
@@ -24,12 +26,16 @@ export const SingleTagPage: React.FC = () => {
     <Layout title={`${tag?.id}`}>
       <h1 style={{ marginBottom: '4rem' }}>
         مشاهده برچسب {tag?.name}
-        <HeaderButton status="Info" href={`/tags/edit/${tag?.id}`}>
-          ویرایش
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(tag)}>
-          حذف
-        </HeaderButton>
+        {has(permissions, PermissionEnum.editTag) && (
+          <HeaderButton status="Info" href={`/tags/edit/${tag?.id}`}>
+            ویرایش
+          </HeaderButton>
+        )}
+        {has(permissions, PermissionEnum.deleteTag) && (
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(tag)}>
+            حذف
+          </HeaderButton>
+        )}
       </h1>
 
       {/* ....:::::: Modals :::::.... */}

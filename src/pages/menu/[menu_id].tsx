@@ -6,7 +6,7 @@ const SingleMenu: NextPage = () => <SingleMenuPage />
 export default SingleMenu
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.token
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
   const { menu_id } = context?.query
 
   if (token) {

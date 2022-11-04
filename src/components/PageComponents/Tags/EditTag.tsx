@@ -1,4 +1,4 @@
-import { deleteTag, editTag, removeItem, useStore } from 'utils'
+import { deleteTag, editTag, has, removeItem, useStore, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, InputGroup, Modal } from '@paljs/ui'
 import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
@@ -6,11 +6,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { useState } from 'react'
 import router from 'next/router'
+import { PermissionEnum } from 'types'
 
 export const EditTagPage: React.FC = () => {
   const { tag } = useStore((state: any) => ({
     tag: state?.tag,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const { register, handleSubmit } = useForm({
     defaultValues: tag,
@@ -43,13 +45,17 @@ export const EditTagPage: React.FC = () => {
       <h1 style={{ marginBottom: '4rem' }}>
         ویرایش برچسب {tag?.name}
         <FlexContainer style={{ display: 'inline-flex' }}>
-          <HeaderButton status="Info" href={`/tags/${tag?.id}`}>
-            مشاهده
-          </HeaderButton>
+          {has(permissions, PermissionEnum.readTag) && (
+            <HeaderButton status="Info" href={`/tags/${tag?.id}`}>
+              مشاهده
+            </HeaderButton>
+          )}
 
-          <HeaderButton status="Danger" onClick={() => setItemToRemove(tag)}>
-            حذف
-          </HeaderButton>
+          {has(permissions, PermissionEnum.deleteTag) && (
+            <HeaderButton status="Danger" onClick={() => setItemToRemove(tag)}>
+              حذف
+            </HeaderButton>
+          )}
         </FlexContainer>
       </h1>
 

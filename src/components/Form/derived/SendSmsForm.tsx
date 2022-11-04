@@ -97,7 +97,7 @@ export function SendSmsForm() {
             placeholder="شماره جدید"
             ref={inputRef}
           />
-          <Button status="Success" onClick={onInsertPhoneNumber}>+</Button>
+          <Button type="button" status="Success" onClick={onInsertPhoneNumber}>+</Button>
         </InputGroup>
       </_InputGroup>
 

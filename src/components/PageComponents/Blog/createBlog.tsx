@@ -30,7 +30,7 @@ export function CreateBlog() {
     const endImage = form?.endimage[0]
     delete form?.endimage
 
-    const response = await createBlog(form, Cookies.get('token'))
+    const response = await createBlog(form, Cookies.get(process.env.TOKEN!))
     if (response !== null) {
       const { data: blogs } = await search_in(
         'blog',

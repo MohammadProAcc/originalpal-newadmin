@@ -1,21 +1,32 @@
-import { RolesPage } from 'components';
-import { GetServerSideProps, NextPage } from 'next';
-import { $_get_roles_list } from 'utils';
+import { RolesPage } from 'components'
+import { GetServerSideProps, NextPage } from 'next'
+import { PermissionEnum } from 'types'
+import { $_get_roles_list, asyncHas } from 'utils'
 
-const PageName: NextPage = () => <RolesPage />;
+const PageName: NextPage = () => <RolesPage />
 
-export default PageName;
+export default PageName
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
-    const roles = await $_get_roles_list(context?.query, context?.req?.cookies?.token);
-    if (roles?.status === 401) {
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  if (token) {
+    if (!(await asyncHas(PermissionEnum.browseRole, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: '/dashboard',
+        },
+      }
+    const roles = await $_get_roles_list(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
+    console.log(roles)
+
+    if (!roles) {
       return {
         props: {},
         redirect: {
           destination: '/auth/login',
         },
-      };
+      }
     }
     return {
       props: {
@@ -23,13 +34,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           roles,
         },
       },
-    };
+    }
   } else {
     return {
       props: {},
       redirect: {
         destination: '/auth/login',
       },
-    };
+    }
   }
-};
+}

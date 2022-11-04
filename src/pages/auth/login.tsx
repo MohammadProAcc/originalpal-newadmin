@@ -12,13 +12,9 @@ import { initialLoginResponseUser } from 'types'
 import { login, useUserStore } from 'utils'
 
 export default function Login() {
-  const { setUser } = useUserStore((state) => ({
+  const { setUser } = useUserStore((state: any) => ({
     setUser: state?.setUser,
   }))
-
-  // const onCheckbox = () => {
-  // v will be true or false
-  // };
 
   const [loading, setLoading] = useState(false)
 
@@ -28,7 +24,8 @@ export default function Login() {
     setLoading(true)
     const user = await login(form)
     if (user !== null) {
-      Cookies.set('token', user.token)
+      Cookies.set(process.env.TOKEN!, user.token)
+      console.log("^^^^^^^^^^^^^ USER HERE ^^^^^^^^^^^^^^",user);
       setUser!(user ?? initialLoginResponseUser)
       toast.success('خوش آمدید')
       router.push('/dashboard')

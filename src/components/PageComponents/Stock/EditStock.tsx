@@ -1,16 +1,17 @@
-import { deleteStock, removeItem, useStore } from 'utils'
-import Layout from 'Layouts'
-import React, { useState } from 'react'
+import { Button, Modal } from '@paljs/ui'
 import { HeaderButton, ModalBox, StockItem } from 'components'
 import { FlexContainer } from 'components/Container/FlexContainer'
-import { Button, Modal } from '@paljs/ui'
+import Layout from 'Layouts'
 import router from 'next/router'
-import { css } from 'styled-components'
+import React, { useState } from 'react'
+import { PermissionEnum } from 'types'
+import { deleteStock, has, removeItem, useStore, useUserStore } from 'utils'
 
 export const EditStockPage: React.FC = () => {
   const { stock } = useStore((state: any) => ({
     stock: state?.stock,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
@@ -27,13 +28,17 @@ export const EditStockPage: React.FC = () => {
       <h1 style={{ marginBottom: '4rem' }}>
         ویرایش انبار {stock?.id}
         <FlexContainer style={{ display: 'inline-flex' }}>
-          <HeaderButton status="Info" href={`/stock/${stock?.id}`}>
-            مشاهده
-          </HeaderButton>
+          {has(permissions, PermissionEnum.editStock) && (
+            <HeaderButton status="Info" href={`/stock/${stock?.id}`}>
+              مشاهده
+            </HeaderButton>
+          )}
 
-          <HeaderButton status="Danger" onClick={() => setItemToRemove(stock)}>
-            حذف
-          </HeaderButton>
+          {has(permissions, PermissionEnum.deleteStock) && (
+            <HeaderButton status="Danger" onClick={() => setItemToRemove(stock)}>
+              حذف
+            </HeaderButton>
+          )}
         </FlexContainer>
       </h1>
 

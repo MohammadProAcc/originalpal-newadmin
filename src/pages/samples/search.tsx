@@ -5,13 +5,13 @@ import { search_in } from 'utils';
 const PageName: NextPage = () => <div>......:::: Page Component ::::......</div>;
 export default PageName;
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
+  if (context?.req?.cookies?.[process.env.TOKEN!]) {
     // const { fields } = await ......:::: Fetching fields ::::......
     const { data: result } = await search_in(
       '......:::: Entity To Search ::::......',
       context.query,
       context.query,
-      context.req.cookies.token,
+      context.req.cookies[process.env.TOKEN!],
     );
 
     return {

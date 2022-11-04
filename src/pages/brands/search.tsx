@@ -1,12 +1,21 @@
 import { BrandsPage } from 'components';
 import { GetServerSideProps, NextPage } from 'next';
-import { getBrandsList, search_in } from 'utils';
+import { PermissionEnum } from 'types';
+import { asyncHas, getBrandsList, search_in } from 'utils';
 
 const PageName: NextPage = () => <BrandsPage />;
 export default PageName;
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
-    const { data: result } = await search_in('brands', context.query, context.query, context.req.cookies.token);
+  const token = context?.req?.cookies?.[process.env.TOKEN!];
+  if (token) {
+    if (!(await asyncHas(PermissionEnum.browseBrand, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: "/dashboard"
+        }
+      }
+    const { data: result } = await search_in('brands', context.query, context.query, context.req.cookies[process.env.TOKEN!]);
 
     return {
       props: {

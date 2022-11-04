@@ -12,7 +12,7 @@ export const admin = (token?: string) => {
       ...config,
       headers: {
         ...config.headers,
-        Authorization: token ? `Bearer ${token}` : `Bearer ${Cookies.get('token')}`,
+        Authorization: token ? `Bearer ${token}` : `Bearer ${Cookies.get(process.env.TOKEN!)}`,
       },
     }
   })

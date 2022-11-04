@@ -15,7 +15,7 @@ export function CreateTag() {
 
   const onSubmit = async (form: any) => {
     setLoading(true)
-    const response = await createTag(form, Cookies.get('token'))
+    const response = await createTag(form, Cookies.get(process.env.TOKEN!))
     if (response?.status === 'success') {
       toast.success('برچسب با موفقیت ساخته شد')
       reset()

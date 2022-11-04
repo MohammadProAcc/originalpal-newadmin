@@ -34,7 +34,7 @@ export const StockItem: React.FC<IStockItemProps> = ({ stock, callback }) => {
         delete form[key as keyof StockForm]
       }
     }
-    const response = await editStock(stock?.id, form, Cookies.get('token'))
+    const response = await editStock(stock?.id, form, Cookies.get(process.env.TOKEN!))
     if (response === null) {
       await callback()
       toast.success('انبار با موفقیت بروز شد')

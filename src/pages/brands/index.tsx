@@ -1,29 +1,38 @@
-import { BrandsPage } from 'components';
-import { GetServerSideProps, NextPage } from 'next';
-import { getBrandsList } from 'utils';
+import { BrandsPage } from 'components'
+import { GetServerSideProps, NextPage } from 'next'
+import { PermissionEnum } from 'types'
+import { asyncHas, getBrandsList } from 'utils'
 
 const PageName: NextPage = () => {
-  return <BrandsPage />;
-};
+  return <BrandsPage />
+}
 
-export default PageName;
+export default PageName
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
-    const brands = await getBrandsList(context?.query, context?.req?.cookies?.token);
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  if (token) {
+    if (!(await asyncHas(PermissionEnum.browseBrand, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: '/dashboard',
+        },
+      }
+    const brands = await getBrandsList(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
     return {
       props: {
         initialState: {
           brands,
         },
       },
-    };
+    }
   } else {
     return {
       props: {},
       redirect: {
         destination: '/auth/login',
       },
-    };
+    }
   }
-};
+}

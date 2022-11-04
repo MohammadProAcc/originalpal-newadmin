@@ -9,7 +9,7 @@ export const OrderDetails: React.FC<{ orderId: number }> = ({ orderId }) => {
   const [orderItems, setOrderItems] = useState<any>([])
 
   useEffect(() => {
-    getSingleOrder(orderId.toString(), Cookies.get('token') ?? '').then(({ data }) => setOrder(data))
+    getSingleOrder(orderId.toString(), Cookies.get(process.env.TOKEN!) ?? '').then(({ data }) => setOrder(data))
   }, [])
 
   useEffect(() => {

@@ -1,21 +1,30 @@
-import { initialLoginResponseUser, LoginResponseUser } from 'types';
-import create from 'zustand';
-import { persist } from 'zustand/middleware';
+import { initialLoginResponseUser, LoginResponseUser } from 'types'
+import create, { GetState, SetState, StoreApi, UseBoundStore } from 'zustand'
+import { persist, devtools } from 'zustand/middleware'
 
 type UserStore = {
-  user: LoginResponseUser;
-  setUser: (user: LoginResponseUser) => void;
-};
+  user: any
+  setUser: (user: any) => void
+  getPermissions: () => string[]
+}
 
-export const useUserStore = create(
+export const useUserStore: UseBoundStore<UserStore> = create(
   persist(
-    (set) => ({
-      user: initialLoginResponseUser,
-      setUser: (user: LoginResponseUser | null) =>
-        set((state: any) => void (state.user = user ?? initialLoginResponseUser)),
-    }),
+    devtools<UserStore, SetState<UserStore>, GetState<UserStore>, StoreApi<UserStore>>(
+      (set, get) => ({
+        user: initialLoginResponseUser,
+        setUser: (user: LoginResponseUser | null) =>
+          set((state: any) => void (state.user = user ?? initialLoginResponseUser)),
+        getPermissions: () => {
+          return Array.from(new Set((get() as any).user!.user!.roles?.map((_role: any) => _role.permissions).flat()))
+        },
+      }),
+      {
+        name: 'user-store',
+      },
+    ),
     {
       name: 'user-store',
     },
   ),
-);
+)

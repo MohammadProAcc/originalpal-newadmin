@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { deletePayment, pluralRemove, translator, useStore } from 'utils'
+import { deletePayment, has, pluralRemove, translator, useStore, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, HeaderButton, PaginationBar, SearchBar } from 'components'
 import { useRouter } from 'next/router'
 import { toast } from 'react-toastify'
-import { Payment } from 'types'
+import { Payment, PermissionEnum } from 'types'
 import Link from 'next/link'
 
 export const PaymentsPage = () => {
@@ -16,6 +16,7 @@ export const PaymentsPage = () => {
     payments: state?.payments,
     clearList: state?.clearList,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -81,19 +82,25 @@ export const PaymentsPage = () => {
     payment?.payment_date,
     payment?.card_number,
     <Container>
-      <Link href={`/payments/${payment?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
+      {has(permissions, PermissionEnum.readPayment) && (
+        <Link href={`/payments/${payment?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.editPayment) && (
+        <Link href={`/payments/edit/${payment?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.deletePayment) && (
+        <Button status="Danger" onClick={() => setItemToRemove(payment)}>
+          حذف
         </Button>
-      </Link>
-      <Link href={`/payments/edit/${payment?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
-      </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(payment)}>
-        حذف
-      </Button>
+      )}
     </Container>,
   ])
 
@@ -101,20 +108,24 @@ export const PaymentsPage = () => {
     <Layout title="پرداخت ها">
       <h1>
         پرداخت ها
-        {tableSelections?.length > 0 && (
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deletePayment) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </h1>
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+      {has(permissions, PermissionEnum.browsePayment) && (
+        <>
+          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
 
-      <PaginationBar
-        totalPages={payments?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <PaginationBar
+            totalPages={payments?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

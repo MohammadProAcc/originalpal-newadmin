@@ -1,13 +1,14 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { useStore, deleteUser, translator, pluralRemove } from 'utils'
-import Layout from 'Layouts'
+import { Add } from '@material-ui/icons'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
+import Layout from 'Layouts'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Add } from '@material-ui/icons'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
+import styled from 'styled-components'
+import { PermissionEnum } from 'types'
+import { deleteUser, has, pluralRemove, translator, useStore, useUserStore } from 'utils'
 
 export const UsersPage = () => {
   const router = useRouter()
@@ -16,6 +17,7 @@ export const UsersPage = () => {
     users: state?.users,
     clearList: state?.clearList,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -69,65 +71,77 @@ export const UsersPage = () => {
     user?.phone,
     translator(user?.role),
     <Container>
-      <Link href={`/users/${user?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
+      {has(permissions, PermissionEnum.readUser) && (
+        <Link href={`/users/${user?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.editUser) && (
+        <Link href={`/users/edit/${user?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.deleteUser) && (
+        <Button status="Danger" onClick={() => setItemToRemove(user)}>
+          حذف
         </Button>
-      </Link>
-      <Link href={`/users/edit/${user?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
-      </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(user)}>
-        حذف
-      </Button>
+      )}
     </Container>,
   ])
 
   return (
     <Layout title="کاربران">
-      <h1>کاربر ها</h1>
+      <h1>کاربران</h1>
 
       <FlexContainer>
-        <Link href="/users/create">
-          <Button
-            style={{
-              margin: '1rem 0 1rem 1rem',
-              display: 'flex',
-            }}
-            status="Success"
-            appearance="outline"
-          >
-            افزودن کاربر
-            <Add />
-          </Button>
-        </Link>
-        {tableSelections?.length > 0 && (
+        {has(permissions, PermissionEnum.editUser) && (
+          <Link href="/users/create">
+            <Button
+              style={{
+                margin: '1rem 0 1rem 1rem',
+                display: 'flex',
+              }}
+              status="Success"
+              appearance="outline"
+            >
+              افزودن کاربر
+              <Add />
+            </Button>
+          </Link>
+        )}
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteUser) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </FlexContainer>
 
-      <SearchBar
-        fields={users.fields}
-        entity="users"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/users/search',
-            query: form,
-          })
-        }
-      />
+      {has(permissions, PermissionEnum.browseUser) && (
+        <>
+          <SearchBar
+            fields={users.fields}
+            entity="users"
+            params={router.query}
+            callback={(form: any) =>
+              router.push({
+                pathname: '/users/search',
+                query: form,
+              })
+            }
+          />
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
-      <PaginationBar
-        totalPages={users?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <PaginationBar
+            totalPages={users?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

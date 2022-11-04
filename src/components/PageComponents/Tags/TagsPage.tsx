@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useStore, deleteTag, pluralRemove } from 'utils'
+import { useStore, deleteTag, pluralRemove, useUserStore, has } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Add } from '@material-ui/icons'
 import { toast } from 'react-toastify'
+import { PermissionEnum } from 'types'
 
 export const TagsPage = () => {
   const router = useRouter()
@@ -16,6 +17,7 @@ export const TagsPage = () => {
     tags: state?.tags,
     clearList: state?.clearList,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -65,19 +67,25 @@ export const TagsPage = () => {
     tag?.name,
     tag?.type,
     <Container>
-      <Link href={`/tags/${tag?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
+      {has(permissions, PermissionEnum.readTag) && (
+        <Link href={`/tags/${tag?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.editTag) && (
+        <Link href={`/tags/edit/${tag?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.deleteTag) && (
+        <Button status="Danger" onClick={() => setItemToRemove(tag)}>
+          حذف
         </Button>
-      </Link>
-      <Link href={`/tags/edit/${tag?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
-      </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(tag)}>
-        حذف
-      </Button>
+      )}
     </Container>,
   ])
 
@@ -86,44 +94,50 @@ export const TagsPage = () => {
       <h1>برچسب ها</h1>
 
       <FlexContainer>
-        <Link href="/tags/create">
-          <Button
-            style={{
-              margin: '1rem 0 1rem 1rem',
-              display: 'flex',
-            }}
-            status="Success"
-            appearance="outline"
-          >
-            افزودن برچسب
-            <Add />
-          </Button>
-        </Link>
-        {tableSelections?.length > 0 && (
+        {has(permissions, PermissionEnum.addTag) && (
+          <Link href="/tags/create">
+            <Button
+              style={{
+                margin: '1rem 0 1rem 1rem',
+                display: 'flex',
+              }}
+              status="Success"
+              appearance="outline"
+            >
+              افزودن برچسب
+              <Add />
+            </Button>
+          </Link>
+        )}
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteTag) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </FlexContainer>
 
-      <SearchBar
-        fields={tags.fields}
-        entity="tags"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/tags/search',
-            query: form,
-          })
-        }
-      />
+      {has(permissions, PermissionEnum.browseTag) && (
+        <>
+          <SearchBar
+            fields={tags.fields}
+            entity="tags"
+            params={router.query}
+            callback={(form: any) =>
+              router.push({
+                pathname: '/tags/search',
+                query: form,
+              })
+            }
+          />
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
-      <PaginationBar
-        totalPages={tags?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <PaginationBar
+            totalPages={tags?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

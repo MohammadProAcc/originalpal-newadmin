@@ -17,3 +17,4 @@ export * from './Payments'
 export * from './Sms'
 export * from './Roles'
 export * from "./Export"
+export * from "./BlogCategories"

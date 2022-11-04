@@ -1,16 +1,28 @@
-import { deleteComment, deleteTag, editComment, getSingleComment, removeItem, toLocalDate, useStore } from 'utils'
+import {
+  deleteComment,
+  deleteTag,
+  editComment,
+  getSingleComment,
+  has,
+  removeItem,
+  toLocalDate,
+  useStore,
+  useUserStore,
+} from 'utils'
 import Layout from 'Layouts'
 import { Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 import { FlexContainer, HeaderButton, ModalBox } from 'components'
 import router from 'next/router'
+import { PermissionEnum } from 'types'
 
 export const SingleCommentPage: React.FC = () => {
   const { comment, updateComment } = useStore((state: any) => ({
     comment: state?.comment,
     updateComment: state?.updateComment,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -41,7 +53,7 @@ export const SingleCommentPage: React.FC = () => {
     <Layout title={`مشاهده نظر ${comment?.id}`}>
       <h1 style={{ marginBottom: '4rem' }}>
         نظر {comment?.id}
-        {comment?.admin_check ? (
+        {has(permissions, PermissionEnum.editComment) && comment?.admin_check ? (
           <Button onClick={() => checkToggle(comment?.id, 1)} className="mr-4" status="Warning" appearance="hero">
             سلب تایید
           </Button>
@@ -50,12 +62,16 @@ export const SingleCommentPage: React.FC = () => {
             تایید نظر
           </Button>
         )}
-        <HeaderButton status="Info" href={`/comments/edit/${comment?.id}`}>
-          ویرایش
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(comment)}>
-          حذف
-        </HeaderButton>
+        {has(permissions, PermissionEnum.editComment) && (
+          <HeaderButton status="Info" href={`/comments/edit/${comment?.id}`}>
+            ویرایش
+          </HeaderButton>
+        )}
+        {has(permissions, PermissionEnum.deleteComment) && (
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(comment)}>
+            حذف
+          </HeaderButton>
+        )}
       </h1>
 
       {/* ....:::::: Modals :::::.... */}

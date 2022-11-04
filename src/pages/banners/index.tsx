@@ -6,7 +6,7 @@ const Main: NextPage = () => <Banners />
 export default Main
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (!context?.req?.cookies?.token) {
+  if (!context?.req?.cookies?.[process.env.TOKEN!]) {
     return {
       props: {},
       redirect: {
@@ -18,7 +18,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       'banners',
       { key: 'type', type: '=', value: 'stand' },
       context.query,
-      context.req.cookies.token,
+      context.req.cookies[process.env.TOKEN!],
     )
 
     return {

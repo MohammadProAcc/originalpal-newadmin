@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { useStore, deleteMenu, pluralRemove, editMenu, translator } from 'utils'
+import { useStore, deleteMenu, pluralRemove, editMenu, translator, has, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, InputGroup, Modal, Popover } from '@paljs/ui'
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Add } from '@material-ui/icons'
 import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
+import { PermissionEnum } from 'types'
 
 export const MenuPage = () => {
   const router = useRouter()
@@ -17,6 +17,8 @@ export const MenuPage = () => {
     menu: state?.menu,
     clearList: state?.clearList,
   }))
+
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -90,23 +92,13 @@ export const MenuPage = () => {
     menu?.id,
     translator(menu?.type),
     <Container>
-      {/*
-        <Link href={`/menu/${menu?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Info">
-            مشاهده
+      {has(permissions, PermissionEnum.editMenu) && (
+        <Link href={`/menu/edit/${menu?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
           </Button>
         </Link>
-      */}
-      <Link href={`/menu/edit/${menu?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
-      </Link>
-      {/*
-        <Button status="Danger" onClick={() => setItemToRemove(menu)}>
-          حذف
-        </Button>
-      */}
+      )}
     </Container>,
   ])
 
@@ -115,44 +107,35 @@ export const MenuPage = () => {
       <h1>منو ها</h1>
 
       <FlexContainer>
-        {/* <Link href="/menu/create"> */}
-        {/*   <Button */}
-        {/*     style={{ */}
-        {/*       margin: '1rem 0 1rem 1rem', */}
-        {/*       display: 'flex', */}
-        {/*     }} */}
-        {/*     status="Success" */}
-        {/*     appearance="outline" */}
-        {/*   > */}
-        {/*     افزودن منو */}
-        {/*     <Add /> */}
-        {/*   </Button> */}
-        {/* </Link> */}
-        {tableSelections?.length > 0 && (
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteMenu) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </FlexContainer>
 
-      <SearchBar
-        fields={menu.fields}
-        entity="menu"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/menu/search',
-            query: form,
-          })
-        }
-      />
+      {has(permissions, PermissionEnum.browseMenu) && (
+        <>
+          <SearchBar
+            fields={menu.fields}
+            entity="menu"
+            params={router.query}
+            callback={(form: any) =>
+              router.push({
+                pathname: '/menu/search',
+                query: form,
+              })
+            }
+          />
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
-      <PaginationBar
-        totalPages={menu?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <PaginationBar
+            totalPages={menu?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

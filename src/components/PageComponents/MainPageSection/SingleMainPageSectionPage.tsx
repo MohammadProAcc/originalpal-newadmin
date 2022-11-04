@@ -4,12 +4,14 @@ import { FlexContainer } from 'components/Container/FlexContainer'
 import Layout from 'Layouts'
 import router from 'next/router'
 import { useState } from 'react'
-import { deleteMainPageSection, removeItem, toLocalDate, useStore } from 'utils'
+import { PermissionEnum } from 'types'
+import { deleteMainPageSection, has, removeItem, toLocalDate, useStore, useUserStore } from 'utils'
 
 export const SingleMainPageSectionPage: React.FC = () => {
   const { mainPageSection } = useStore((state: any) => ({
     mainPageSection: state?.mainPageSection,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
@@ -25,12 +27,16 @@ export const SingleMainPageSectionPage: React.FC = () => {
     <Layout title={`بخش صفحه اصلی ${mainPageSection?.id}`}>
       <h1 style={{ marginBottom: '4rem' }}>
         مشاهده بخش صفحه اصلی {mainPageSection?.id}
-        <HeaderButton status="Info" href={`/mainPageSection/edit/${mainPageSection?.id}`}>
-          ویرایش
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(mainPageSection)}>
-          حذف
-        </HeaderButton>
+        {has(permissions, PermissionEnum.editMainPageSection) && (
+          <HeaderButton status="Info" href={`/mainPageSection/edit/${mainPageSection?.id}`}>
+            ویرایش
+          </HeaderButton>
+        )}
+        {has(permissions, PermissionEnum.deleteMainPageSection) && (
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(mainPageSection)}>
+            حذف
+          </HeaderButton>
+        )}
       </h1>
 
       {/* ....:::::: Modals :::::.... */}

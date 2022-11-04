@@ -19,7 +19,7 @@ export function CreateStock() {
 
   const onSubmit = async (form: any) => {
     setLoading(true)
-    const response = await createStock(form, Cookies.get('token'))
+    const response = await createStock(form, Cookies.get(process.env.TOKEN!))
     if (response?.status === 'success') {
       toast.success('انبار با موفقیت ساخته شد')
       reset()

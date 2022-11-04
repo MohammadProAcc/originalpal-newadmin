@@ -1,15 +1,15 @@
 import { Button, Checkbox, InputGroup, Modal, Select } from '@paljs/ui'
-import axios from 'axios'
 import { FlexContainer, HeaderButton, ModalBox } from 'components'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
+import {} from 'lodash'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
-import Dropzone from 'react-dropzone-uploader'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
-import { admin, removeItem, useStore } from 'utils'
+import { PermissionEnum } from 'types'
+import { admin, has, removeItem, useStore, useUserStore } from 'utils'
 import { deleteBanner, uploadBannerImage } from 'utils/api/REST/actions/banners'
 import { updateBanner } from 'utils/api/REST/actions/banners/updateBanner'
 
@@ -19,6 +19,7 @@ export function EditBanner() {
   const { banner } = useStore((state: any) => ({
     banner: state?.banner,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const platformOptions = [
     { label: 'دسکتاپ', value: 'desktop' },
@@ -92,7 +93,7 @@ export function EditBanner() {
     const updatBannerResponse = await updateBanner(
       router?.query?.banner_id as string,
       finalForm,
-      Cookies.get('token') ?? '',
+      Cookies.get(process.env.TOKEN!) ?? '',
     )
 
     if (updatBannerResponse?.status === 'success') {
@@ -114,13 +115,17 @@ export function EditBanner() {
       <h1>
         بروزرسانی بنر (شناسه: {banner?.id})
         <FlexContainer style={{ display: 'inline-flex' }}>
-          <HeaderButton status="Info" href={`/banners/${banner?.id}`}>
-            مشاهده
-          </HeaderButton>
+          {has(permissions, PermissionEnum.readStand) && (
+            <HeaderButton status="Info" href={`/banners/${banner?.id}`}>
+              مشاهده
+            </HeaderButton>
+          )}
 
-          <HeaderButton status="Danger" onClick={() => setItemToRemove(banner)}>
-            حذف
-          </HeaderButton>
+          {has(permissions, PermissionEnum.deleteStand) && (
+            <HeaderButton status="Danger" onClick={() => setItemToRemove(banner)}>
+              حذف
+            </HeaderButton>
+          )}
         </FlexContainer>
       </h1>
 

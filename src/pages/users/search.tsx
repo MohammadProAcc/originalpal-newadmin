@@ -1,12 +1,26 @@
-import { UsersPage } from 'components';
-import { GetServerSideProps, NextPage } from 'next';
-import { getUsersList, search_in } from 'utils';
+import { UsersPage } from 'components'
+import { GetServerSideProps, NextPage } from 'next'
+import { PermissionEnum } from 'types'
+import { asyncHas, getUsersList, search_in } from 'utils'
 
-const PageName: NextPage = () => <UsersPage />;
-export default PageName;
+const PageName: NextPage = () => <UsersPage />
+export default PageName
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
-    const { data: result } = await search_in('users', context.query, context.query, context.req.cookies.token);
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  if (token) {
+    if (!(await asyncHas(PermissionEnum.browseUser, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: '/dashboard',
+        },
+      }
+    const { data: result } = await search_in(
+      'users',
+      context.query,
+      context.query,
+      context.req.cookies[process.env.TOKEN!],
+    )
 
     return {
       props: {
@@ -29,13 +43,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           },
         },
       },
-    };
+    }
   } else {
     return {
       props: {},
       redirect: {
         destination: '/auth/login',
       },
-    };
+    }
   }
-};
+}

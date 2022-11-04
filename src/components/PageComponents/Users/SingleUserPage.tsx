@@ -1,14 +1,16 @@
-import { deleteUser, removeItem, toLocalDate, translator, useStore } from 'utils'
+import { deleteUser, has, removeItem, toLocalDate, translator, useStore, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import React, { useState } from 'react'
 import { FlexContainer, HeaderButton, ModalBox } from 'components'
 import router from 'next/router'
+import { PermissionEnum } from 'types'
 
 export const SingleUserPage: React.FC = () => {
   const { user } = useStore((state: any) => ({
     user: state?.user,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
@@ -24,12 +26,16 @@ export const SingleUserPage: React.FC = () => {
     <Layout title={`${user?.id}`}>
       <h1 style={{ marginBottom: '4rem' }}>
         کاربر "{user?.name}"
-        <HeaderButton status="Info" href={`/users/edit/${user?.id}`}>
-          ویرایش
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(user)}>
-          حذف
-        </HeaderButton>
+        {has(permissions, PermissionEnum.editUser) && (
+          <HeaderButton status="Info" href={`/users/edit/${user?.id}`}>
+            ویرایش
+          </HeaderButton>
+        )}
+        {has(permissions, PermissionEnum.deleteUser) && (
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(user)}>
+            حذف
+          </HeaderButton>
+        )}
       </h1>
 
       {/* ....:::::: Removal Modals :::::.... */}

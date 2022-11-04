@@ -1,9 +1,10 @@
-import { deleteAddress, numeralize, removeItem, translator, useStore } from 'utils'
+import { deleteAddress, numeralize, removeItem, translator, useStore, useUserStore, has } from 'utils'
 import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import React, { useState } from 'react'
 import router from 'next/router'
 import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
+import { PermissionEnum } from 'types'
 
 const clacTotalPrice = (addressItems: any[]) => {
   // const priceArr = address['address_items']
@@ -18,6 +19,7 @@ export const SingleAddressPage: React.FC = () => {
   const { address } = useStore((state: any) => ({
     address: state?.address,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
@@ -33,12 +35,16 @@ export const SingleAddressPage: React.FC = () => {
     <Layout title={`آدرس شماره ${address?.id}`}>
       <h1 style={{ margin: '0 0 4rem 0' }}>
         آدرس شماره {address?.id}
-        <HeaderButton status="Info" href={`/address/edit/${address?.id}`}>
-          ویرایش
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(address)}>
-          حذف
-        </HeaderButton>
+        {has(permissions, PermissionEnum.editAddress) && (
+          <HeaderButton status="Info" href={`/address/edit/${address?.id}`}>
+            ویرایش
+          </HeaderButton>
+        )}
+        {has(permissions, PermissionEnum.deleteAddress) && (
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(address)}>
+            حذف
+          </HeaderButton>
+        )}
       </h1>
 
       {Object.keys(address).map((key) => (

@@ -1,4 +1,4 @@
-import { deleteMenu, removeItem, toLocalDate, useStore } from 'utils'
+import { deleteMenu, has, removeItem, toLocalDate, useStore, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Alert as _Alert, Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import Image from 'next/image'
@@ -6,11 +6,13 @@ import styled from 'styled-components'
 import React, { useState } from 'react'
 import router from 'next/router'
 import { FlexContainer, HeaderButton, ModalBox } from 'components'
+import { PermissionEnum } from 'types'
 
 export const SingleMenuPage: React.FC = () => {
   const { menu } = useStore((state: any) => ({
     menu: state?.menu,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
@@ -26,12 +28,16 @@ export const SingleMenuPage: React.FC = () => {
     <Layout title={`مشاهده منو ${menu?.id}`}>
       <h1 style={{ marginBottom: '4rem' }}>
         <span style={{ marginLeft: '1rem' }}>مشاهده منو {menu?.id}</span>{' '}
-        <HeaderButton status="Info" href={`/menu/edit/${menu.id}`}>
-          ویرایش
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(menu)}>
-          حذف
-        </HeaderButton>
+        {has(permissions, PermissionEnum.editMainPageSection) && (
+          <HeaderButton status="Info" href={`/menu/edit/${menu.id}`}>
+            ویرایش
+          </HeaderButton>
+        )}
+        {has(permissions, PermissionEnum.deleteMainPageSection) && (
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(menu)}>
+            حذف
+          </HeaderButton>
+        )}
         {menu?.is_news ? (
           <Alert status="Info">
             <h2

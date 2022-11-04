@@ -15,7 +15,7 @@ export function CreateBrand() {
 
   const onSubmit = async (form: any) => {
     setLoading(true)
-    const response = await createBrand(form, Cookies.get('token'))
+    const response = await createBrand(form, Cookies.get(process.env.TOKEN!))
     if (response?.status === 'success') {
       reset()
 

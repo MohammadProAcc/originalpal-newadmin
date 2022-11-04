@@ -5,7 +5,7 @@ import { $_create_role, $_edit_role, reqSucceed } from "utils";
 import { toast } from "react-toastify";
 import { Form } from "components";
 import { Button, InputGroup as _InputGroup } from "@paljs/ui"
-import { ROLES } from "types";
+import { PERMISSIONS } from "types";
 
 export function RoleForm(props: RoleFormProps) {
   const [loading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ export function RoleForm(props: RoleFormProps) {
       </InputGroup>
 
       {
-        ROLES.map(_role => (
+        PERMISSIONS.map(_role => (
           <div>
             <label htmlFor={_role}>{_role}</label>
             <input type="checkbox" id={_role} value={_role} {...register(`permissions.${_role}`)} />

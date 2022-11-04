@@ -8,7 +8,8 @@ import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
-import { pluralRemove, useStore } from 'utils'
+import { PermissionEnum } from 'types'
+import { has, pluralRemove, useStore, useUserStore } from 'utils'
 import { deleteBanner } from 'utils/api/REST/actions/banners'
 
 export const Banners = () => {
@@ -20,6 +21,8 @@ export const Banners = () => {
     setCache: state?.setCache,
     clearList: state?.clearList,
   }))
+
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -110,65 +113,77 @@ export const Banners = () => {
     </div>,
     banner?.active,
     <Container>
-      <Link href={`/banners/${banner?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
+      {has(permissions, PermissionEnum.readStand) && (
+        <Link href={`/banners/${banner?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.editStand) && (
+        <Link href={`/banners/edit/${banner?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.deleteStand) && (
+        <Button status="Danger" onClick={() => setItemToRemove(banner)}>
+          حذف
         </Button>
-      </Link>
-      <Link href={`/banners/edit/${banner?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
-      </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(banner)}>
-        حذف
-      </Button>
+      )}
     </Container>,
   ])
 
   return (
-    <Layout title="بنر های">
-      <h1>بنر ها</h1>
+    <Layout title="بنر های ایستاده">
+      <h1>بنر های ایستاده</h1>
 
       <FlexContainer>
-        <Link href="/banners/create">
-          <Button
-            style={{
-              margin: '1rem 0 1rem 1rem',
-              display: 'flex',
-            }}
-            status="Success"
-            appearance="outline"
-          >
-            افزودن بنر
-            <Add />
-          </Button>
-        </Link>
-        {tableSelections?.length > 0 && (
+        {has(permissions, PermissionEnum.addStand) && (
+          <Link href="/banners/create">
+            <Button
+              style={{
+                margin: '1rem 0 1rem 1rem',
+                display: 'flex',
+              }}
+              status="Success"
+              appearance="outline"
+            >
+              افزودن بنر
+              <Add />
+            </Button>
+          </Link>
+        )}
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteStand) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </FlexContainer>
 
-      <SearchBar
-        fields={banners.fields}
-        entity="banners"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/banners/search',
-            query: form,
-          })
-        }
-      />
+      {has(permissions, PermissionEnum.browseStand) && (
+        <>
+          <SearchBar
+            fields={banners.fields}
+            entity="banners"
+            params={router.query}
+            callback={(form: any) =>
+              router.push({
+                pathname: '/banners/search',
+                query: form,
+              })
+            }
+          />
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
-      <PaginationBar
-        totalPages={banners?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <PaginationBar
+            totalPages={banners?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

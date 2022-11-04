@@ -1,13 +1,22 @@
 import { Banners } from 'components'
 import { GetServerSideProps, NextPage } from 'next'
-import { search_in } from 'utils'
+import { PermissionEnum } from 'types'
+import { asyncHas, search_in } from 'utils'
 
 const Main: NextPage = () => <Banners />
 export default Main
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
-    const { data: result } = await search_in('banners', context.query, context.query, context.req.cookies.token)
+  const token = context?.req?.cookies?.[process.env.TOKEN!];
+  if (token) {
+    if (!(await asyncHas(PermissionEnum.browseStand, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: "/dashboard"
+        }
+      }
+    const { data: result } = await search_in('banners', context.query, context.query, context.req.cookies[process.env.TOKEN!])
     result.data = result?.data.filter((banner: any) => banner?.type === 'stand')
 
     return {

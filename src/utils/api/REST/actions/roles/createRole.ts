@@ -1,4 +1,4 @@
-import { Roles } from 'types';
+import { Permission } from 'types';
 import { admin } from 'utils';
 
 export const $_create_role = async (form: Form, token?: string) => {
@@ -12,5 +12,5 @@ export const $_create_role = async (form: Form, token?: string) => {
 
 interface Form {
   name: string,
-  permissions: Roles[]
+  permissions: Permission[]
 }

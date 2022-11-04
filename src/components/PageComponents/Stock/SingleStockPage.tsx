@@ -5,12 +5,14 @@ import Layout from 'Layouts'
 import router from 'next/router'
 import { useState } from 'react'
 import styled, { css } from 'styled-components'
-import { deleteStock, removeItem, toLocalDate, useStore } from 'utils'
+import { PermissionEnum } from 'types'
+import { deleteStock, has, removeItem, toLocalDate, useStore, useUserStore } from 'utils'
 
 export const SingleStockPage: React.FC = () => {
   const { stock } = useStore((state: any) => ({
     stock: state?.stock,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
@@ -26,12 +28,16 @@ export const SingleStockPage: React.FC = () => {
     <Layout title={`${stock?.id}`}>
       <h1 style={{ marginBottom: '4rem' }}>
         مشاهده انبار {stock?.id}
-        <HeaderButton status="Info" href={`/stock/edit/${stock?.id}`}>
-          ویرایش
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(stock)}>
-          حذف
-        </HeaderButton>
+        {has(permissions, PermissionEnum.editStock) && (
+          <HeaderButton status="Info" href={`/stock/edit/${stock?.id}`}>
+            ویرایش
+          </HeaderButton>
+        )}
+        {has(permissions, PermissionEnum.deleteStock) && (
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(stock)}>
+            حذف
+          </HeaderButton>
+        )}
       </h1>
 
       {/* ....:::::: Modals :::::.... */}

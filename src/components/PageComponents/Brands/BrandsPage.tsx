@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { pluralRemove, useStore } from 'utils'
+import { has, pluralRemove, useStore, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, deleteBrand, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Add } from '@material-ui/icons'
 import { toast } from 'react-toastify'
+import { PermissionEnum } from 'types'
 
 export const BrandsPage = () => {
   const router = useRouter()
@@ -16,6 +17,7 @@ export const BrandsPage = () => {
     brands: state?.brands,
     clearList: state?.clearList,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -65,19 +67,25 @@ export const BrandsPage = () => {
     brand?.id,
     brand?.name,
     <Container>
-      <Link href={`/brands/${brand?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
+      {has(permissions, PermissionEnum.readBrand) && (
+        <Link href={`/brands/${brand?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.editBrand) && (
+        <Link href={`/brands/edit/${brand?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.deleteBrand) && (
+        <Button status="Danger" onClick={() => setItemToRemove(brand)}>
+          حذف
         </Button>
-      </Link>
-      <Link href={`/brands/edit/${brand?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
-      </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(brand)}>
-        حذف
-      </Button>
+      )}
     </Container>,
   ])
 
@@ -87,19 +95,21 @@ export const BrandsPage = () => {
 
       <FlexContainer>
         <Link href="/brands/create">
-          <Button
-            style={{
-              margin: '1rem 0 1rem 1rem',
-              display: 'flex',
-            }}
-            status="Success"
-            appearance="outline"
-          >
-            افزودن برند
-            <Add />
-          </Button>
+          {has(permissions, PermissionEnum.editBrand) && (
+            <Button
+              style={{
+                margin: '1rem 0 1rem 1rem',
+                display: 'flex',
+              }}
+              status="Success"
+              appearance="outline"
+            >
+              افزودن برند
+              <Add />
+            </Button>
+          )}
         </Link>
-        {tableSelections?.length > 0 && (
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.browseBrand) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>

@@ -1,4 +1,4 @@
-import { deleteAddress, editAddress, removeItem, useStore } from 'utils'
+import { deleteAddress, editAddress, removeItem, useStore, has, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, InputGroup, Modal } from '@paljs/ui'
 import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
@@ -6,11 +6,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { useState } from 'react'
 import router from 'next/router'
+import { PermissionEnum } from 'types'
 
 export const EditAddressPage: React.FC = () => {
   const { address } = useStore((state: any) => ({
     address: state?.address,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const { register, handleSubmit } = useForm({
     defaultValues: address,
@@ -41,13 +43,16 @@ export const EditAddressPage: React.FC = () => {
       <h1 style={{ marginBottom: '4rem' }}>
         ویرایش آدرس {address?.name}
         <FlexContainer style={{ display: 'inline-flex' }}>
-          <HeaderButton status="Info" href={`/address/${address?.id}`}>
-            مشاهده
-          </HeaderButton>
-
-          <HeaderButton status="Danger" onClick={() => setItemToRemove(address)}>
-            حذف
-          </HeaderButton>
+          {has(permissions, PermissionEnum.readAddress) && (
+            <HeaderButton status="Info" href={`/address/${address?.id}`}>
+              مشاهده
+            </HeaderButton>
+          )}
+          {has(permissions, PermissionEnum.deleteAddress) && (
+            <HeaderButton status="Danger" onClick={() => setItemToRemove(address)}>
+              حذف
+            </HeaderButton>
+          )}
         </FlexContainer>
       </h1>
 

@@ -6,7 +6,8 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
-import { deleteOrder, pluralRemove, toLocalDate, toLocalTime, translator, useStore } from 'utils'
+import { PermissionEnum } from 'types'
+import { deleteOrder, has, pluralRemove, toLocalDate, toLocalTime, translator, useStore, useUserStore } from 'utils'
 import { OrderNotes } from './OrderNotes'
 
 export const OrdersPage = () => {
@@ -16,6 +17,7 @@ export const OrdersPage = () => {
     orders: state?.orders,
     clearList: state?.clearList,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -82,19 +84,25 @@ export const OrdersPage = () => {
     toLocalDate(order.created_at) + ' - ' + toLocalTime(order.created_at),
     toLocalDate(order.updated_at) + ' - ' + toLocalTime(order.updated_at),
     <Container>
-      <Link href={`/orders/${order?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
+      {has(permissions, PermissionEnum.readOrder) && (
+        <Link href={`/orders/${order?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.editUser) && (
+        <Link href={`/orders/edit/${order?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.deleteUser) && (
+        <Button status="Danger" onClick={() => setItemToRemove(order)}>
+          حذف
         </Button>
-      </Link>
-      <Link href={`/orders/edit/${order?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
-      </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(order)}>
-        حذف
-      </Button>
+      )}
     </Container>,
   ])
 
@@ -102,32 +110,36 @@ export const OrdersPage = () => {
     <Layout title="سفارشات">
       <h1>
         سفارشات
-        {tableSelections?.length > 0 && (
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteUser) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </h1>
 
-      <SearchBar
-        fields={orders.fields}
-        entity="orders"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/orders/search',
-            query: form,
-          })
-        }
-      />
+      {has(permissions, PermissionEnum.browseUser) && (
+        <>
+          <SearchBar
+            fields={orders.fields}
+            entity="orders"
+            params={router.query}
+            callback={(form: any) =>
+              router.push({
+                pathname: '/orders/search',
+                query: form,
+              })
+            }
+          />
 
-      <BasicTable getSelections={setTableSelections} isOrder columns={columns} rows={data} />
+          <BasicTable getSelections={setTableSelections} isOrder columns={columns} rows={data} />
 
-      <PaginationBar
-        totalPages={orders?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <PaginationBar
+            totalPages={orders?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

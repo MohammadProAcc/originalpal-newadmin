@@ -1,12 +1,21 @@
 import { AddressesPage } from 'components'
 import { GetServerSideProps, NextPage } from 'next'
-import { search_in } from 'utils'
+import { PermissionEnum } from 'types'
+import { asyncHas, search_in } from 'utils'
 
 const SearchAddresses: NextPage = () => <AddressesPage />
 export default SearchAddresses
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  if (token) {
+    if (!(await asyncHas(PermissionEnum.browseAddress, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: '/dashboard',
+        },
+      }
     const { data: addresses } = await search_in(
       'address',
       {
@@ -15,7 +24,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         value: context?.query?.value,
       },
       context.query,
-      context.req.cookies.token,
+      context.req.cookies[process.env.TOKEN!],
     )
 
     return {

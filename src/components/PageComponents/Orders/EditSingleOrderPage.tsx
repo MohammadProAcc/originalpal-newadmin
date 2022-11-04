@@ -34,7 +34,10 @@ import {
   translator,
   update_order_status,
   useStore,
+  useUserStore,
+  has,
 } from 'utils'
+import { PermissionEnum } from 'types'
 
 const statusOptions = [
   { label: 'در انتظار پرداخت', value: 'waiting' },
@@ -54,6 +57,7 @@ export const EditSingleOrderPage: React.FC = () => {
     clearOrderItems: state?.clearOrderItems,
     reload: state?.reload,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const reloadOrder = async () => {
     const { data: updatedOrder } = await getSingleOrder(order?.id)
@@ -74,7 +78,7 @@ export const EditSingleOrderPage: React.FC = () => {
     const response = await update_order_status(
       router.query.order_id as string,
       { status, sms },
-      Cookies.get('token') ?? '',
+      Cookies.get(process.env.TOKEN!) ?? '',
     )
     if (response?.status === 'success') {
       toast.success(`وضعیت با موفقیت تغییر کرد به ${translator(status)}`)
@@ -99,7 +103,11 @@ export const EditSingleOrderPage: React.FC = () => {
       quantity: Number(form?.quantity),
       stock_id: form?.stock?.id.toString(),
     }
-    const response = await add_stock_option(router?.query?.order_id as string, finalForm, Cookies.get('token') ?? '')
+    const response = await add_stock_option(
+      router?.query?.order_id as string,
+      finalForm,
+      Cookies.get(process.env.TOKEN!) ?? '',
+    )
     if (response?.status === 'success') {
       const updatedOrder = await getSingleOrder(order?.id)
       updateOrder(updatedOrder.data)
@@ -200,13 +208,17 @@ export const EditSingleOrderPage: React.FC = () => {
       <h1 style={{ margin: '0 0 4rem 0' }}>
         ویرایش سفارش شماره {order?.id}
         <FlexContainer style={{ display: 'inline-flex' }}>
-          <HeaderButton status="Info" href={`/orders/${order?.id}`}>
-            مشاهده
-          </HeaderButton>
+          {has(permissions, PermissionEnum.readOrder) && (
+            <HeaderButton status="Info" href={`/orders/${order?.id}`}>
+              مشاهده
+            </HeaderButton>
+          )}
 
-          <HeaderButton status="Danger" onClick={() => setItemToRemove(order)}>
-            حذف
-          </HeaderButton>
+          {has(permissions, PermissionEnum.deleteOrder) && (
+            <HeaderButton status="Danger" onClick={() => setItemToRemove(order)}>
+              حذف
+            </HeaderButton>
+          )}
         </FlexContainer>
       </h1>
 
@@ -224,20 +236,20 @@ export const EditSingleOrderPage: React.FC = () => {
       </Modal>
 
       <form onSubmit={userHandleSubmit(onUserFormSubmit)}>
-        <InputGroup fullWidth className='user'>
+        <InputGroup fullWidth className="user">
           <label htmlFor="user-name">نام کاربر : </label>
           <input id="user-name" {...userRegister('name')} disabled />
         </InputGroup>
 
-        <InputGroup fullWidth className='user'>
+        <InputGroup fullWidth className="user">
           <label htmlFor="user-lastname">نام خانوادگی کاربر : </label>
           <input {...userRegister('lastname')} disabled />
         </InputGroup>
-        <InputGroup fullWidth className='user'>
+        <InputGroup fullWidth className="user">
           <label htmlFor="user-phone">شماره همراه کاربر : </label>
           <input id="user-phone" {...userRegister('phone')} disabled />
         </InputGroup>
-        <InputGroup fullWidth className='user'>
+        <InputGroup fullWidth className="user">
           <label htmlFor="user-email">ایمیل </label>
           <input id="user-email" {...userRegister('email')} disabled />
         </InputGroup>
@@ -265,9 +277,7 @@ export const EditSingleOrderPage: React.FC = () => {
               // <Checkbox style={{ color: 'transparent', marginRight: '2rem' }} checked={sms} onChange={setSms}>
               //   پیامک تغییر وضعیت ارسال شود؟
               // </Checkbox>
-              <Button status="Info">
-                ارسال پیامک
-              </Button>
+              <Button status="Info">ارسال پیامک</Button>
             )}
           </CardHeader>
           <Select

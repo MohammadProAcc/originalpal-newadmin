@@ -33,7 +33,7 @@ export function CreateMainPage() {
     console.log(finalForm)
 
     try {
-      await createBanner(finalForm, Cookies.get('token'))
+      await createBanner(finalForm, Cookies.get(process.env.TOKEN!))
       const result = await search_in(
         'banners',
         {

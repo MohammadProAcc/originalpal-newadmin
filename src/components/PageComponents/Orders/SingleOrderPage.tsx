@@ -1,9 +1,10 @@
-import { deleteOrder, numeralize, removeItem, translator, useStore } from 'utils'
+import { deleteOrder, has, numeralize, removeItem, translator, useStore, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import React, { useState } from 'react'
 import router from 'next/router'
 import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
+import { PermissionEnum } from 'types'
 
 const clacTotalPrice = (orderItems: any[]) => {
   // const priceArr = order['order_items']
@@ -18,6 +19,7 @@ export const SingleOrderPage: React.FC = () => {
   const { order } = useStore((state: any) => ({
     order: state?.order,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
@@ -33,12 +35,16 @@ export const SingleOrderPage: React.FC = () => {
     <Layout title={`سفارش شماره ${order?.id}`}>
       <h1 style={{ margin: '0 0 4rem 0' }}>
         سفارش شماره {order?.id}
-        <HeaderButton status="Info" href={`/orders/edit/${order?.id}`}>
-          ویرایش
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(order)}>
-          حذف
-        </HeaderButton>
+        {has(permissions, PermissionEnum.editOrder) && (
+          <HeaderButton status="Info" href={`/orders/edit/${order?.id}`}>
+            ویرایش
+          </HeaderButton>
+        )}
+        {has(permissions, PermissionEnum.deleteOrder) && (
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(order)}>
+            حذف
+          </HeaderButton>
+        )}
       </h1>
 
       {/* ....:::::: Modals :::::.... */}

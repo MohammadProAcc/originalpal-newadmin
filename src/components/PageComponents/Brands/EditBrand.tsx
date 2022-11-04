@@ -1,4 +1,4 @@
-import { editBrand, removeItem, useStore } from 'utils'
+import { editBrand, has, removeItem, useStore, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, InputGroup, Modal } from '@paljs/ui'
 import { Button, deleteBrand, FlexContainer, HeaderButton, ModalBox } from 'components'
@@ -6,11 +6,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import React, { useState } from 'react'
 import router from 'next/router'
+import { PermissionEnum } from 'types'
 
 export const EditBrandPage: React.FC = () => {
   const { brand } = useStore((state: any) => ({
     brand: state?.brand,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -50,13 +52,17 @@ export const EditBrandPage: React.FC = () => {
       <h1 style={{ marginBottom: '4rem' }}>
         ویرایش برند {brand?.name}
         <FlexContainer style={{ display: 'inline-flex' }}>
-          <HeaderButton status="Info" href={`/brands/${brand?.id}`}>
-            مشاهده
-          </HeaderButton>
+          {has(permissions, PermissionEnum.readBrand) && (
+            <HeaderButton status="Info" href={`/brands/${brand?.id}`}>
+              مشاهده
+            </HeaderButton>
+          )}
 
-          <HeaderButton status="Danger" onClick={() => setItemToRemove(brand)}>
-            حذف
-          </HeaderButton>
+          {has(permissions, PermissionEnum.deleteBrand) && (
+            <HeaderButton status="Danger" onClick={() => setItemToRemove(brand)}>
+              حذف
+            </HeaderButton>
+          )}
         </FlexContainer>
       </h1>
 

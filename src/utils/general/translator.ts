@@ -130,7 +130,8 @@ const dictionary = {
   invoice: 'شماره فاکتور',
   item: 'موارد',
   'post-code': 'کد پستی',
-  'verification-code': 'کد تایید'
+  'verification-code': 'کد تایید',
+  permissions: 'مجوز ها'
 }
 
 export const translator = (target: string) => {

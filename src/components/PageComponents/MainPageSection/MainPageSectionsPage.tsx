@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-
-import { useStore, deleteMainPageSection, numeralize, translator } from 'utils'
+import { useStore, deleteMainPageSection, translator, useUserStore, has } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
@@ -9,6 +8,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Add } from '@material-ui/icons'
 import { toast } from 'react-toastify'
+import { PermissionEnum } from 'types'
 
 export const MainPageSectionPage = () => {
   const router = useRouter()
@@ -17,6 +17,8 @@ export const MainPageSectionPage = () => {
     mainPageSections: state?.mainPageSections,
     clearList: state?.clearMainPageSectionsList,
   }))
+
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -34,9 +36,9 @@ export const MainPageSectionPage = () => {
     if (response?.status === 'success') {
       clearList(item?.id)
       setItemToRemove(null)
-      toast.success('بخش صفحه اصلی با موفقیت حذف شد')
+      toast.success('بخش های  صفحه اصلی با موفقیت حذف شد')
     } else {
-      toast.error('حذف بخش صفحه اصلی موفقیت آمیز نبود')
+      toast.error('حذف بخش های  صفحه اصلی موفقیت آمیز نبود')
     }
     setLoading(false)
   }
@@ -48,9 +50,9 @@ export const MainPageSectionPage = () => {
       const deletions = selections?.map(async (id) => {
         const response = await deleteMainPageSection(id)
 
-        console.log("delete section response >>> ", response);
+        console.log('delete section response >>> ', response)
         if (response?.status === 'success') {
-          clearList(id);
+          clearList(id)
 
           toast.success(`مورد با شناسه ${id} حذف شد`)
         }
@@ -63,7 +65,7 @@ export const MainPageSectionPage = () => {
     setLoading(false)
   }
 
-  const columns: any[] = ['شناسه بخش صفحه اصلی', 'نوع بخش', 'عنوان', 'اولویت', 'فعالیت']
+  const columns: any[] = ['شناسه بخش ', 'نوع بخش ', 'عنوان', 'اولویت', 'فعالیت']
 
   console.log(mainPageSections)
   const data = mainPageSections?.data?.map((mainPageSection: any) => [
@@ -73,71 +75,83 @@ export const MainPageSectionPage = () => {
     mainPageSection?.title,
     mainPageSection?.priority,
     <Container>
-      <Link href={`/main-page-sections/${mainPageSection?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
+      {has(permissions, PermissionEnum.readMainPageSection) && (
+        <Link href={`/main-page-sections/${mainPageSection?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.editMainPageSection) && (
+        <Link href={`/main-page-sections/edit/${mainPageSection?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.deleteMainPageSection) && (
+        <Button status="Danger" onClick={() => setItemToRemove(mainPageSection)}>
+          حذف
         </Button>
-      </Link>
-      <Link href={`/main-page-sections/edit/${mainPageSection?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
-      </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(mainPageSection)}>
-        حذف
-      </Button>
+      )}
     </Container>,
   ])
 
   return (
-    <Layout title="بخش صفحه اصلی">
-      <h1>بخش صفحه اصلی</h1>
+    <Layout title="بخش های  صفحه اصلی">
+      <h1>بخش های صفحه اصلی</h1>
 
       <FlexContainer>
-        <Link href="/main-page-sections/create">
-          <Button
-            style={{
-              margin: '1rem 0 1rem 1rem',
-              display: 'flex',
-            }}
-            status="Success"
-            appearance="outline"
-          >
-            افزودن بخش صفحه اصلی
-            <Add />
-          </Button>
-        </Link>
-        {tableSelections?.length > 0 && (
+        {has(permissions, PermissionEnum.editMainPageSection) && (
+          <Link href="/main-page-sections/create">
+            <Button
+              style={{
+                margin: '1rem 0 1rem 1rem',
+                display: 'flex',
+              }}
+              status="Success"
+              appearance="outline"
+            >
+              افزودن بخش های صفحه اصلی
+              <Add />
+            </Button>
+          </Link>
+        )}
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteMainPageSection) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </FlexContainer>
 
-      <SearchBar
-        // fields={mainPageSections.fields}
-        fields={[]}
-        entity="mainPageSections"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/main-page-sections/search',
-            query: form,
-          })
-        }
-      />
+      {has(permissions, PermissionEnum.browseMainPageSection) && (
+        <>
+          <SearchBar
+            // fields={mainPageSections.fields}
+            fields={[]}
+            entity="mainPageSections"
+            params={router.query}
+            callback={(form: any) =>
+              router.push({
+                pathname: '/main-page-sections/search',
+                query: form,
+              })
+            }
+          />
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
 
-      <PaginationBar
-        totalPages={mainPageSections?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <PaginationBar
+            totalPages={mainPageSections?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
-          آیا از حذف بخش صفحه اصلی <span className="text-danger">{`${itemToRemove?.id} `}</span> با عنوان{' '}
+          آیا از حذف بخش های صفحه اصلی <span className="text-danger">{`${itemToRemove?.id} `}</span> با عنوان{' '}
           <span className="text-danger">{`${itemToRemove?.title} `}</span> اطمینان دارید؟
           <ButtonGroup>
             <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>

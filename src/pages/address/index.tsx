@@ -1,14 +1,21 @@
 import { AddressesPage } from 'components'
 import { GetServerSideProps, NextPage } from 'next'
-import { getAddressList } from 'utils'
+import { PermissionEnum } from 'types'
+import { asyncHas, getAddressList } from 'utils'
 
 const Addresses: NextPage = () => <AddressesPage />
 
 export default Addresses
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
-    const addresses = await getAddressList(context?.query, context?.req?.cookies?.token)
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  if (token) {
+    if (!asyncHas(PermissionEnum.browseAddress, token))
+      return {
+        props: {},
+        redirect: '/dashboard',
+      }
+    const addresses = await getAddressList(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
 
     console.log(addresses.fields)
 

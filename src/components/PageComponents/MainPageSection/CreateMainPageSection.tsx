@@ -68,7 +68,7 @@ export function CreateMainPageSection() {
     console.log('final', final)
 
     setLoading(true)
-    const response = await createMainPageSection(final, Cookies.get('token'))
+    const response = await createMainPageSection(final, Cookies.get(process.env.TOKEN!))
     if (response?.status === 'success') {
       toast.success('بخش صفحه اصلی  با موفقیت ساخته شد')
       router.push('/main-page-sections')

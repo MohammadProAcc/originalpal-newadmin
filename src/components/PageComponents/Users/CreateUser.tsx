@@ -21,7 +21,7 @@ export function CreateUser() {
   const onSubmit = async (form: any) => {
     setLoading(true)
     console.log(form)
-    const response = await createUser(form, Cookies.get('token'))
+    const response = await createUser(form, Cookies.get(process.env.TOKEN!))
     if (response?.status === 'success') {
       reset()
       router.push('/users')

@@ -1,4 +1,4 @@
-import { deleteBlog, removeItem, toLocalDate, useStore } from 'utils'
+import { deleteBlog, has, removeItem, toLocalDate, useStore, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Alert as _Alert, Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import Image from 'next/image'
@@ -6,11 +6,13 @@ import styled from 'styled-components'
 import React, { useState } from 'react'
 import router from 'next/router'
 import { FlexContainer, HeaderButton, ModalBox } from 'components'
+import { PermissionEnum } from 'types'
 
 export const SingleBlogPage: React.FC = () => {
   const { blog } = useStore((state: any) => ({
     blog: state?.blog,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [itemToRemove, setItemToRemove] = useState<any>(null)
   const closeRemovalModal = () => setItemToRemove(false)
@@ -39,12 +41,16 @@ export const SingleBlogPage: React.FC = () => {
         ) : (
           <></>
         )}
-        <HeaderButton status="Info" href={`/blog/edit/${blog.id}`}>
-          ویرایش
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(blog)}>
-          حذف
-        </HeaderButton>
+        {has(permissions, PermissionEnum.editBlog) && (
+          <HeaderButton status="Info" href={`/blog/edit/${blog.id}`}>
+            ویرایش
+          </HeaderButton>
+        )}
+        {has(permissions, PermissionEnum.deleteBlog) && (
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(blog)}>
+            حذف
+          </HeaderButton>
+        )}
       </h1>
 
       {/* ....:::::: Removal Modals :::::.... */}

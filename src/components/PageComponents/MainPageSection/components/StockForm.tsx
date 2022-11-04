@@ -27,7 +27,7 @@ export const StockForm: React.FC<IStockFormProps> = ({ defaultValues, callback }
     setLoading(true)
 
     if (defaultValues) {
-      const response = await editStock(form, Cookies.get('token'))
+      const response = await editStock(form, Cookies.get(process.env.TOKEN!))
       if (response?.status === 'success') {
         await callback(response)
         toast.success('انبار با موفقیت بروز شد')
@@ -35,7 +35,7 @@ export const StockForm: React.FC<IStockFormProps> = ({ defaultValues, callback }
         toast.error('بروزرسانی انبار موفقیت آمیز نبود')
       }
     } else {
-      const response = await createStock(form, Cookies.get('token'))
+      const response = await createStock(form, Cookies.get(process.env.TOKEN!))
       if (response?.status === 'success') {
         callback(response)
         toast.success('انبار با موفقیت ساخته شد')

@@ -30,7 +30,7 @@ export function CreateBanner() {
     delete finalForm?.image
 
     try {
-      const bannerCreationResponse = await createBanner(finalForm, Cookies.get('token'))
+      const bannerCreationResponse = await createBanner(finalForm, Cookies.get(process.env.TOKEN!))
       const result = await search_in('banners', { key: 'content', type: '=', value: form?.content }, router?.query)
       const bannerId = result?.data?.data[0]?.id
 

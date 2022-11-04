@@ -1,27 +1,36 @@
-import { MainPages } from 'components';
-import { GetServerSideProps, NextPage } from 'next';
-import { search_in } from 'utils';
-import { getMainPageBannersList } from 'utils/api/REST/actions/banners';
+import { MainPages } from 'components'
+import { GetServerSideProps, NextPage } from 'next'
+import { PermissionEnum } from 'types'
+import { asyncHas, search_in } from 'utils'
+import { getMainPageBannersList } from 'utils/api/REST/actions/banners'
 
-const Main: NextPage = () => <MainPages />;
-export default Main;
+const Main: NextPage = () => <MainPages />
+export default Main
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (!context?.req?.cookies?.token) {
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  if (!token) {
     return {
       props: {},
       redirect: {
         destination: '/auth/login',
       },
-    };
+    }
   } else {
-    const { fields } = await getMainPageBannersList(context?.query, context?.req?.cookies?.token);
+    if (!(await asyncHas(PermissionEnum.browseSlide, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: '/dashboard',
+        },
+      }
+    const { fields } = await getMainPageBannersList(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
     const { data: result } = await search_in(
       'banners',
       { key: 'type', type: '=', value: 'slide' },
       context.query,
-      context.req.cookies.token,
-    );
+      context.req.cookies[process.env.TOKEN!],
+    )
 
     return {
       props: {
@@ -46,6 +55,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           },
         },
       },
-    };
+    }
   }
-};
+}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useStore, deleteCoupon, pluralRemove } from 'utils'
+import { useStore, deleteCoupon, pluralRemove, useUserStore, has } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Add } from '@material-ui/icons'
 import { toast } from 'react-toastify'
+import { PermissionEnum } from 'types'
 
 export const CouponsPage = () => {
   const router = useRouter()
@@ -16,6 +17,7 @@ export const CouponsPage = () => {
     coupons: state?.coupons,
     clearList: state?.clearList,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -69,19 +71,25 @@ export const CouponsPage = () => {
     coupon?.decription ?? '-',
 
     <Container>
-      <Link href={`/coupons/${coupon?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
+      {has(permissions, PermissionEnum.readCoupon) && (
+        <Link href={`/coupons/${coupon?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.editCoupon) && (
+        <Link href={`/coupons/edit/${coupon?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.deleteCoupon) && (
+        <Button status="Danger" onClick={() => setItemToRemove(coupon)}>
+          حذف
         </Button>
-      </Link>
-      <Link href={`/coupons/edit/${coupon?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
-      </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(coupon)}>
-        حذف
-      </Button>
+      )}
     </Container>,
   ])
 
@@ -90,57 +98,65 @@ export const CouponsPage = () => {
       <h1>کوپن ها</h1>
 
       <FlexContainer>
-        <Link href="/coupons/create">
-          <Button
-            style={{
-              margin: '1rem 0 1rem 1rem',
-              display: 'flex',
-            }}
-            status="Success"
-            appearance="outline"
-          >
-            افزودن کوپن
-            <Add />
-          </Button>
-        </Link>
+        {has(permissions, PermissionEnum.editCoupon) && (
+          <Link href="/coupons/create">
+            <Button
+              style={{
+                margin: '1rem 0 1rem 1rem',
+                display: 'flex',
+              }}
+              status="Success"
+              appearance="outline"
+            >
+              افزودن کوپن
+              <Add />
+            </Button>
+          </Link>
+        )}
 
-        <Link href="/coupons/aggregate">
-          <Button
-            style={{
-              margin: '1rem 0 1rem 1rem',
-              display: 'flex',
-            }}
-            status="Info"
-            appearance="outline"
-          >
-            فهرست  تخفیف محصولات
-          </Button>
-        </Link>
-        {tableSelections?.length > 0 && (
+        {has(permissions, PermissionEnum.editCoupon) && (
+          <Link href="/coupons/aggregate">
+            <Button
+              style={{
+                margin: '1rem 0 1rem 1rem',
+                display: 'flex',
+              }}
+              status="Info"
+              appearance="outline"
+            >
+              فهرست تخفیف محصولات
+            </Button>
+          </Link>
+        )}
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteCoupon) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </FlexContainer>
 
-      <SearchBar
-        fields={coupons.fields}
-        entity="coupons"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/coupons/search',
-            query: form,
-          })
-        }
-      />
+      {has(permissions, PermissionEnum.browseCoupon) && (
+        <>
+          <SearchBar
+            fields={coupons.fields}
+            entity="coupons"
+            params={router.query}
+            callback={(form: any) =>
+              router.push({
+                pathname: '/coupons/search',
+                query: form,
+              })
+            }
+          />
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
-      <PaginationBar
-        totalPages={coupons?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <PaginationBar
+            totalPages={coupons?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

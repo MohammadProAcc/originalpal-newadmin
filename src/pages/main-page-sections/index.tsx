@@ -8,7 +8,7 @@ const PageName: NextPage = () => <MainPageSectionPage />
 export default PageName
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.token
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
   const params = context?.query
 
   if (token) {

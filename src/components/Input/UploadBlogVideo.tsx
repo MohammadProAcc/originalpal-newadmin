@@ -23,7 +23,7 @@ export const UploadBlogVideo = (props: FileInputProps) => {
 
       await axios.post(`${process.env.API}/admin/blogs/${props.blogId}/video`, formData, {
         headers: {
-          Authorization: `Bearer ${Cookies.get('token')}`,
+          Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
           'Content-Type': 'multipart/form-data',
         },
       })

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useStore, deleteStock, numeralize } from 'utils'
+import { useStore, deleteStock, numeralize, useUserStore, has } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Add } from '@material-ui/icons'
 import { toast } from 'react-toastify'
+import { PermissionEnum } from 'types'
 
 export const StockPage = () => {
   const router = useRouter()
@@ -16,6 +17,7 @@ export const StockPage = () => {
     stocks: state?.stocks,
     clearList: state?.clearList,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -94,45 +96,51 @@ export const StockPage = () => {
       <h1>انبار</h1>
 
       <FlexContainer>
-        <Link href="/stock/create">
-          <Button
-            style={{
-              margin: '1rem 0 1rem 1rem',
-              display: 'flex',
-            }}
-            status="Success"
-            appearance="outline"
-          >
-            افزودن انبار
-            <Add />
-          </Button>
-        </Link>
-        {tableSelections?.length > 0 && (
+        {has(permissions, PermissionEnum.editStock) && (
+          <Link href="/stock/create">
+            <Button
+              style={{
+                margin: '1rem 0 1rem 1rem',
+                display: 'flex',
+              }}
+              status="Success"
+              appearance="outline"
+            >
+              افزودن انبار
+              <Add />
+            </Button>
+          </Link>
+        )}
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteStock) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </FlexContainer>
 
-      <SearchBar
-        fields={stocks.fields}
-        entity="stocks"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/stock/search',
-            query: form,
-          })
-        }
-      />
+      {has(permissions, PermissionEnum.browseStock) && (
+        <>
+          <SearchBar
+            fields={stocks.fields}
+            entity="stocks"
+            params={router.query}
+            callback={(form: any) =>
+              router.push({
+                pathname: '/stock/search',
+                query: form,
+              })
+            }
+          />
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
 
-      <PaginationBar
-        totalPages={stocks?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <PaginationBar
+            totalPages={stocks?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

@@ -1,4 +1,4 @@
-import { Roles } from 'types';
+import { Permission } from 'types';
 import { admin } from 'utils';
 
 export const $_edit_role = async (body: Body) => {
@@ -14,7 +14,7 @@ interface Body {
   id: number,
   form: {
     name: string,
-    permissions: Roles[]
+    permissions: Permission[]
   },
   token?: string
 }

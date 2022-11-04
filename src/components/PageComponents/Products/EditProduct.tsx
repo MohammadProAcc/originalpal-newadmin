@@ -217,7 +217,7 @@ export const EditProductPage: React.FC = () => {
       axios
         .post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
           headers: {
-            Authorization: `Bearer ${Cookies.get('token')}`,
+            Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
           },
         })
         .then(() => {
@@ -237,7 +237,7 @@ export const EditProductPage: React.FC = () => {
       axios
         .post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
           headers: {
-            Authorization: `Bearer ${Cookies.get('token')}`,
+            Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
           },
         })
         .then(() => {
@@ -261,7 +261,7 @@ export const EditProductPage: React.FC = () => {
 
     const { data: response } = await axios.post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
       headers: {
-        Authorization: `Bearer ${Cookies.get('token')}`,
+        Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
         'Content-Type': 'multipart/form-data',
       },
     })
@@ -271,7 +271,7 @@ export const EditProductPage: React.FC = () => {
   const [imageToRemove, setImageToRemove] = useState<any>(null)
 
   const removeProductImage = async (media: Media) => {
-    const response = await deleteProductMedia(router?.query?.product_id as string, media?.u, Cookies.get('token') ?? '')
+    const response = await deleteProductMedia(router?.query?.product_id as string, media?.u, Cookies.get(process.env.TOKEN!) ?? '')
     if (response?.includes('operation done successfully')) {
       setImages((_curr) => _curr.filter((_image) => !_.isEqual(_image, media)))
       setImageToRemove(null)
@@ -286,7 +286,7 @@ export const EditProductPage: React.FC = () => {
 
   // TODO: complete video remove process
   const removeProductVideo = async (media: Media) => {
-    const response = await deleteProductVideo(router?.query?.product_id as string, media?.u, Cookies.get('token') ?? '')
+    const response = await deleteProductVideo(router?.query?.product_id as string, media?.u, Cookies.get(process.env.TOKEN!) ?? '')
     console.error(response);
     // if (response?.includes('operation done successfully')) {
     //   setVideos((_curr) => _curr.filter((_image) => !_.isEqual(_image, media)))

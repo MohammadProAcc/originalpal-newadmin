@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useStore, deleteProduct, numeralize, pluralRemove } from 'utils'
+import { useStore, deleteProduct, numeralize, pluralRemove, useUserStore, has } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
@@ -11,6 +11,7 @@ import { toast } from 'react-toastify'
 import { Avatar } from '@material-ui/core'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { PermissionEnum } from 'types'
 
 export const ProductsPage = () => {
   const router = useRouter()
@@ -19,6 +20,7 @@ export const ProductsPage = () => {
     products: state?.products,
     clearList: state?.clearList,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -33,7 +35,7 @@ export const ProductsPage = () => {
     // const response = await deleteProduct(item?.id)
     const { data: response } = await axios.delete(`${process.env.API}/admin/products/${item?.id})`, {
       headers: {
-        Authorization: `Bearer ${Cookies.get('token') ?? ''}`,
+        Authorization: `Bearer ${Cookies.get(process.env.TOKEN!) ?? ''}`,
       },
     })
     if (response?.status === 'success') {
@@ -72,14 +74,18 @@ export const ProductsPage = () => {
           مشاهده
         </Button>
       </Link> */}
-      <Link href={`/products/edit/${product?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
+      {has(permissions, PermissionEnum.editProduct) && (
+        <Link href={`/products/edit/${product?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.deleteProduct) && (
+        <Button status="Danger" onClick={() => setItemToRemove(product)}>
+          حذف
         </Button>
-      </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(product)}>
-        حذف
-      </Button>
+      )}
     </Container>,
   ])
 
@@ -105,48 +111,54 @@ export const ProductsPage = () => {
 
   return (
     <Layout title="محصولات">
-      <h1>محصول ها</h1>
+      <h1>محصولات</h1>
 
       <FlexContainer>
-        <Link href="/products/create">
-          <Button
-            style={{
-              margin: '1rem 0 1rem 1rem',
-              display: 'flex',
-            }}
-            status="Success"
-            appearance="outline"
-          >
-            افزودن محصول
-            <Add />
-          </Button>
-        </Link>
-        {tableSelections?.length > 0 && (
+        {has(permissions, PermissionEnum.editProduct) && (
+          <Link href="/products/create">
+            <Button
+              style={{
+                margin: '1rem 0 1rem 1rem',
+                display: 'flex',
+              }}
+              status="Success"
+              appearance="outline"
+            >
+              افزودن محصول
+              <Add />
+            </Button>
+          </Link>
+        )}
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteProduct) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </FlexContainer>
 
-      <SearchBar
-        fields={products.fields}
-        entity="products"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/products/search',
-            query: form,
-          })
-        }
-      />
+      {has(permissions, PermissionEnum.browseProduct) && (
+        <>
+          <SearchBar
+            fields={products.fields}
+            entity="products"
+            params={router.query}
+            callback={(form: any) =>
+              router.push({
+                pathname: '/products/search',
+                query: form,
+              })
+            }
+          />
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
 
-      <PaginationBar
-        totalPages={products?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <PaginationBar
+            totalPages={products?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

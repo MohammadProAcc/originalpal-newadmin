@@ -8,7 +8,8 @@ import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
-import { pluralRemove, translator, useStore } from 'utils'
+import { PermissionEnum } from 'types'
+import { has, pluralRemove, translator, useStore, useUserStore } from 'utils'
 import { deleteBanner } from 'utils/api/REST/actions/banners'
 
 export const MainPages = () => {
@@ -20,6 +21,7 @@ export const MainPages = () => {
     setCache: state?.setCache,
     clearList: state?.clearList,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -112,19 +114,25 @@ export const MainPages = () => {
     </div>,
     banner?.active,
     <Container>
-      <Link href={`/main-page/${banner?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
+      {has(permissions, PermissionEnum.readSlide) && (
+        <Link href={`/main-page/${banner?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.editSlide) && (
+        <Link href={`/main-page/edit/${banner?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.deleteSlide) && (
+        <Button status="Danger" onClick={() => setItemToRemove(banner)}>
+          حذف
         </Button>
-      </Link>
-      <Link href={`/main-page/edit/${banner?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
-      </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(banner)}>
-        حذف
-      </Button>
+      )}
     </Container>,
   ])
 
@@ -146,31 +154,35 @@ export const MainPages = () => {
             <Add />
           </Button>
         </Link>
-        {tableSelections?.length > 0 && (
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteMainPageSection) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </FlexContainer>
 
-      <SearchBar
-        fields={mainPageBanners.fields}
-        entity="banners"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/main-page/search',
-            query: form,
-          })
-        }
-      />
+      {has(permissions, PermissionEnum.browseSlide) && (
+        <>
+          <SearchBar
+            fields={mainPageBanners.fields}
+            entity="banners"
+            params={router.query}
+            callback={(form: any) =>
+              router.push({
+                pathname: '/main-page/search',
+                query: form,
+              })
+            }
+          />
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
-      <PaginationBar
-        totalPages={mainPageBanners?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <PaginationBar
+            totalPages={mainPageBanners?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

@@ -1,22 +1,20 @@
-import { deleteUser, editUser, getSingleUser, removeItem, translator, useStore } from 'utils'
+import { deleteUser, editUser, getSingleUser, has, removeItem, translator, useStore, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, InputGroup, Modal, Select } from '@paljs/ui'
 import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
 import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
 import React, { useState } from 'react'
 import router from 'next/router'
-
-const roleOptions = [
-  { label: 'ادمین', value: 'admin' },
-  { label: 'بدون نقش', value: null },
-]
+import { toast } from 'react-toastify'
+import { PermissionEnum } from 'types'
 
 export const EditUserPage: React.FC = () => {
-  const { user, updateUser } = useStore((state: any) => ({
+  const { user, updateUser, storeRoles } = useStore((state: any) => ({
     user: state?.user,
+    storeRoles: state?.roles,
     updateUser: state?.updateUser,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const {
     register,
@@ -24,17 +22,36 @@ export const EditUserPage: React.FC = () => {
     control,
     formState: { dirtyFields },
   } = useForm({
-    defaultValues: user,
+    defaultValues: {
+      email: user?.email,
+      name: user?.name,
+      lastname: user?.lastname,
+      password: user?.password,
+      phone: user?.phone,
+      points: user?.points,
+      role: user?.role,
+      status: user?.status,
+      roles: user?.roles?.map((_item: any) => ({
+        label: _item.name,
+        value: _item.id,
+      })),
+    },
   })
   type UserForm = typeof dirtyFields
 
-  const onSubmit = async (form: UserForm) => {
-    for (let key in form) {
-      if (!dirtyFields[key]) {
-        delete form[key]
-      }
-    }
+  const roleOptions = [
+    ...storeRoles.map((_role: any) => ({
+      label: _role.name,
+      value: _role.id,
+    })),
+  ]
 
+  const onSubmit = async (form: UserForm) => {
+    delete form.phone
+    delete form.email
+
+    console.log(form)
+    form.roles = form.roles?.map((_role: any) => _role.value)
     const response = await editUser(user?.id, form)
     if (response?.status === 'success') {
       const updatedUser = await getSingleUser(user?.id)
@@ -59,12 +76,16 @@ export const EditUserPage: React.FC = () => {
     <Layout title={`${user?.id}`}>
       <h1 style={{ marginBottom: '4rem' }}>
         کاربر "{user?.name}"
-        <HeaderButton status="Info" href={`/users/${user?.id}`}>
-          مشاهده
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(user)}>
-          حذف
-        </HeaderButton>
+        {has(permissions, PermissionEnum.readUser) && (
+          <HeaderButton status="Info" href={`/users/${user?.id}`}>
+            مشاهده
+          </HeaderButton>
+        )}
+        {has(permissions, PermissionEnum.deleteUser) && (
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(user)}>
+            حذف
+          </HeaderButton>
+        )}
       </h1>
 
       {/* ....:::::: Remove Modals :::::.... */}
@@ -126,8 +147,8 @@ export const EditUserPage: React.FC = () => {
           <CardBody style={{ overflow: 'initial' }}>
             <Controller
               control={control}
-              name="role"
-              render={({ field }) => <Select options={roleOptions} onChange={(e: any) => field?.onChange(e?.value)} />}
+              name="roles"
+              render={({ field }) => <Select options={roleOptions} isMulti {...field} />}
             />
           </CardBody>
         </Card>

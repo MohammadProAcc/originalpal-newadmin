@@ -14,10 +14,10 @@ const Home = () => {
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context.req.cookies.token) {
-    const products = await getProductsList(context.query, context.req.cookies.token);
-    const users = await getUsersList(context.query, context.req.cookies.token);
-    const orders = await getOrdersList(context.query, context.req.cookies.token);
+  if (context.req.cookies[process.env.TOKEN!]) {
+    const products = await getProductsList(context.query, context.req.cookies[process.env.TOKEN!]);
+    const users = await getUsersList(context.query, context.req.cookies[process.env.TOKEN!]);
+    const orders = await getOrdersList(context.query, context.req.cookies[process.env.TOKEN!]);
     return {
       props: {
         initialState: {

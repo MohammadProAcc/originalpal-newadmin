@@ -1,12 +1,12 @@
-import Layout from 'Layouts'
-import { removeItem, translator, useStore } from 'utils'
 import { Alert, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
+import { Button, Dot, FlexContainer, HeaderButton, ModalBox } from 'components'
+import Layout from 'Layouts'
+import _Image from 'next/image'
+import router from 'next/router'
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Button, Dot, FlexContainer, HeaderButton, ModalBox } from 'components'
-import _Image from 'next/image'
+import { removeItem, translator, useStore } from 'utils'
 import { deleteBanner } from 'utils/api/REST/actions/banners'
-import router from 'next/router'
 
 export const MainPage: React.FC = () => {
   const { banner } = useStore((state: any) => ({

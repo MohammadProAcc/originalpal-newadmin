@@ -1,5 +1,5 @@
 import Layout from 'Layouts'
-import { removeItem, translator, useStore } from 'utils'
+import { removeItem, translator, useStore, useUserStore, has } from 'utils'
 import { Alert, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import React, { useState } from 'react'
 import styled from 'styled-components'
@@ -7,12 +7,13 @@ import { Button, Dot, FlexContainer, HeaderButton, ModalBox } from 'components'
 import Image from 'next/image'
 import { deleteBanner } from 'utils/api/REST/actions/banners'
 import router from 'next/router'
+import { PermissionEnum } from 'types'
 
 export const Banner: React.FC = () => {
   const { banner } = useStore((state: any) => ({
     banner: state?.banner,
   }))
-  console.log(banner)
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -30,12 +31,16 @@ export const Banner: React.FC = () => {
     <Layout title="بنر صفحه اصلی">
       <h1 style={{ marginBottom: '3rem' }}>
         مشاهده بنر شماره {banner?.id ?? '?'}
-        <HeaderButton status="Info" href={`/banners/edit/${banner?.id}`}>
-          ویرایش
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(banner)}>
-          حذف
-        </HeaderButton>
+        {has(permissions, PermissionEnum.editStand) && (
+          <HeaderButton status="Info" href={`/banners/edit/${banner?.id}`}>
+            ویرایش
+          </HeaderButton>
+        )}
+        {has(permissions, PermissionEnum.deleteStand) && (
+          <HeaderButton status="Danger" onClick={() => setItemToRemove(banner)}>
+            حذف
+          </HeaderButton>
+        )}
       </h1>
 
       {/* ....:::::: Modals :::::.... */}

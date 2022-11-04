@@ -16,4 +16,4 @@ export * from './Order'
 export * from './Address'
 export * from './Payment'
 export * from "./OwnMedia"
-export * from "./Roles"
+export * from "./Permissions"

@@ -1,19 +1,25 @@
 import { EditProductPage } from 'components'
 import { GetServerSideProps, NextPage } from 'next'
-import { getAllBrands, getBrandsList, getSingleProduct } from 'utils'
+import { PermissionEnum } from 'types'
+import { asyncHas, getAllBrands, getBrandsList, getSingleProduct } from 'utils'
 
 const SingleProduct: NextPage = () => <EditProductPage />
 export default SingleProduct
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.token
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
   const { product_id } = context?.query
 
-  if (context?.req?.cookies?.token) {
+  if (token) {
+    if (!(await asyncHas(PermissionEnum.browseTag, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: '/dashboard',
+        },
+      }
     const product = await getSingleProduct(product_id as string, token)
-    // const brands = await getBrandsList(context?.query, context?.req?.cookies?.token);
     const brands = await getAllBrands(token)
-    console.log(brands)
 
     return {
       props: {

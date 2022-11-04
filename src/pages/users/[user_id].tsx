@@ -1,13 +1,22 @@
 import { SingleUserPage } from 'components/PageComponents/Users/SingleUserPage';
 import { GetServerSideProps, NextPage } from 'next';
-import { getSingleUser } from 'utils';
+import { PermissionEnum } from 'types';
+import { asyncHas, getSingleUser } from 'utils';
 
 const SingleUser: NextPage = () => <SingleUserPage />;
 export default SingleUser;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
-    const user = await getSingleUser(context?.query?.user_id as string, context?.req?.cookies?.token);
+  const token = context?.req?.cookies?.[process.env.TOKEN!];
+  if (token) {
+    if (!(await asyncHas(PermissionEnum.readUser, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: "/dashboard"
+        }
+      }
+    const user = await getSingleUser(context?.query?.user_id as string, context?.req?.cookies?.[process.env.TOKEN!]);
 
     return {
       props: {

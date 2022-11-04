@@ -1,12 +1,27 @@
-import { CommentsPage } from 'components';
-import { GetServerSideProps, NextPage } from 'next';
-import { getCommentsList, search_in } from 'utils';
+import { CommentsPage } from 'components'
+import { GetServerSideProps, NextPage } from 'next'
+import { PermissionEnum } from 'types'
+import { asyncHas, getCommentsList, search_in } from 'utils'
 
-const PageName: NextPage = () => <CommentsPage />;
-export default PageName;
+const PageName: NextPage = () => <CommentsPage />
+export default PageName
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
-    const { data: result } = await search_in('comments', context.query, context.query, context.req.cookies.token);
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  if (token) {
+    if (!(await asyncHas(PermissionEnum.browseComment, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: '/dashboard',
+        },
+      }
+    const { data: result } = await search_in(
+      'comments',
+      context.query,
+      context.query,
+      context.req.cookies[process.env.TOKEN!],
+    )
 
     return {
       props: {
@@ -31,13 +46,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           },
         },
       },
-    };
+    }
   } else {
     return {
       props: {},
       redirect: {
         destination: '/auth/login',
       },
-    };
+    }
   }
-};
+}

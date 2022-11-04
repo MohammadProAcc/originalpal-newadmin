@@ -2,11 +2,12 @@ import { InputGroup as _InputGroup, Modal } from '@paljs/ui'
 import { AdsMenuForm, Button, FlexContainer, HeaderButton, ModalBox, TopSiteMenuForm } from 'components'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
+import { has } from 'lodash'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { toast } from 'react-toastify'
-import { MenuType, TopSiteMenu } from 'types'
-import { deleteMenu, editMenu, removeItem, useStore } from 'utils'
+import { MenuType, PermissionEnum, TopSiteMenu } from 'types'
+import { deleteMenu, editMenu, removeItem, useStore, useUserStore } from 'utils'
 import { BottomSiteDescriptionForm, ProductsBottomSiteMenuForm } from './components'
 import { BottomSiteMenuForm } from './components/ProductsBottomSiteMenuForm'
 
@@ -14,7 +15,6 @@ export const EditMenuPage: React.FC = () => {
   const { menu } = useStore((state: any) => ({
     menu: state?.menu,
   }))
-
   const router = useRouter()
 
   const [loading, setLoading] = useState(false)
@@ -31,7 +31,7 @@ export const EditMenuPage: React.FC = () => {
 
   const updateMenuCallback = async (type: MenuType, items: any) => {
     setLoading(true)
-    const response = await editMenu(menu?.id, { type, items }, Cookies.get('token'))
+    const response = await editMenu(menu?.id, { type, items }, Cookies.get(process.env.TOKEN!))
     if (response?.status === 'success') {
       toast.success('منو با موفقیت بروز شد')
       router.back()
@@ -92,15 +92,7 @@ export const EditMenuPage: React.FC = () => {
 
   return (
     <Layout title={`ویرایش منوی ${menu?.id}`}>
-      <h1 style={{ marginBottom: '4rem' }}>
-        ویرایش منو شماره {menu?.id}
-        <HeaderButton status="Info" href={`/menu/${menu?.id}`}>
-          مشاهده
-        </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(menu)}>
-          حذف
-        </HeaderButton>
-      </h1>
+      <h1 style={{ marginBottom: '4rem' }}>ویرایش منو شماره {menu?.id}</h1>
 
       {renderForm(menu?.type, menu?.items)}
 

@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { deleteAddress, pluralRemove, translator, useStore } from 'utils'
+import { deleteAddress, has, pluralRemove, translator, useStore, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, HeaderButton, PaginationBar, SearchBar } from 'components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { toast } from 'react-toastify'
-import { Address } from 'types'
+import { Address, PermissionEnum } from 'types'
 
 export const AddressesPage = () => {
   const router = useRouter()
@@ -16,6 +16,7 @@ export const AddressesPage = () => {
     addresses: state?.addresses,
     clearList: state?.clearList,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -57,7 +58,7 @@ export const AddressesPage = () => {
         setItemsToRemove(null)
       },
       // TODO: add a proper error callback
-      () => { },
+      () => {},
     )
   }
 
@@ -73,19 +74,25 @@ export const AddressesPage = () => {
     address?.address,
     address?.postalcode,
     <Container>
-      <Link href={`/address/${address?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
+      {has(permissions, PermissionEnum.readAddress) && (
+        <Link href={`/address/${address?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.editAddress) && (
+        <Link href={`/address/edit/${address?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.deleteAddress) && (
+        <Button status="Danger" onClick={() => setItemToRemove(address)}>
+          حذف
         </Button>
-      </Link>
-      <Link href={`/address/edit/${address?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
-      </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(address)}>
-        حذف
-      </Button>
+      )}
     </Container>,
   ])
 
@@ -93,32 +100,35 @@ export const AddressesPage = () => {
     <Layout title="آدرس ها">
       <h1>
         آدرس
-        {tableSelections?.length > 0 && (
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteAddress) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </h1>
+      {has(permissions, PermissionEnum.browseAddress) && (
+        <>
+          <SearchBar
+            fields={addresses.fields}
+            entity="addresses"
+            params={router.query}
+            callback={(form: any) =>
+              router.push({
+                pathname: '/address/search',
+                query: form,
+              })
+            }
+          />
 
-      <SearchBar
-        fields={addresses.fields}
-        entity="addresses"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/address/search',
-            query: form,
-          })
-        }
-      />
+          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
-
-      <PaginationBar
-        totalPages={addresses?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <PaginationBar
+            totalPages={addresses?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

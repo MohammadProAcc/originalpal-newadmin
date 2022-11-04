@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useStore, deleteComment, editComment, toLocalDate, pluralRemove } from 'utils'
+import { useStore, deleteComment, editComment, toLocalDate, pluralRemove, useUserStore, has } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar, AnswerCommentFormModal } from 'components'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { toast } from 'react-toastify'
+import { PermissionEnum } from 'types'
 
 export const CommentsPage = () => {
   const router = useRouter()
@@ -16,6 +17,7 @@ export const CommentsPage = () => {
     clearList: state?.clearList,
     updateCommentCheck: state?.updateCommentCheck,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
 
@@ -104,17 +106,17 @@ export const CommentsPage = () => {
             setShowCommentToReply(comment)
           }}
         >
-          پاسخ دادن {comment?.parent_id ? "پاسخ" : "نظر"}
+          پاسخ دادن {comment?.parent_id ? 'پاسخ' : 'نظر'}
         </Button>
       )}
-      {comment?.admin_check == 1 ? (
+      {has(permissions, PermissionEnum.editComment) && comment?.admin_check == 1 ? (
         <Button
           style={{ marginLeft: '1rem' }}
           status="Warning"
           appearance="outline"
           onClick={() => checkToggle(comment?.id, 0)}
         >
-          سلب تایید از {comment?.parent_id ? "پاسخ" : "نظر"}
+          سلب تایید از {comment?.parent_id ? 'پاسخ' : 'نظر'}
         </Button>
       ) : (
         <Button
@@ -123,55 +125,65 @@ export const CommentsPage = () => {
           appearance="outline"
           onClick={() => checkToggle(comment?.id, 1)}
         >
-          تایید {comment?.parent_id ? "پاسخ" : "نظر"}
+          تایید {comment?.parent_id ? 'پاسخ' : 'نظر'}
         </Button>
       )}
-      <Link href={`/comments/${comment?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
+      {has(permissions, PermissionEnum.readComment) && (
+        <Link href={`/comments/${comment?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.editComment) && (
+        <Link href={`/comments/edit/${comment?.id}`}>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </Link>
+      )}
+      {has(permissions, PermissionEnum.deleteComment) && (
+        <Button status="Danger" onClick={() => setItemToRemove(comment)}>
+          حذف
         </Button>
-      </Link>
-      <Link href={`/comments/edit/${comment?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
-      </Link>
-      <Button status="Danger" onClick={() => setItemToRemove(comment)}>
-        حذف
-      </Button>
+      )}
     </Div>,
   ])
 
   return (
     <Layout title="نظرات">
-      <h1>نظر ها</h1>
+      <h1>نظرات</h1>
 
       <FlexContainer>
-        {tableSelections?.length > 0 && (
+        {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteAddress) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
       </FlexContainer>
 
-      <SearchBar
-        fields={comments.fields}
-        entity="comments"
-        params={router.query}
-        callback={(form: any) =>
-          router.push({
-            pathname: '/comments/search',
-            query: form,
-          })
-        }
-      />
+      {has(permissions, PermissionEnum.browseComment) && (
+        <>
+          <SearchBar
+            fields={comments.fields}
+            entity="comments"
+            params={router.query}
+            callback={(form: any) =>
+              router.push({
+                pathname: '/comments/search',
+                query: form,
+              })
+            }
+          />
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
-      <PaginationBar
-        totalPages={comments?.data?.last_page}
-        activePage={router.query.page ? Number(router.query.page) : 1}
-        router={router}
-      />
+          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <PaginationBar
+            totalPages={comments?.data?.last_page}
+            activePage={router.query.page ? Number(router.query.page) : 1}
+            router={router}
+          />
+        </>
+      )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>

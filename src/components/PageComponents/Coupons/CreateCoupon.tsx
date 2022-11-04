@@ -15,7 +15,7 @@ export function CreateCoupon() {
 
   const onSubmit = async (form: any) => {
     setLoading(true)
-    const response = await createCoupon(form, Cookies.get('token'))
+    const response = await createCoupon(form, Cookies.get(process.env.TOKEN!))
     if (response?.status === 'success') {
       reset()
       toast.success('کوپن با موفقیت ساخته شد')

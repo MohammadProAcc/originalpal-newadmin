@@ -1,12 +1,26 @@
-import { CouponsPage } from 'components';
-import { GetServerSideProps, NextPage } from 'next';
-import { getCouponsList, search_in } from 'utils';
+import { CouponsPage } from 'components'
+import { GetServerSideProps, NextPage } from 'next'
+import { PermissionEnum } from 'types'
+import { asyncHas, getCouponsList, search_in } from 'utils'
 
-const PageName: NextPage = () => <CouponsPage />;
-export default PageName;
+const PageName: NextPage = () => <CouponsPage />
+export default PageName
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
-    const { data: result } = await search_in('coupons', context.query, context.query, context.req.cookies.token);
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  if (token) {
+    if (!(await asyncHas(PermissionEnum.browseCoupon, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: '/dashboard',
+        },
+      }
+    const { data: result } = await search_in(
+      'coupons',
+      context.query,
+      context.query,
+      context.req.cookies[process.env.TOKEN!],
+    )
 
     return {
       props: {
@@ -33,13 +47,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           },
         },
       },
-    };
+    }
   } else {
     return {
       props: {},
       redirect: {
         destination: '/auth/login',
       },
-    };
+    }
   }
-};
+}

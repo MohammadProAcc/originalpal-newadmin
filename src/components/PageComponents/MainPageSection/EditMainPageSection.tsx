@@ -1,4 +1,12 @@
-import { createMainPageSection, deleteMainPageSection, editMainPageSection, removeItem, useStore } from 'utils'
+import {
+  createMainPageSection,
+  deleteMainPageSection,
+  editMainPageSection,
+  has,
+  removeItem,
+  useStore,
+  useUserStore,
+} from 'utils'
 import Layout from 'Layouts'
 import React, { useEffect, useRef, useState } from 'react'
 import { HeaderButton, ModalBox } from 'components'
@@ -9,6 +17,7 @@ import { Controller, useForm } from 'react-hook-form'
 import Cookies from 'js-cookie'
 import { toast } from 'react-toastify'
 import styled, { css } from 'styled-components'
+import { PermissionEnum } from 'types'
 
 const sectionTypeOptions = [
   { label: 'محصول', value: 'product' },
@@ -22,6 +31,7 @@ export const EditMainPageSectionPage: React.FC = () => {
   const { mainPageSection } = useStore((state: any) => ({
     mainPageSection: state?.mainPageSection,
   }))
+  const permissions = useUserStore().getPermissions()
 
   const [insertedLinks, setInsertedLinks] = useState<any>(mainPageSection?.parameter)
 
@@ -114,7 +124,7 @@ export const EditMainPageSectionPage: React.FC = () => {
     console.log('final', final)
 
     setLoading(true)
-    const response = await editMainPageSection(mainPageSection?.id, final, Cookies.get('token'))
+    const response = await editMainPageSection(mainPageSection?.id, final, Cookies.get(process.env.TOKEN!))
     if (response?.status === 'success') {
       toast.success('بخش صفحه اصلی  با موفقیت بروز شد')
       router.push('/main-page-sections')
@@ -130,13 +140,17 @@ export const EditMainPageSectionPage: React.FC = () => {
       <h1 style={{ marginBottom: '4rem' }}>
         ویرایش بخش صفحه اصلی - {mainPageSection?.id}
         <FlexContainer style={{ display: 'inline-flex' }}>
-          <HeaderButton status="Info" href={`/mainPageSection/${mainPageSection?.id}`}>
-            مشاهده
-          </HeaderButton>
+          {has(permissions, PermissionEnum.readMainPageSection) && (
+            <HeaderButton status="Info" href={`/mainPageSection/${mainPageSection?.id}`}>
+              مشاهده
+            </HeaderButton>
+          )}
 
-          <HeaderButton status="Danger" onClick={() => setItemToRemove(mainPageSection)}>
-            حذف
-          </HeaderButton>
+          {has(permissions, PermissionEnum.deleteMainPageSection) && (
+            <HeaderButton status="Danger" onClick={() => setItemToRemove(mainPageSection)}>
+              حذف
+            </HeaderButton>
+          )}
         </FlexContainer>
       </h1>
 

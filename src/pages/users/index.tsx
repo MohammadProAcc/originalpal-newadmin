@@ -1,23 +1,31 @@
-import { UsersPage } from 'components';
-import { GetServerSideProps, NextPage } from 'next';
-import { getUsersList } from 'utils';
+import { UsersPage } from 'components'
+import { GetServerSideProps, NextPage } from 'next'
+import { PermissionEnum } from 'types'
+import { asyncHas, getUsersList } from 'utils'
 
-const PageName: NextPage = () => <UsersPage />;
+const PageName: NextPage = () => <UsersPage />
 
-export default PageName;
+export default PageName
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  console.log(">>>>>>>>>>>>>>>>^^^^^^^^^^^^^>>>>>>>>>")
-  if (context?.req?.cookies?.token) {
-    const users = await getUsersList(context?.query, context?.req?.cookies?.token);
-    console.log(users)
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  if (token) {
+    if (!(await asyncHas(PermissionEnum.browseUser, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: '/dashboard',
+        },
+      }
+    const users = await getUsersList(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
+
     if (users?.status === 401) {
       return {
         props: {},
         redirect: {
           destination: '/auth/login',
         },
-      };
+      }
     }
     return {
       props: {
@@ -28,13 +36,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           },
         },
       },
-    };
+    }
   } else {
     return {
       props: {},
       redirect: {
         destination: '/auth/login',
       },
-    };
+    }
   }
-};
+}

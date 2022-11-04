@@ -15,7 +15,7 @@ export function CreateProduct() {
 
   const onSubmit = async (form: any) => {
     setLoading(true)
-    const response = await createProduct(form, Cookies.get('token'))
+    const response = await createProduct(form, Cookies.get(process.env.TOKEN!))
     console.log(response)
     if (response?.status === 'success') {
       toast.success('محصول با موفقیت ساخته شد')

@@ -4,7 +4,7 @@ const PageName: NextPage = () => <div>......:::: Page Component ::::......</div>
 export default PageName;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
+  if (context?.req?.cookies?.[process.env.TOKEN!]) {
     // const sample = await ......:::: Fetch Single Item ::::......
 
     return {

@@ -1,11 +1,20 @@
-import { OrdersPage } from 'components';
-import { GetServerSideProps, NextPage } from 'next';
-import { getOrdersList, search_in } from 'utils';
+import { OrdersPage } from 'components'
+import { GetServerSideProps, NextPage } from 'next'
+import { PermissionEnum } from 'types'
+import { asyncHas, getOrdersList, search_in } from 'utils'
 
-const SearchOrders: NextPage = () => <OrdersPage />;
-export default SearchOrders;
+const SearchOrders: NextPage = () => <OrdersPage />
+export default SearchOrders
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  if (token) {
+    if (!(await asyncHas(PermissionEnum.browseUser, token)))
+      return {
+        props: {},
+        redirect: {
+          destination: '/dashboard',
+        },
+      }
     const { data: orders } = await search_in(
       'orders',
       {
@@ -14,8 +23,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         value: context?.query?.value,
       },
       context.query,
-      context.req.cookies.token,
-    );
+      context.req.cookies[process.env.TOKEN!],
+    )
 
     return {
       props: {
@@ -46,13 +55,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           },
         },
       },
-    };
+    }
   } else {
     return {
       props: {},
       redirect: {
         destination: '/auth/login',
       },
-    };
+    }
   }
-};
+}

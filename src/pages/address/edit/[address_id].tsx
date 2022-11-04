@@ -1,13 +1,23 @@
 import { EditAddressPage } from 'components'
 import { GetServerSideProps, NextPage } from 'next'
-import { getSingleAddress } from 'utils'
+import { PermissionEnum } from 'types'
+import { asyncHas, getSingleAddress } from 'utils'
 
 const SingleAddress: NextPage = () => <EditAddressPage />
 export default SingleAddress
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
-    const address = await getSingleAddress(context?.query?.address_id as string, context?.req?.cookies?.token)
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  if (token) {
+    if (!asyncHas(PermissionEnum.editAddress, token))
+      return {
+        props: {},
+        redirect: '/dashboard',
+      }
+    const address = await getSingleAddress(
+      context?.query?.address_id as string,
+      context?.req?.cookies?.[process.env.TOKEN!],
+    )
 
     return {
       props: {

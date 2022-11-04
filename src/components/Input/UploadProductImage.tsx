@@ -20,7 +20,7 @@ export const UploadProductImage = (props: FileInputProps) => {
 
     await axios.post(`${process.env.API}/admin/products/${props.productId}/image`, formData, {
       headers: {
-        Authorization: `Bearer ${Cookies.get('token')}`,
+        Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
         'Content-Type': 'multipart/form-data',
       },
     })

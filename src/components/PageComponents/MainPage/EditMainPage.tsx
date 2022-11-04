@@ -65,7 +65,7 @@ export function EditMainPage() {
     const updatBannerResponse = await updateBanner(
       router?.query?.banner_id as string,
       finalForm,
-      Cookies.get('token') ?? '',
+      Cookies.get(process.env.TOKEN!) ?? '',
     )
 
     if (updatBannerResponse?.status === 'success') {

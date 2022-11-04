@@ -5,7 +5,7 @@ const PageName: NextPage = () => <div>PageComponent</div>;
 export default PageName;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  if (context?.req?.cookies?.token) {
+  if (context?.req?.cookies?.[process.env.TOKEN!]) {
     return {
       props: {},
     };
