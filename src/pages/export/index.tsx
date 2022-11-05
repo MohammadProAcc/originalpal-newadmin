@@ -10,7 +10,7 @@ export default function Page() {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const token = context.req.cookies[process.env.TOKEN!]
   if (token) {
-    if (!(await asyncHas(PermissionEnum.export)))
+    if (!(await asyncHas(PermissionEnum.export, token)))
       return {
         props: {},
         redirect: '/dashboard',

@@ -1,64 +1,64 @@
-import { Button, InputGroup } from "@paljs/ui";
-import { useFetchAll, useLoading, useNonInitialEffect } from "hooks";
-import Layout from "Layouts"
-import { useState } from "react"
-import _Select from "react-select"
-import styled from "styled-components";
-import { getUsersList, getOrdersList } from "utils";
-import { TableForExport } from "./TableForExport";
-import { utils, writeFile } from "xlsx";
+import { Button, InputGroup } from '@paljs/ui'
+import { useFetchAll, useLoading, useNonInitialEffect } from 'hooks'
+import Layout from 'Layouts'
+import { useState } from 'react'
+import _Select from 'react-select'
+import styled from 'styled-components'
+import { getUsersList, getOrdersList } from 'utils'
+import { TableForExport } from './TableForExport'
+import { utils, writeFile } from 'xlsx'
 
 export function ExportPage() {
+  const [result, setResult] = useState<any>(null)
+  const [loadingList, toggleLoading] = useLoading()
 
-  const [result, setResult] = useState<any>(null);
-  const [loadingList, toggleLoading] = useLoading();
-
-  const [exportType, setExportType] = useState(exportTypeOptions[0]);
+  const [exportType, setExportType] = useState(exportTypeOptions[0])
   function exportTypeHandler(e: any) {
     setExportType(e ?? exportTypeOptions[0])
   }
 
-  const [entityToExport, setEntityToExport] = useState(entityToExportOptions[0]);
+  const [entityToExport, setEntityToExport] = useState(entityToExportOptions[0])
   function entityToExportHandler(e: any) {
     setEntityToExport(e ?? entityToExportOptions[0])
   }
   const xport = async () => {
-    const table = document.getElementById("Table2XLSX");
-    const wb = utils.table_to_book(table);
+    const table = document.getElementById('Table2XLSX')
+    const wb = utils.table_to_book(table)
 
-    writeFile(wb, "SheetJSTable.xlsx");
-  };
+    writeFile(wb, 'SheetJSTable.xlsx')
+  }
 
   async function onExport() {
-    toggleLoading('exporting');
-    let response;
+    toggleLoading('exporting')
+    let response
 
     switch (entityToExport.value) {
       case 'users':
-        response = await getUsersList();
-        console.log(response)
-        break;
+        response = await getUsersList()
+        if (response) {
+          const all = await useFetchAll(response.data.last_page, getUsersList);
+          console.log(all);
+        }
+        break
 
       case 'orders':
-        response = await getOrdersList();
+        response = await getOrdersList()
         if (response) {
-          const allData = await useFetchAll(response.data.last_page, getOrdersList);
+          const allData = await useFetchAll(response.data.last_page, getOrdersList)
           setResult(allData)
         }
-        break;
+        break
 
       default:
-        break;
+        break
     }
 
-    // if (!reqSucceed(response)) return
-    // setResult(response);
-    toggleLoading('exporting');
+    toggleLoading('exporting')
   }
 
   useNonInitialEffect(() => {
-    if (result) xport();
-  }, [result]);
+    if (result) xport()
+  }, [result])
 
   return (
     <Layout title="خروجی">
@@ -66,11 +66,7 @@ export function ExportPage() {
         <SelectionItem>
           <InputGroup fullWidth>
             <label>نوع خروجی :</label>
-            <Select
-              options={exportTypeOptions}
-              defaultValue={exportTypeOptions[0]}
-              onChange={exportTypeHandler}
-            />
+            <Select options={exportTypeOptions} defaultValue={exportTypeOptions[0]} onChange={exportTypeHandler} />
           </InputGroup>
         </SelectionItem>
 
@@ -86,28 +82,23 @@ export function ExportPage() {
         </SelectionItem>
       </SelectionList>
 
-      <Button status="Success" onClick={onExport}
-        disabled={loadingList.includes('exporting')}>
+      <Button status="Success" onClick={onExport} disabled={loadingList.includes('exporting')}>
         گرفتن خروجی
       </Button>
 
-      {
-        result &&
-        <TableForExport data={result} />
-      }
-
+      {result && <TableForExport data={result} />}
     </Layout>
   )
 }
 
 const exportTypeOptions = [
-  // { "label": "PDF", "value": "pdf" },
-  { "label": "Excel", "value": "xsl" },
+  { label: 'PDF', value: 'pdf' },
+  { label: 'Excel', value: 'xsl' },
 ]
 
 const entityToExportOptions = [
-  // { "label": "کاربران", "value": "users" },
-  { "label": "سفارشات", "value": "orders" },
+  { label: 'کاربران', value: 'users' },
+  { label: 'سفارشات', value: 'orders' },
 ]
 
 const SelectionList = styled.ul`

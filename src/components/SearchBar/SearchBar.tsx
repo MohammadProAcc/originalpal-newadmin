@@ -3,6 +3,7 @@ import { Button } from 'components';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import styled from 'styled-components';
+import { ZIndex } from 'styles';
 import { search_in, translator } from 'utils';
 
 export function SearchBar({
@@ -84,6 +85,8 @@ export function SearchBar({
 const Component = styled.form`
   width: 100%;
   margin: 1rem 0;
+
+  z-index: ${Number(ZIndex.modal) - 1};
 
   display: flex;
   height: 2.5rem;

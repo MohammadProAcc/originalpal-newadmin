@@ -17,3 +17,4 @@ export * from './Address'
 export * from './Payment'
 export * from "./OwnMedia"
 export * from "./Permissions"
+export * from "./BlogCategory"
