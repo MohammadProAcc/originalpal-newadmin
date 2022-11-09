@@ -131,7 +131,14 @@ const dictionary = {
   item: 'موارد',
   'post-code': 'کد پستی',
   'verification-code': 'کد تایید',
-  permissions: 'مجوز ها'
+  permissions: 'مجوز ها',
+  priceAfterDiscount: 'قیمت پس از تخفیف',
+  port: 'درگاه',
+  ref_id: 'شناسه مرجع',
+  tracking_code: 'کد پیگیری',
+  card_number: 'شماره کارت',
+  ip: 'آی پی',
+  payment_date: 'تاریخ پرداخت'
 }
 
 export const translator = (target: string) => {

@@ -1,8 +1,9 @@
 import { CreateBlog } from 'components'
+import { useFetchAll } from 'hooks'
 import { GetServerSideProps } from 'next'
 import React from 'react'
 import { PermissionEnum } from 'types'
-import { asyncHas, getTagsList } from 'utils'
+import { $_get_categories, asyncHas, getTagsList } from 'utils'
 
 const Create = () => <CreateBlog />
 

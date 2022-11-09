@@ -23,6 +23,7 @@ export async function useFetchAll(lastPage: number, callback: any) {
   }
 
   for await (let fetchedPage of source) {
+    if (!fetchedPage) continue;
     fetchedItems.push(...fetchedPage.data.data);
   }
 
