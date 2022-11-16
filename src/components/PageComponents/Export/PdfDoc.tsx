@@ -2,10 +2,10 @@ import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import dynamic from "next/dynamic";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { translator } from "utils";
-const PDFViewer: any = dynamic(() =>
-  import("@react-pdf/renderer")
-    .then(mod => mod.PDFViewer), {
+const PDFViewer: any = dynamic(async () => {
+  const mod = await import("@react-pdf/renderer");
+  return mod.PDFViewer;
+}, {
   ssr: false,
 });
 
