@@ -1,41 +1,40 @@
-import { Button, InputGroup } from '@paljs/ui'
-import { useFetchAll, useLoading, useNonInitialEffect } from 'hooks'
-import Layout from 'Layouts'
-import React, { useEffect, useRef, useState } from 'react'
-import _Select from 'react-select'
-import styled from 'styled-components'
+import { Button, InputGroup } from "@paljs/ui";
+import { FIELDS } from "constants/FIELDS";
+import { useFetchAll, useLoading, useNonInitialEffect } from "hooks";
+import Layout from "Layouts";
+import React, { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import _Select from "react-select";
+import { toast } from "react-toastify";
+import styled from "styled-components";
 import {
-  getUsersList,
-  getOrdersList,
   getAddressList,
+  getCouponsList,
+  getOrdersList,
   getPayments,
   getProductsList,
   getStocksList,
-  getCouponsList,
-  translator
-} from 'utils'
-import { TableForExport } from './TableForExport'
-import { utils, writeFile } from 'xlsx'
-import { toast } from 'react-toastify'
-import { FIELDS } from 'constants/FIELDS'
-import { useForm } from 'react-hook-form'
-import { PdfDoc } from './PdfDoc'
-import ReactPDF from '@react-pdf/renderer';
-import axios from 'axios'
-import router from 'next/router'
+  getUsersList,
+  translator,
+} from "utils";
+import { utils, writeFile } from "xlsx";
+import { MyDocument, Renderer } from "./PdfDoc";
+import { TableForExport } from "./TableForExport";
 
 export function ExportPage() {
-  const [result, setResult] = useState<any>(null)
-  const [loadingList, toggleLoading] = useLoading()
+  const [result, setResult] = useState<any>(null);
+  const [loadingList, toggleLoading] = useLoading();
 
-  const [exportType, setExportType] = useState(exportTypeOptions[0])
+  const [exportType, setExportType] = useState(exportTypeOptions[0]);
   function exportTypeHandler(e: any) {
-    setExportType(e ?? exportTypeOptions[0])
+    setExportType(e ?? exportTypeOptions[0]);
   }
 
-  const [entityToExport, setEntityToExport] = useState<any>(entityToExportOptions[0])
+  const [entityToExport, setEntityToExport] = useState<any>(
+    entityToExportOptions[0],
+  );
   function entityToExportHandler(e: any) {
-    setEntityToExport(e ?? entityToExportOptions[0])
+    setEntityToExport(e ?? entityToExportOptions[0]);
   }
 
   const [showPdfDoc, SetShowPdfDoc] = useState(false);
@@ -47,99 +46,117 @@ export function ExportPage() {
     handleSubmit: handleSubmitFields,
     getValues,
     control,
-    reset
+    reset,
   } = useForm();
 
   function getFields() {
     return Object.entries(getValues())
       .filter(([, _value]) => _value)
-      .map(([_key, _value]) => _key)
+      .map(([_key, _value]) => _key);
   }
 
   const xport = async () => {
-    const table = document.getElementById('Table2XLSX')
-    const wb = utils.table_to_book(table)
+    const table = document.getElementById("Table2XLSX");
+    const wb = utils.table_to_book(table);
 
-    writeFile(wb, 'SheetJSTable.xlsx')
-  }
+    writeFile(wb, "SheetJSTable.xlsx");
+  };
 
   async function onExport() {
-    toggleLoading('exporting')
+    toggleLoading("exporting");
 
     const selectedFields = [];
     for (let [key, value] of Object.entries(getValues())) {
-      if (value) selectedFields.push(key)
+      if (value) selectedFields.push(key);
     }
-    let response
+    let response;
 
     switch (entityToExport.value) {
-      case 'user':
+      case "user":
         response = await getUsersList({}, null, true);
         if (response && response.data) {
           const all = await useFetchAll(response.data.last_page, getUsersList);
-          setResult(all)
+          setResult(all);
         } else {
-          toast.warn("گرفتن خروجی موفقیت آمیز نبود")
-        }
-        break
-
-      case 'address':
-        response = await getAddressList()
-        if (response && response.data) {
-          const allData = await useFetchAll(response.data.last_page, getAddressList)
-          setResult(allData)
-        } else {
-          toast.warn("گرفتن خروجی موفقیت آمیز نبود")
+          toast.warn("گرفتن خروجی موفقیت آمیز نبود");
         }
         break;
 
-      case 'order':
-        response = await getOrdersList()
+      case "address":
+        response = await getAddressList();
         if (response && response.data) {
-          const allData = await useFetchAll(response.data.last_page, getOrdersList)
-          setResult(allData)
+          const allData = await useFetchAll(
+            response.data.last_page,
+            getAddressList,
+          );
+          setResult(allData);
         } else {
-          toast.warn("گرفتن خروجی موفقیت آمیز نبود")
+          toast.warn("گرفتن خروجی موفقیت آمیز نبود");
         }
         break;
 
-      case 'payment':
+      case "order":
+        response = await getOrdersList();
+        if (response && response.data) {
+          const allData = await useFetchAll(
+            response.data.last_page,
+            getOrdersList,
+          );
+          setResult(allData);
+        } else {
+          toast.warn("گرفتن خروجی موفقیت آمیز نبود");
+        }
+        break;
+
+      case "payment":
         response = await getPayments();
         if (response && response.data) {
-          const allData = await useFetchAll(response.data.last_page, getPayments)
-          setResult(allData)
+          const allData = await useFetchAll(
+            response.data.last_page,
+            getPayments,
+          );
+          setResult(allData);
         } else {
-          toast.warn("گرفتن خروجی موفقیت آمیز نبود")
+          toast.warn("گرفتن خروجی موفقیت آمیز نبود");
         }
         break;
 
-      case 'product':
+      case "product":
         response = await getProductsList();
         if (response && response.data) {
-          const allData = await useFetchAll(response.data.last_page, getProductsList)
-          setResult(allData)
+          const allData = await useFetchAll(
+            response.data.last_page,
+            getProductsList,
+          );
+          setResult(allData);
         } else {
-          toast.warn("گرفتن خروجی موفقیت آمیز نبود")
+          toast.warn("گرفتن خروجی موفقیت آمیز نبود");
         }
         break;
 
-      case 'stock':
+      case "stock":
         response = await getStocksList();
         if (response && response.data) {
-          const allData = await useFetchAll(response.data.last_page, getStocksList)
-          setResult(allData)
+          const allData = await useFetchAll(
+            response.data.last_page,
+            getStocksList,
+          );
+          setResult(allData);
         } else {
-          toast.warn("گرفتن خروجی موفقیت آمیز نبود")
+          toast.warn("گرفتن خروجی موفقیت آمیز نبود");
         }
         break;
 
-      case 'coupon':
+      case "coupon":
         response = await getCouponsList();
         if (response && response.data) {
-          const allData = await useFetchAll(response.data.last_page, getCouponsList)
-          setResult(allData)
+          const allData = await useFetchAll(
+            response.data.last_page,
+            getCouponsList,
+          );
+          setResult(allData);
         } else {
-          toast.warn("گرفتن خروجی موفقیت آمیز نبود")
+          toast.warn("گرفتن خروجی موفقیت آمیز نبود");
         }
         break;
 
@@ -147,27 +164,16 @@ export function ExportPage() {
         break;
     }
 
-    toggleLoading('exporting')
+    toggleLoading("exporting");
   }
 
   useNonInitialEffect(() => {
     if (result) {
       if (exportType.value === "xslx") {
-        xport()
-      } else {
-        // axios.post('/api/export-pdf', {
-        //   result,
-        //   fields: getValues()
-        // }).then(res => { console.log("^^^ RES: >>>", res) })
-        // ReactPDF.render(<PdfDoc>{
-        //   <TableForExport
-        //     data={result}
-        //     fields={getFields()}
-        //     ref={tableRef} />
-        // }</PdfDoc>, 'example.pdf');
+        xport();
       }
     }
-  }, [result])
+  }, [result]);
 
   return (
     <Layout title="خروجی">
@@ -178,7 +184,8 @@ export function ExportPage() {
             <Select
               options={exportTypeOptions}
               defaultValue={exportTypeOptions[0]}
-              onChange={exportTypeHandler} />
+              onChange={exportTypeHandler}
+            />
           </InputGroup>
         </SelectionItem>
 
@@ -191,62 +198,72 @@ export function ExportPage() {
               onChange={(e) => {
                 reset();
                 entityToExportHandler(e);
-              }} />
+              }}
+            />
           </InputGroup>
         </SelectionItem>
       </SelectionList>
 
-      <p>مولفه های خروجی : </p>
+      <p>مولفه های خروجی :</p>
       <FieldsList>
-        {
-          FIELDS[(entityToExport.value as "product")].map(_field => (
-            <FieldItem key={`${entityToExport.value}_${_field}`}>
-              <FieldLabel>
-                <input type="checkbox"
-                  {...registerFields(_field)}
-                  key={`${entityToExport}_${_field}`}
-                  defaultChecked={false} />
-                {translator(_field)}
-              </FieldLabel>
-            </FieldItem>
-          ))
-        }
+        {FIELDS[entityToExport.value as "product"].map(_field => (
+          <FieldItem key={`${entityToExport.value}_${_field}`}>
+            <FieldLabel>
+              <input
+                type="checkbox"
+                {...registerFields(_field)}
+                key={`${entityToExport}_${_field}`}
+                defaultChecked={false}
+              />
+              {translator(_field)}
+            </FieldLabel>
+          </FieldItem>
+        ))}
       </FieldsList>
 
       <Button
         status="Success"
         onClick={onExport}
-        disabled={loadingList.includes('exporting')}>
+        disabled={loadingList.includes("exporting")}
+      >
         گرفتن خروجی
       </Button>
+
+      <hr />
 
       {result && (
         <Hidden>
           <TableForExport
             data={result}
             fields={getFields()}
-            ref={tableRef} />
+            ref={tableRef}
+          />
         </Hidden>
       )}
 
+      {result && exportType.value === "pdf" && (
+        <Renderer>
+          <MyDocument result={result} fields={getFields()} />
+        </Renderer>
+      )}
     </Layout>
-  )
+  );
 }
 
 const exportTypeOptions = [
-  // { label: 'PDF', value: 'pdf' },
-  { label: 'Excel', value: 'xslx' },
-]
+  { label: "PDF", value: "pdf" },
+  { label: "Excel", value: "xslx" },
+];
 
 const entityToExportOptions = [
-  { label: 'کاربران', value: 'user' },
-  { label: 'سفارشات', value: 'order' },
-  { label: 'آدرس ها', value: 'address' },
-  { label: 'پرداخت ها', value: 'payment' },
-  { label: 'محصولات', value: 'product' },
-  { label: 'انبار', value: 'stock' },
-  { label: 'کد های تخفیف', value: 'coupon' },
-]
+  { label: "کاربران", value: "user" },
+  { label: "سفارشات", value: "order" },
+  { label: "آدرس ها", value: "address" },
+  { label: "پرداخت ها", value: "payment" },
+  { label: "محصولات", value: "product" },
+  { label: "انبار", value: "stock" },
+  { label: "کد های تخفیف", value: "coupon" },
+];
 
 const SelectionList = styled.ul`
   padding: 0;
@@ -256,33 +273,33 @@ const SelectionList = styled.ul`
 
   display: flex;
   gap: 1rem;
-`
+`;
 
 const SelectionItem = styled.li`
   list-style: none;
-`
+`;
 
 const Select = styled(_Select)`
   min-width: 10rem;
-`
+`;
 
 const FieldsList = styled.ul`
   display: flex;
   flex-wrap: wrap;
 
   width: 100%;
-`
+`;
 
 const FieldItem = styled.li`
   list-style: none;
-`
+`;
 
 const FieldLabel = styled.label`
   display: flex;
 
   gap: 0.5rem;
-`
+`;
 
 const Hidden = styled.div`
   display: none;
-`
+`;
