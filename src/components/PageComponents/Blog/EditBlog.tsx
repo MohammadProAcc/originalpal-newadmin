@@ -1,118 +1,162 @@
-import { Card, CardBody, CardHeader, Checkbox, InputGroup, Modal } from '@paljs/ui'
-import { BasicEditor, Button, FlexContainer, HeaderButton, ModalBox } from 'components'
-import { MediaCard } from 'components/Card'
-import Layout from 'Layouts'
-import router from 'next/router'
-import React, { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
-import styled from 'styled-components'
-import { deleteBlog, editBlog, getSingleBlog, removeItem, uploadBlogImage, uploadBlogVideo, useStore } from 'utils'
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Checkbox,
+  InputGroup,
+  Modal,
+} from "@paljs/ui";
+import {
+  BasicEditor,
+  Button,
+  FlexContainer,
+  handlePostLink,
+  HeaderButton,
+  ModalBox,
+  postLinkOptions,
+} from "components";
+import { MediaCard } from "components/Card";
+import Layout from "Layouts";
+import router from "next/router";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import Select from "react-select";
+import { toast } from "react-toastify";
+import styled from "styled-components";
+import { PostLink } from "types";
+import {
+  $_remove_blog_video,
+  deleteBlog,
+  editBlog,
+  getSingleBlog,
+  removeItem,
+  uploadBlogImage,
+  uploadBlogVideo,
+  useStore,
+} from "utils";
+import {
+  Badge
+} from "@mantine/core";
 
 export const EditBlogPage: React.FC = () => {
   const { blog, reload } = useStore((state: any) => ({
     blog: state?.blog,
     reload: state?.reload,
-  }))
+  }));
 
-  const endimage = blog.endimage?.includes('{') ? JSON.parse(blog.endimage) : blog.endimage
+  const [postLinkToAddName, setPostLinkToAddName] = useState<string | null>(null)
+  const [postLinkToAddHref, setPostLinkToAddHref] = useState<string | null>(null)
+
+  const endimage = blog.endimage?.includes("{")
+    ? JSON.parse(blog.endimage)
+    : blog.endimage;
 
   const reloadBlog = async () => {
-    const reloadedBlog = await getSingleBlog(blog?.id)
-    reload('blog', reloadedBlog?.data)
-  }
+    const reloadedBlog = await getSingleBlog(blog?.id);
+    reload("blog", reloadedBlog?.data);
+  };
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
     control,
     formState: { dirtyFields },
+    getValues,
+    setValue
   } = useForm({
     defaultValues: blog,
-  })
+  });
 
   const onSubmit = async (form: any) => {
-    setLoading(true)
+    setLoading(true);
 
     for (let key in form) {
-      if (!dirtyFields[key]) delete form[key]
+      if (!dirtyFields[key]) delete form[key];
     }
 
     if (form?.length < 1) {
-      toast.info('ابتدا تغییرات را اعمال کنید')
-      return
+      toast.info("ابتدا تغییرات را اعمال کنید");
+      return;
     }
 
     const finalForm = {
       ...form,
-    }
+      post_links: getValues().post_links
+    };
 
-    const response = await editBlog(blog?.id, finalForm)
+    const response = await editBlog(blog?.id, finalForm);
 
-    if (response?.status === 'success') {
-      toast.success('وبلاگ  بروز شد')
+    if (response?.status === "success") {
+      toast.success("وبلاگ  بروز شد");
     } else {
-      toast.error('بروزرسانی وبلاگ موفقیت آمیز نبود')
+      toast.error("بروزرسانی وبلاگ موفقیت آمیز نبود");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const updateBlogMedia = async (form: any, source: 'endimage' | 'thumb' | 'video') => {
-    setLoading(true)
+  const updateBlogMedia = async (
+    form: any,
+    source: "endimage" | "thumb" | "video",
+  ) => {
+    setLoading(true);
 
     const response = await editBlog(blog?.id, {
       [source]: form,
-    })
+    });
 
-    if (response?.status === 'success') {
-      await reloadBlog()
-      toast.success('وبلاگ  بروز شد')
+    if (response?.status === "success") {
+      await reloadBlog();
+      toast.success("وبلاگ  بروز شد");
     } else {
-      toast.error('بروزرسانی وبلاگ موفقیت آمیز نبود')
+      toast.error("بروزرسانی وبلاگ موفقیت آمیز نبود");
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
-  const closeRemovalModal = () => setItemToRemove(false)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const closeRemovalModal = () => setItemToRemove(false);
 
-  const [videoToRemove, setVideoToRemove] = useState<any>(null)
-  const closeVideoRemovalModal = () => setVideoToRemove(null)
+  const [videoToRemove, setVideoToRemove] = useState<any>(null);
+  const closeVideoRemovalModal = () => setVideoToRemove(null);
 
   const remove = async (removeId: any) => {
-    await removeItem('blog', removeId, deleteBlog, () => router.push('/blog'), [
+    await removeItem("blog", removeId, deleteBlog, () => router.push("/blog"), [
       `وبلاگ ${removeId} با موفقیت حذف شد`,
-      'حذف وبلاگ موفقیت آمیز نبود',
-    ])
-  }
+      "حذف وبلاگ موفقیت آمیز نبود",
+    ]);
+  };
 
   const removeVideo = async (videoToRemove: any) => {
-    console.log(videoToRemove)
-  }
+    const response = await $_remove_blog_video(blog.id, videoToRemove.u);
+    console.log(response);
+  };
 
-  const replaceMedia = async (source: 'thumb' | 'endimage' | 'video', file: File) => {
-    setLoading(true)
-    let response
-    if (source === 'video') {
-      response = await uploadBlogVideo(blog?.id, file)
+  const replaceMedia = async (
+    source: "thumb" | "endimage" | "video",
+    file: File,
+  ) => {
+    setLoading(true);
+    let response;
+    if (source === "video") {
+      response = await uploadBlogVideo(blog?.id, file);
     } else {
-      response = await uploadBlogImage(blog?.id, source, file)
+      response = await uploadBlogImage(blog?.id, source, file);
     }
-    if (response?.status === 'success') {
-      await reloadBlog()
-      toast.success('وبلاگ با موفقیت بروز شد')
+    if (response?.status === "success") {
+      await reloadBlog();
+      toast.success("وبلاگ با موفقیت بروز شد");
     } else {
-      toast.error('بروزرسانی وبلاگ موفقیت آمیز نبود')
+      toast.error("بروزرسانی وبلاگ موفقیت آمیز نبود");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   return (
     <Layout title={`${blog?.id}`}>
-      <h1 style={{ marginBottom: '4rem' }}>
+      <h1 style={{ marginBottom: "4rem" }}>
         ویرایش وبلاگ شماره {blog?.id}
         <HeaderButton status="Info" href={`/blog/${blog?.id}`}>
           مشاهده
@@ -121,18 +165,19 @@ export const EditBlogPage: React.FC = () => {
           حذف
         </HeaderButton>
       </h1>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <h2>
-          <span style={{ margin: '0 0 0 1rem' }}>ساخت وبلاگ</span>
+          <span style={{ margin: "0 0 0 1rem" }}>ساخت وبلاگ</span>
           <Controller
             name="is_news"
             control={control}
             render={({ field }) => (
-              <span style={{ color: 'transparent', fontSize: '0' }}>
+              <span style={{ color: "transparent", fontSize: "0" }}>
                 <Checkbox
-                  style={{ color: 'transparent' }}
+                  style={{ color: "transparent" }}
                   checked={field.value}
-                  onChange={(e: any) => field.onChange(e ? 1 : 0)}
+                  onChange={(e: any) =>
+                    field.onChange(e ? 1 : 0)}
                 >
                   اخبار
                 </Checkbox>
@@ -144,7 +189,7 @@ export const EditBlogPage: React.FC = () => {
         {/* ....:::::: Remove Modals :::::.... */}
         <Modal on={itemToRemove} toggle={closeRemovalModal}>
           <ModalBox>
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: "1rem" }}>
               آیا از حذف برچسب
               <span className="mx-1">{itemToRemove?.id}</span>
               اطمینان دارید؟
@@ -160,11 +205,19 @@ export const EditBlogPage: React.FC = () => {
 
         <Modal on={videoToRemove} toggle={closeVideoRemovalModal}>
           <ModalBox>
-            <div style={{ marginBottom: '1rem' }}>آیا از حذف ویدیو زیر اطمینان دارید؟</div>
-            <video src={`${process.env.VID_SRC}/${videoToRemove?.u}`} controls />
+            <div style={{ marginBottom: "1rem" }}>
+              آیا از حذف ویدیو زیر اطمینان دارید؟
+            </div>
+            <video
+              src={`${process.env.VID_SRC}/${videoToRemove?.u}`}
+              controls
+            />
             <FlexContainer jc="space-between">
               <Button onClick={closeVideoRemovalModal}>انصراف</Button>
-              <Button onClick={() => removeVideo(videoToRemove)} status="Danger">
+              <Button
+                onClick={() => removeVideo(videoToRemove)}
+                status="Danger"
+              >
                 حذف
               </Button>
             </FlexContainer>
@@ -173,7 +226,10 @@ export const EditBlogPage: React.FC = () => {
 
         <InputGroup className="col mb-4" fullWidth>
           <label>عنوان</label>
-          <input {...register('title', { required: true })} placeholder="عنوان" />
+          <input
+            {...register("title", { required: true })}
+            placeholder="عنوان"
+          />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
@@ -183,28 +239,37 @@ export const EditBlogPage: React.FC = () => {
             rules={{
               required: true,
             }}
-            render={({ field }) => <BasicEditor initialValue={blog?.desc} callback={field?.onChange} title="محتوا" />}
+            render={({ field }) => (
+              <BasicEditor
+                initialValue={blog?.desc}
+                callback={field?.onChange}
+                title="محتوا"
+              />
+            )}
           />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>اسلاگ</label>
-          <input {...register('slug', { required: true })} placeholder="اسلاگ" />
+          <input
+            {...register("slug", { required: true })}
+            placeholder="اسلاگ"
+          />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>نویسنده</label>
-          <input {...register('writer')} placeholder="نویسنده" />
+          <input {...register("writer")} placeholder="نویسنده" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>برچسب ها</label>
-          <input {...register('labels')} placeholder="برچسب ها" />
+          <input {...register("labels")} placeholder="برچسب ها" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>دسته بندی ها</label>
-          <input {...register('show_categories')} placeholder="دسته بندی ها" />
+          <input {...register("show_categories")} placeholder="دسته بندی ها" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
@@ -213,7 +278,11 @@ export const EditBlogPage: React.FC = () => {
             control={control}
             name="summary"
             render={({ field }) => (
-              <BasicEditor initialValue={blog?.summary} callback={field?.onChange} title="خلاصه" />
+              <BasicEditor
+                initialValue={blog?.summary}
+                callback={field?.onChange}
+                title="خلاصه"
+              />
             )}
           />
         </InputGroup>
@@ -223,26 +292,33 @@ export const EditBlogPage: React.FC = () => {
           <CardBody>
             <InputGroup className="col" fullWidth>
               <label>کلمات مترادف (meta_keywords)</label>
-              <input {...register('meta_keywords')} placeholder="کلمات مترادف" />
+              <input
+                {...register("meta_keywords")}
+                placeholder="کلمات مترادف"
+              />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>عنوان متا</label>
-              <input {...register('meta_title')} placeholder="عنوان متا" />
+              <input {...register("meta_title")} placeholder="عنوان متا" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>توضیحات متا</label>
-              <input {...register('meta_description')} placeholder="توضیحات متا" />
+              <input
+                {...register("meta_description")}
+                placeholder="توضیحات متا"
+              />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>عنوان صفحه</label>
-              <input {...register('title_page')} placeholder="عنوان" />
+              <input {...register("title_page")} placeholder="عنوان" />
             </InputGroup>
           </CardBody>
         </Card>
-        {/*
+        {
+          /*
                 <InputGroup className="col" fullWidth>
                     <label>is board</label>
                     <Controller
@@ -317,7 +393,8 @@ export const EditBlogPage: React.FC = () => {
                         )}
                     />
                 </InputGroup>
-          */}
+          */
+        }
 
         {/* <InputGroup className="col" fullWidth> */}
         {/*   <label>فایل ویدیویی</label> */}
@@ -329,11 +406,63 @@ export const EditBlogPage: React.FC = () => {
         {/*     onChange={(e: any) => replaceMedia('srcvideo', e?.target?.files[0])} */}
         {/*   /> */}
         {/* </InputGroup> */}
+        <Styler>
+          <InputGroup className="col" fullWidth>
+            <label>پیوند های پست در شبکه های اجتماعی: </label>
 
-        <Button disabled={loading} style={{ width: 'auto', margin: '3rem 0' }} status="Info" appearance="outline">
-          {loading ? '...' : 'بروزرسانی وبلاگ'}
+            <InputGroup fullWidth className="col post-links">
+              <div>
+                {
+                  blog["post_links"]?.map((_post: PostLink) =>
+                    <div>
+                      <Badge color="blue">{_post.name} : </Badge>
+                      {_post.href}
+                    </div>
+                  )
+                }
+              </div>
+              <Select
+                options={postLinkOptions}
+                onChange={({ value }: any) =>
+                  setPostLinkToAddName(value)
+                }
+              />
+              <input
+                placeholder="پیوند پست"
+                id="post-link-name"
+                onChange={(e) =>
+                  setPostLinkToAddHref(e.target.value)
+                }
+              />
+              <Button status="Success" type="button"
+                onClick={
+                  () => postLinkToAddName && postLinkToAddHref && handlePostLink(
+                    { name: postLinkToAddName, href: postLinkToAddHref },
+                    getValues,
+                    (value: PostLink[]) => setValue("post_links", value),
+                    () => {
+                      setPostLinkToAddName("");
+                      setPostLinkToAddHref("");
+                      (document.getElementById('post-link-name')! as any).value = '';
+                    }
+                  )
+                }
+              >
+                افزودن پیوند پست
+              </Button>
+            </InputGroup>
+          </InputGroup>
+        </Styler>
+
+        <Button
+          disabled={loading}
+          style={{ width: "auto", margin: "3rem 0" }}
+          status="Info"
+          appearance="outline"
+        >
+          {loading ? "..." : "بروزرسانی وبلاگ"}
         </Button>
-      </form>
+      </Form>
 
       <h3 className="mb-4">رسانه</h3>
 
@@ -341,53 +470,63 @@ export const EditBlogPage: React.FC = () => {
         <CardHeader>تصویر پایانی</CardHeader>
         <CardBody>
           <InputGroup className="col" fullWidth>
-            <label>تصویر پایانی ( برای جایگزینی تصویر، تصویر موردنظر خود را از طریق ورودی زیر بارگزاری کنید)</label>
+            <label>
+              تصویر پایانی ( برای جایگزینی تصویر، تصویر موردنظر خود را از طریق
+              ورودی زیر بارگزاری کنید)
+            </label>
             <input
               type="file"
-              onChange={(e: any) => replaceMedia('endimage', e?.target?.files[0])}
+              onChange={(e: any) =>
+                replaceMedia("endimage", e?.target?.files[0])}
               placeholder="تصویر پایانی"
             />
             <MediaCard
               media={endimage}
               removalCallback={console.log}
-              updateCallback={(form: any) => updateBlogMedia(form, 'endimage')}
+              updateCallback={(form: any) => updateBlogMedia(form, "endimage")}
               index={0}
             />
           </InputGroup>
 
           <InputGroup className="col" fullWidth>
             <label>عنوان پایانی</label>
-            <input {...register('endtitle')} placeholder="عنوان پایانی" />
+            <input {...register("endtitle")} placeholder="عنوان پایانی" />
           </InputGroup>
 
           <InputGroup className="col" fullWidth>
             <label>تگ آلت تصویر پایانی</label>
-            <input {...register('endtitle')} placeholder="تگ آلت تصویر پایانی" />
+            <input
+              {...register("endtitle")}
+              placeholder="تگ آلت تصویر پایانی"
+            />
           </InputGroup>
 
           <InputGroup className="col" fullWidth>
             <label>متن تصویر پایانی</label>
-            <input {...register('endtext')} placeholder="متن تصویر پایانی" />
+            <input {...register("endtext")} placeholder="متن تصویر پایانی" />
           </InputGroup>
         </CardBody>
       </Card>
 
       <Card>
         <CardHeader>
-          <label>تصویر بنر ( برای جایگزینی تصویر، تصویر موردنظر خود را از طریق ورودی زیر بارگزاری کنید)</label>
+          <label>
+            تصویر بنر ( برای جایگزینی تصویر، تصویر موردنظر خود را از طریق ورودی
+            زیر بارگزاری کنید)
+          </label>
         </CardHeader>
         <CardBody>
           <InputGroup className="col" fullWidth>
             <input
               type="file"
-              onChange={(e: any) => replaceMedia('thumb', e?.target?.files[0])}
+              onChange={(e: any) => replaceMedia("thumb", e?.target?.files[0])}
               placeholder="تصویر بنر"
             />
 
             <MediaCard
               media={endimage}
               removalCallback={console.log}
-              updateCallback={(form: any) => updateBlogMedia(form, 'thumb')}
+              updateCallback={(form: any) => updateBlogMedia(form, "thumb")}
               index={0}
             />
           </InputGroup>
@@ -402,7 +541,7 @@ export const EditBlogPage: React.FC = () => {
           <InputGroup className="col" fullWidth>
             <input
               type="file"
-              onChange={(e: any) => replaceMedia('video', e?.target?.files[0])}
+              onChange={(e: any) => replaceMedia("video", e?.target?.files[0])}
               placeholder="ویدیوی بنر"
             />
 
@@ -412,7 +551,8 @@ export const EditBlogPage: React.FC = () => {
                   <MediaCard
                     media={video}
                     removalCallback={setVideoToRemove}
-                    updateCallback={(form: any) => updateBlogMedia(form, 'video')}
+                    updateCallback={(form: any) =>
+                      updateBlogMedia(form, "video")}
                     index={index}
                     isVideo
                   />
@@ -423,10 +563,35 @@ export const EditBlogPage: React.FC = () => {
         </CardBody>
       </Card>
     </Layout>
-  )
-}
+  );
+};
 
 const CheckBoxWrapper = styled.div`
   color: transparent;
   font-size: 0;
+`;
+
+const Styler = styled.div`
+  .col {
+    flex-direction: column;
+    &.post-links {
+      display: flex;
+      gap: 1rem;
+    }
+  }
+
+`
+
+const Form = styled.form`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  h1 {
+    margin-bottom: 2rem;
+  }
+
+  label {
+    margin-bottom: 1rem;
+  }
 `

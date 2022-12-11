@@ -18,3 +18,5 @@ export * from './Payment'
 export * from "./OwnMedia"
 export * from "./Permissions"
 export * from "./BlogCategory"
+export * from "./IPostLink"
+export * from "./Banner"

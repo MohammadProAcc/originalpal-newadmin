@@ -2,6 +2,7 @@ import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import dynamic from "next/dynamic";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+
 const PDFViewer: any = dynamic(async () => {
   const mod = await import("@react-pdf/renderer");
   return mod.PDFViewer;
@@ -46,11 +47,12 @@ export const MyDocument = (props: any) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {pages.current.flat().map((_item, index) => (
-          <View>
-            <Text>Section #{index}</Text>
-          </View>
-        ))}
+        <View style={styles.section}>
+          <Text>بخش #۱</Text>
+        </View>
+        <View style={styles.section}>
+          <Text>Section #2</Text>
+        </View>
       </Page>
     </Document>
   );

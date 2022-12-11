@@ -1,4 +1,4 @@
-import { deleteCoupon, removeItem, toLocalDate, useStore } from 'utils'
+import { deleteCoupon, removeItem, toLocalDate, translator, useStore } from 'utils'
 import Layout from 'Layouts'
 import { Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import React, { useState } from 'react'
@@ -65,7 +65,7 @@ export const SingleCouponPage: React.FC = () => {
 
       <Card>
         <CardHeader>نوع</CardHeader>
-        <CardBody>{coupon?.type ?? '-'}</CardBody>
+        <CardBody>{translator(coupon?.type ?? '-')}</CardBody>
       </Card>
 
       <Card>
