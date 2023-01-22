@@ -114,16 +114,20 @@ export const MainPages = () => {
     <Container>
       {has(permissions, PermissionEnum.readSlide) && (
         <Link href={`/main-page/${banner?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Info">
-            مشاهده
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Info">
+              مشاهده
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.editSlide) && (
         <Link href={`/main-page/edit/${banner?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.deleteSlide) && (
@@ -140,17 +144,19 @@ export const MainPages = () => {
 
       <FlexContainer>
         <Link href="/main-page/create">
-          <Button
-            style={{
-              margin: '1rem 0 1rem 1rem',
-              display: 'flex',
-            }}
-            status="Success"
-            appearance="outline"
-          >
-            افزودن بنر
-            <Add />
-          </Button>
+          <a>
+            <Button
+              style={{
+                margin: '1rem 0 1rem 1rem',
+                display: 'flex',
+              }}
+              status="Success"
+              appearance="outline"
+            >
+              افزودن بنر
+              <Add />
+            </Button>
+          </a>
         </Link>
         {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteMainPageSection) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>

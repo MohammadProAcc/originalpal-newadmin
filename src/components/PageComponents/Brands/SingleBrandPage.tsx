@@ -1,4 +1,4 @@
-import { removeItem, toLocalDate, useStore } from 'utils'
+import { removeItem, toLocalDate, toLocalTime, useStore } from 'utils'
 import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import React, { useState } from 'react'
@@ -84,11 +84,15 @@ export const SingleBrandPage: React.FC = () => {
         <CardBody>
           <Card>
             <CardHeader>ساخته شده در</CardHeader>
-            <CardBody>{toLocalDate(brand?.created_at)}</CardBody>
+            <CardBody>
+              {toLocalDate(brand?.created_at)} - {toLocalTime(brand?.created_at)}
+            </CardBody>
           </Card>
           <Card>
             <CardHeader>بروز شده در</CardHeader>
-            <CardBody>{toLocalDate(brand?.updated_at)}</CardBody>
+            <CardBody>
+              {toLocalDate(brand?.updated_at)} - {toLocalTime(brand?.updated_at)}
+            </CardBody>
           </Card>
         </CardBody>
       </Card>

@@ -129,17 +129,21 @@ export const CommentsPage = () => {
         </Button>
       )}
       {has(permissions, PermissionEnum.readComment) && (
-        <Link href={`/comments/${comment?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Info">
-            مشاهده
-          </Button>
+        <Link href={`/comments/${comment?.id}`} passHref>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Info">
+              مشاهده
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.editComment) && (
-        <Link href={`/comments/edit/${comment?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+        <Link href={`/comments/edit/${comment?.id}`} passHref>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.deleteComment) && (

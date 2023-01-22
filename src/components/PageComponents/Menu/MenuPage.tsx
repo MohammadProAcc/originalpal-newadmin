@@ -91,9 +91,11 @@ export const MenuPage = () => {
     <Container>
       {has(permissions, PermissionEnum.editMenu) && (
         <Link href={`/menu/edit/${menu?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
     </Container>,

@@ -75,16 +75,20 @@ export const MainPageSectionPage = () => {
     <Container>
       {has(permissions, PermissionEnum.readMainPageSection) && (
         <Link href={`/main-page-sections/${mainPageSection?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Info">
-            مشاهده
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Info">
+              مشاهده
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.editMainPageSection) && (
         <Link href={`/main-page-sections/edit/${mainPageSection?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.deleteMainPageSection) && (
@@ -102,17 +106,19 @@ export const MainPageSectionPage = () => {
       <FlexContainer>
         {has(permissions, PermissionEnum.editMainPageSection) && (
           <Link href="/main-page-sections/create">
-            <Button
-              style={{
-                margin: '1rem 0 1rem 1rem',
-                display: 'flex',
-              }}
-              status="Success"
-              appearance="outline"
-            >
-              افزودن بخش های صفحه اصلی
-              <Add />
-            </Button>
+            <a>
+              <Button
+                style={{
+                  margin: '1rem 0 1rem 1rem',
+                  display: 'flex',
+                }}
+                status="Success"
+                appearance="outline"
+              >
+                افزودن بخش های صفحه اصلی
+                <Add />
+              </Button>
+            </a>
           </Link>
         )}
         {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteMainPageSection) && (

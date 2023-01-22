@@ -116,17 +116,21 @@ export const Banners = () => {
     banner?.active ? 'فعال' : 'غیر فعال',
     <Container>
       {has(permissions, PermissionEnum.readStand) && (
-        <Link href={`/banners/${banner?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Info">
-            مشاهده
-          </Button>
+        <Link href={`/banners/${banner?.id}`} passHref>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Info">
+              مشاهده
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.editStand) && (
-        <Link href={`/banners/edit/${banner?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+        <Link href={`/banners/edit/${banner?.id}`} passHref>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.deleteStand) && (
@@ -143,18 +147,20 @@ export const Banners = () => {
 
       <FlexContainer>
         {has(permissions, PermissionEnum.addStand) && (
-          <Link href="/banners/create">
-            <Button
-              style={{
-                margin: '1rem 0 1rem 1rem',
-                display: 'flex',
-              }}
-              status="Success"
-              appearance="outline"
-            >
-              افزودن بنر
-              <Add />
-            </Button>
+          <Link href="/banners/create" passHref>
+            <a>
+              <Button
+                style={{
+                  margin: '1rem 0 1rem 1rem',
+                  display: 'flex',
+                }}
+                status="Success"
+                appearance="outline"
+              >
+                افزودن بنر
+                <Add />
+              </Button>
+            </a>
           </Link>
         )}
         {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteStand) && (
