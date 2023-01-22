@@ -1,3 +1,4 @@
+import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { TagsPage } from 'components'
 import { GetServerSideProps, NextPage } from 'next'
 import { PermissionEnum } from 'types'
@@ -9,8 +10,12 @@ export default PageName
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const token = context?.req?.cookies?.[process.env.TOKEN!]
+  const query = context?.query
+
   if (token) {
-    const tags = await getTagsList(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
+    const queryClient = new QueryClient()
+    await queryClient.prefetchQuery(['tags', query], async () => await getTagsList(query, token))
+
     if (!(await asyncHas(PermissionEnum.browseTag, token)))
       return {
         props: {},
@@ -21,9 +26,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     return {
       props: {
-        initialState: {
-          tags,
-        },
+        dehydratedState: dehydrate(queryClient),
       },
     }
   } else {
