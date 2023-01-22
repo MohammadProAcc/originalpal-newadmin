@@ -123,7 +123,7 @@ export const EditMainPageSectionPage: React.FC = () => {
     const response = await editMainPageSection(mainPageSection?.id, final, Cookies.get(process.env.TOKEN!))
     if (response?.status === 'success') {
       toast.success('بخش صفحه اصلی  با موفقیت بروز شد')
-      router.push('/main-page-sections')
+      router.back()
       reset()
     } else {
       toast.error('بروزرسانی بخش صفحه اصلی  موفقیت آمیز نبود')

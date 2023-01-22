@@ -18,7 +18,7 @@ export function EditBanner() {
   const { data: banner, isLoading, refetch } = useQuery(['banner', bannerId], () => getSingleBanner(bannerId))
 
   async function afterUpdateCallback() {
-    await refetch({})
+    router.back()
   }
 
   const permissions = useUserStore().getPermissions()

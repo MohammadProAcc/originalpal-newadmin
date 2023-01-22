@@ -37,6 +37,7 @@ export const BrandsPage = () => {
       clearList('brands', item?.id)
       setItemToRemove(null)
       toast.success('برند با موفقیت حذف شد')
+      router.back()
     } else {
       toast.error('حذف برند موفقیت آمیز نبود')
     }

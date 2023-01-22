@@ -139,6 +139,7 @@ export const EditSingleOrderPage: React.FC = () => {
     const response = await editOrder(order.id, { user: form })
     if (response.status === 'success') {
       toast.success('تغییرات کاربر اعمال شد')
+      router.back()
     } else {
       toast.error('اعمال تغییرات کاربر موفقیت آمیز نبود')
     }
@@ -154,6 +155,7 @@ export const EditSingleOrderPage: React.FC = () => {
     const response = await editOrderAddress(order?.id, order?.address?.id, form)
     if (response?.status === 'success') {
       toast.success('آدرس با موفقیت بروز شد')
+      router.back()
     } else {
       toast.error('بروزرسانی آدرس موفقیت آمیز نبود')
     }
@@ -165,6 +167,7 @@ export const EditSingleOrderPage: React.FC = () => {
       const { data: response } = await admin().put(`/orders/${router?.query?.order_id}`, form)
       if (response?.status === 'success') {
         toast.success('سفارش با موفقیت بروز شد')
+        router.back()
       }
     } catch (err) {
       toast.error('بروزرسانی سفارش موفقیت آمیز نبود')

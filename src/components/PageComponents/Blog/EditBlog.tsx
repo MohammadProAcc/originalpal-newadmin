@@ -71,6 +71,7 @@ export const EditBlogPage: React.FC = () => {
 
     if (response?.status === 'success') {
       toast.success('وبلاگ  بروز شد')
+      router.back()
     } else {
       toast.error('بروزرسانی وبلاگ موفقیت آمیز نبود')
     }
@@ -87,6 +88,7 @@ export const EditBlogPage: React.FC = () => {
     if (response?.status === 'success') {
       await reloadBlog()
       toast.success('وبلاگ  بروز شد')
+      router.back()
     } else {
       toast.error('بروزرسانی وبلاگ موفقیت آمیز نبود')
     }
@@ -122,6 +124,7 @@ export const EditBlogPage: React.FC = () => {
     if (response?.status === 'success') {
       await reloadBlog()
       toast.success('وبلاگ با موفقیت بروز شد')
+      router.back()
     } else {
       toast.error('بروزرسانی وبلاگ موفقیت آمیز نبود')
     }

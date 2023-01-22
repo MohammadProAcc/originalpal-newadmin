@@ -98,8 +98,8 @@ export const EditProductPage: React.FC = () => {
         product?.site_main_picture && product?.media?.length > 0
           ? [product?.site_main_picture, ...product?.media]
           : product?.site_main_picture
-            ? [product?.site_main_picture]
-            : [null],
+          ? [product?.site_main_picture]
+          : [null],
       ),
     [product],
   )
@@ -201,6 +201,7 @@ export const EditProductPage: React.FC = () => {
     if (response !== null) {
       await resetProduct()
       toast.success('محصول بروز شد')
+      router.back()
     } else {
       toast.error('بروزرسانی محصول موفقیت آمیز نبود')
     }
@@ -271,7 +272,11 @@ export const EditProductPage: React.FC = () => {
   const [imageToRemove, setImageToRemove] = useState<any>(null)
 
   const removeProductImage = async (media: Media) => {
-    const response = await deleteProductMedia(router?.query?.product_id as string, media?.u, Cookies.get(process.env.TOKEN!) ?? '')
+    const response = await deleteProductMedia(
+      router?.query?.product_id as string,
+      media?.u,
+      Cookies.get(process.env.TOKEN!) ?? '',
+    )
     if (response?.includes('operation done successfully')) {
       setImages((_curr) => _curr.filter((_image) => !_.isEqual(_image, media)))
       setImageToRemove(null)
@@ -286,8 +291,12 @@ export const EditProductPage: React.FC = () => {
 
   // TODO: complete video remove process
   const removeProductVideo = async (media: Media) => {
-    const response = await deleteProductVideo(router?.query?.product_id as string, media?.u, Cookies.get(process.env.TOKEN!) ?? '')
-    console.error(response);
+    const response = await deleteProductVideo(
+      router?.query?.product_id as string,
+      media?.u,
+      Cookies.get(process.env.TOKEN!) ?? '',
+    )
+    console.error(response)
     // if (response?.includes('operation done successfully')) {
     //   setVideos((_curr) => _curr.filter((_image) => !_.isEqual(_image, media)))
     //   setVideoToRemove(null)
@@ -732,7 +741,15 @@ export const EditProductPage: React.FC = () => {
                 انصراف
               </Button>
             </div>
-            {<video controls className="mb-2" width="100px" height="100px" src={`${process.env.VID_SRC}/${videoToRemove?.u}`} />}{' '}
+            {
+              <video
+                controls
+                className="mb-2"
+                width="100px"
+                height="100px"
+                src={`${process.env.VID_SRC}/${videoToRemove?.u}`}
+              />
+            }{' '}
           </CardBody>
         </Card>
       </Modal>
@@ -785,16 +802,16 @@ interface CardFamilyProps {
   overflow?: boolean
 }
 
-const Card = styled(_Card) <CardFamilyProps>`
+const Card = styled(_Card)<CardFamilyProps>`
   overflow: ${(props) => props.overflow && 'initial'};
   overflow: initial;
 `
 
-const CardBody = styled(_CardBody) <CardFamilyProps>`
+const CardBody = styled(_CardBody)<CardFamilyProps>`
   overflow: initial;
 `
 
-const CardHeader = styled(_CardHeader) <CardFamilyProps>`
+const CardHeader = styled(_CardHeader)<CardFamilyProps>`
   overflow: ${(props) => props.overflow && 'initial'};
   overflow: initial;
 `

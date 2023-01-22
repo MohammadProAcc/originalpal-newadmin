@@ -40,6 +40,7 @@ export const CommentsPage = () => {
       clearList('comments', item?.id)
       setItemToRemove(null)
       toast.success('نظر با موفقیت حذف شد')
+      router.back()
     } else {
       toast.error('حذف نظر موفقیت آمیز نبود')
     }
