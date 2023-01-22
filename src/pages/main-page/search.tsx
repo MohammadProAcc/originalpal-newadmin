@@ -1,30 +1,39 @@
-import { MainPages } from 'components';
-import { GetServerSideProps, NextPage } from 'next';
-import { PermissionEnum } from 'types';
-import { asyncHas, search_in } from 'utils';
-import { getMainPageBannersList } from 'utils/api/REST/actions/banners';
+import { MainPages } from 'components'
+import { GetServerSideProps, NextPage } from 'next'
+import { PermissionEnum } from 'types'
+import { asyncHas, search_in } from 'utils'
 
-const Main: NextPage = () => <MainPages />;
-export default Main;
+const Main: NextPage = () => <MainPages />
+export default Main
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.[process.env.TOKEN!];
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
   if (token) {
     if (!(await asyncHas(PermissionEnum.browseSlide, token)))
       return {
         props: {},
         redirect: {
-          destination: "/dashboard"
-        }
+          destination: '/dashboard',
+        },
       }
-    const { data: result } = await search_in('banners', context.query, context.query, context.req.cookies[process.env.TOKEN!]);
-    result.data = result?.data.filter((banner: any) => banner?.type === 'slide');
+    const response = await search_in('banners', context.query, context.query, context.req.cookies[process.env.TOKEN!])
+    response.data.data = response?.data?.data.filter((banner: any) => banner?.type === 'slide')
+
+    if (!response) {
+      return {
+        props: {},
+        redirect: {
+          destination: '/main-page',
+          permanent: false,
+        },
+      }
+    }
 
     return {
       props: {
         initialState: {
           mainPageBanners: {
-            data: result,
+            data: response?.data,
             fields: [
               'id',
               'type',
@@ -43,13 +52,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           },
         },
       },
-    };
+    }
   } else {
     return {
       props: {},
       redirect: {
         destination: '/auth/login',
       },
-    };
+    }
   }
-};
+}

@@ -13,6 +13,7 @@ import { PermissionEnum } from 'types'
 export const TagsPage = () => {
   const router = useRouter()
 
+  // FIXME: migrate to react-query
   const { tags, clearList } = useStore((state) => ({
     tags: state?.tags,
     clearList: state?.clearList,

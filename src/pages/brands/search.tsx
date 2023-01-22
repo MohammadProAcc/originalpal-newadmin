@@ -30,7 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         initialState: {
           brands: {
-            data: response?.data?.result,
+            data: response?.data,
             fields: [
               'id',
               'name',

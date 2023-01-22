@@ -16,18 +16,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           destination: '/dashboard',
         },
       }
-    const { data: result } = await search_in(
-      'blog',
-      context.query,
-      context.query,
-      context.req.cookies[process.env.TOKEN!],
-    )
+    const response = await search_in('blog', context.query, context.query, context.req.cookies[process.env.TOKEN!])
+
+    if (!response) {
+      return {
+        props: {},
+        redirect: {
+          destination: '/blog',
+          permanent: false,
+        },
+      }
+    }
 
     return {
       props: {
         initialState: {
           blog: {
-            data: result,
+            data: response?.data,
             fields: [
               'comments',
               'created_at',
