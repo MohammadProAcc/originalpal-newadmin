@@ -50,7 +50,6 @@ export const MainPageSectionPage = () => {
       const deletions = selections?.map(async (id) => {
         const response = await deleteMainPageSection(id)
 
-        console.log('delete section response >>> ', response)
         if (response?.status === 'success') {
           clearList(id)
 
@@ -67,7 +66,6 @@ export const MainPageSectionPage = () => {
 
   const columns: any[] = ['شناسه بخش ', 'نوع بخش ', 'عنوان', 'اولویت', 'فعالیت']
 
-  console.log(mainPageSections)
   const data = mainPageSections?.data?.map((mainPageSection: any) => [
     // =====>> Table Columns <<=====
     mainPageSection?.id,

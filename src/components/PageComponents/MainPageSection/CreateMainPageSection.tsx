@@ -55,8 +55,6 @@ export function CreateMainPageSection() {
   const { register, handleSubmit, control, reset } = useForm()
 
   const onSubmit = async (form: any) => {
-    console.log(form)
-
     const final = {
       ...form,
       tags: form?.tags?.split(' '),
@@ -64,8 +62,6 @@ export function CreateMainPageSection() {
       banners: form?.banners?.split(' '),
       links: insertedLinks,
     }
-
-    console.log('final', final)
 
     setLoading(true)
     const response = await createMainPageSection(final, Cookies.get(process.env.TOKEN!))
@@ -177,7 +173,6 @@ export function CreateMainPageSection() {
 
               <AddLinkButton
                 onClick={() => {
-                  console.log('clicked')
                   addLink()
                 }}
               >

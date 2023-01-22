@@ -110,8 +110,6 @@ export const EditMainPageSectionPage: React.FC = () => {
   })
 
   const onSubmit = async (form: any) => {
-    console.log(form)
-
     const final = {
       ...form,
       tags: form?.tags ? form?.tags?.split(' ')?.map((tag: string) => Number(tag)) : [],
@@ -120,8 +118,6 @@ export const EditMainPageSectionPage: React.FC = () => {
       links: insertedLinks,
       inStock: form?.inStock ? 1 : 0,
     }
-
-    console.log('final', final)
 
     setLoading(true)
     const response = await editMainPageSection(mainPageSection?.id, final, Cookies.get(process.env.TOKEN!))
@@ -263,7 +259,6 @@ export const EditMainPageSectionPage: React.FC = () => {
 
               <AddLinkButton
                 onClick={() => {
-                  console.log('clicked')
                   addLink()
                 }}
               >

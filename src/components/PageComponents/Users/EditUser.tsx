@@ -50,7 +50,6 @@ export const EditUserPage: React.FC = () => {
     delete form.phone
     delete form.email
 
-    console.log(form)
     form.roles = form.roles?.map((_role: any) => _role.value)
     const response = await editUser(user?.id, form)
     if (response?.status === 'success') {

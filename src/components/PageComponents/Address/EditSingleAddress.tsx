@@ -20,7 +20,6 @@ export const EditAddressPage: React.FC = () => {
 
   const onSubmit = async (form: any) => {
     const response = await editAddress(address?.id, form)
-    console.log(response)
     if (response === null) {
       toast.success('آدرس بروز شد')
     } else {

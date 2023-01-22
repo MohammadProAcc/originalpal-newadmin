@@ -18,7 +18,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       }
     const stocks = await getStocksList(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
-    console.log(stocks)
     return {
       props: {
         initialState: {

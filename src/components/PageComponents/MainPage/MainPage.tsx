@@ -12,7 +12,6 @@ export const MainPage: React.FC = () => {
   const { banner } = useStore((state: any) => ({
     banner: state?.banner,
   }))
-  console.log(banner)
 
   const [loading, setLoading] = useState(false)
 

@@ -48,7 +48,6 @@ export const StockPage = () => {
     if (selections?.length > 0) {
       const deletions = await selections?.map(async (id) => {
         const response = await deleteStock(id)
-        console.log(response)
 
         if (response?.status === 'success') {
           clearList('stocks', id)

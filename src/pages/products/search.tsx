@@ -7,17 +7,21 @@ const PageName: NextPage = () => <ProductsPage />
 export default PageName
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.[process.env.TOKEN!];
+  const token = context?.req?.cookies?.[process.env.TOKEN!]
   if (token) {
     if (!(await asyncHas(PermissionEnum.browseProduct, token)))
       return {
         props: {},
         redirect: {
-          destination: "/dashboard"
-        }
+          destination: '/dashboard',
+        },
       }
-    const { data: result } = await search_in('products', context.query, context.query, context.req.cookies[process.env.TOKEN!])
-    console.log(search_in)
+    const { data: result } = await search_in(
+      'products',
+      context.query,
+      context.query,
+      context.req.cookies[process.env.TOKEN!],
+    )
 
     return {
       props: {

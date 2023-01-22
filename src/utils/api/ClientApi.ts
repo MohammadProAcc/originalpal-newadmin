@@ -24,7 +24,6 @@ export const client = (token?: string) => {
         Cookies.remove('token')
         router.push('/auth/login')
       }
-      console.log('>>>>> Axios Api >>>>> Error ', error)
     },
   )
 

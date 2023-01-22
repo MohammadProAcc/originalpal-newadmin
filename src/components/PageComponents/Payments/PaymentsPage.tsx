@@ -31,7 +31,6 @@ export const PaymentsPage = () => {
 
   const removeItem = async (item: any) => {
     setLoading(true)
-    console.log(item)
     const response = await deletePayment(item?.id)
     if (response?.status === 'success') {
       clearList('payments', item?.id)
@@ -40,7 +39,6 @@ export const PaymentsPage = () => {
     } else {
       toast.error('عملیات حذف موفقیت آمیز نبود')
     }
-    console.log(response)
     setLoading(false)
   }
 

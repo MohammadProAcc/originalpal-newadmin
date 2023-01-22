@@ -76,8 +76,6 @@ export const MainPages = () => {
     <p style={{ margin: 0, textAlign: 'center' }}>فعالیت ها</p>,
   ]
 
-  console.log('Banners >>', mainPageBanners?.data?.data)
-
   const data = mainPageBanners?.data?.data?.map((banner: any) => [
     banner?.id,
     <Avatar src={`${process.env.SRC}/${banner?.media ? banner?.media[0]?.u : null}`} />,

@@ -18,7 +18,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       }
     const roles = await $_get_roles_list(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
-    console.log(roles)
 
     if (!roles) {
       return {

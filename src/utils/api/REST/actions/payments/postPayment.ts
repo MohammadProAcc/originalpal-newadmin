@@ -5,7 +5,6 @@ export const postPayment = async (order_id: string, form: any, token: string) =>
     const { data: stock_options } = await admin(token ?? null).post(`/admin/payments/${order_id}`, form)
     return stock_options
   } catch (err) {
-    console.log(err)
     return false
   }
 }

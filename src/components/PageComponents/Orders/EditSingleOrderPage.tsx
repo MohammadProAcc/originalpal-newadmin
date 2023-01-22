@@ -152,7 +152,6 @@ export const EditSingleOrderPage: React.FC = () => {
 
   const addressOnSubmit = async (form: any) => {
     const response = await editOrderAddress(order?.id, order?.address?.id, form)
-    console.log(response)
     if (response?.status === 'success') {
       toast.success('آدرس با موفقیت بروز شد')
     } else {
@@ -168,17 +167,10 @@ export const EditSingleOrderPage: React.FC = () => {
         toast.success('سفارش با موفقیت بروز شد')
       }
     } catch (err) {
-      console.log(err)
       toast.error('بروزرسانی سفارش موفقیت آمیز نبود')
     }
     setLoading(false)
   }
-
-  // const { register: smsRegister, handleSubmit: smsHandleSubmit } = useForm()
-
-  // const submitSmsForm = async (form: any) => {
-  //   console.log(form)
-  // }
 
   const removeStock = async (stock: any) => {
     setLoading(true)

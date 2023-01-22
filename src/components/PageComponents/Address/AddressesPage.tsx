@@ -31,7 +31,6 @@ export const AddressesPage = () => {
 
   const removeItem = async (item: any) => {
     setLoading(true)
-    console.log(item)
     const response = await deleteAddress(item?.id)
     if (response?.status === 'success') {
       clearList('addresses', item?.id)
@@ -40,7 +39,6 @@ export const AddressesPage = () => {
     } else {
       toast.error('عملیات حذف موفقیت آمیز نبود')
     }
-    console.log(response)
     setLoading(false)
   }
 

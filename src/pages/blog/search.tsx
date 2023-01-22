@@ -22,7 +22,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       context.query,
       context.req.cookies[process.env.TOKEN!],
     )
-    console.log(result)
 
     return {
       props: {

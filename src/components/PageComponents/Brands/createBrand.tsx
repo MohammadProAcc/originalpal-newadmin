@@ -33,27 +33,27 @@ export function CreateBrand() {
       <Form onSubmit={handleSubmit(onSubmit)}>
         <h1>ساخت برند</h1>
 
-        <InputGroup className="col">
+        <InputGroup className="col" fullWidth>
           <label>نام برند</label>
           <input {...register('name', { required: true })} placeholder="نام" />
         </InputGroup>
 
-        <InputGroup className="col mt-4">
+        <InputGroup className="col mt-4" fullWidth>
           <label>عنوان متا</label>
           <input {...register('meta_title', { required: true })} placeholder="عنوان متا" />
 
-          <InputGroup className="col mt-4">
+          <InputGroup className="col mt-4" fullWidth>
             <label>کلمات کلیدی</label>
             <input {...register('meta_keywords', { required: true })} placeholder="کلمات کلیدی متا" />
           </InputGroup>
         </InputGroup>
 
-        <InputGroup className="col mt-4">
+        <InputGroup className="col mt-4" fullWidth>
           <label>توضیحات متا</label>
           <input {...register('meta_description', { required: true })} placeholder="توصیحات متا" />
         </InputGroup>
 
-        <InputGroup className="col mt-4">
+        <InputGroup className="col mt-4" fullWidth>
           <label>عنوان صفحه</label>
           <input {...register('title_page', { required: true })} placeholder="عنوان صفحه" />
         </InputGroup>

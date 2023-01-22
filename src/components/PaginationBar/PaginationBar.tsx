@@ -109,4 +109,6 @@ export const PaginationBar: React.FC<IProps> = ({ totalPages, activePage, router
 
 const Component = styled.div`
   margin: 1rem 0;
+  position: relative;
+  z-index: 0;
 `

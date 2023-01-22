@@ -17,8 +17,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     const addresses = await getAddressList(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
 
-    console.log(addresses.fields)
-
     return {
       props: {
         initialState: {

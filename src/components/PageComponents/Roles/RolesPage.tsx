@@ -25,10 +25,6 @@ export const RolesPage = () => {
 
   const [showCreationModal, setShowCreationModal] = useState(false)
 
-  useEffect(() => {
-    console.log(showCreationModal)
-  }, [showCreationModal])
-
   const [tableSelections, setTableSelections] = useState<number[] | []>([])
 
   const toggleModal = () => setItemToRemove(null)

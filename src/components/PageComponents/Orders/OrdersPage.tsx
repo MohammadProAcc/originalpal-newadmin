@@ -32,7 +32,6 @@ export const OrdersPage = () => {
 
   const removeItem = async (item: any) => {
     setLoading(true)
-    console.log(item)
     const response = await deleteOrder(item?.id)
     if (response?.status === 'success') {
       clearList('orders', item?.id)
@@ -41,7 +40,6 @@ export const OrdersPage = () => {
     } else {
       toast.error('عملیات حذف موفقیت آمیز نبود')
     }
-    console.log(response)
     setLoading(false)
   }
 

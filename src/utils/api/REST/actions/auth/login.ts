@@ -1,12 +1,11 @@
-import { Login } from 'types';
-import { api } from 'utils';
+import { Login } from 'types'
+import { api } from 'utils'
 
 export const login: Login = async (form: { username: string; password: string }) => {
   try {
-    const { data: user } = await api().post(`/login`, form);
-    return user.data;
+    const { data: user } = await api().post(`/login`, form)
+    return user.data
   } catch (err) {
-    console.log(err);
-    return null;
+    return null
   }
-};
+}

@@ -37,7 +37,6 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
         },
       })
       if (updateResponse !== null) {
-        console.log(updateResponse)
         return updateResponse.data.data
       } else {
         toast.error('بارگذاری تصویر موفقیت آمیز نبود')
@@ -46,9 +45,6 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
       toast.error('بارگذاری تصویر موفقیت آمیز نبود')
     }
   }
-
-  // FIXME: temp
-  useEffect(() => console.log(menu), [menu])
 
   const findMenuIndex = (targetMenu: TopSiteMenu) => {
     return menu?.findIndex((item) => item?.menuTitle === targetMenu?.menuTitle)
