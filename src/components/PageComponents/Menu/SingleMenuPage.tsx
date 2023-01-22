@@ -7,6 +7,7 @@ import React, { useState } from 'react'
 import router from 'next/router'
 import { FlexContainer, HeaderButton, ModalBox } from 'components'
 import { PermissionEnum } from 'types'
+import { DatesCard } from 'components/Card/DatesCard'
 
 export const SingleMenuPage: React.FC = () => {
   const { menu } = useStore((state: any) => ({
@@ -98,19 +99,7 @@ export const SingleMenuPage: React.FC = () => {
         </CardBody>
       </Card>
 
-      <Card>
-        <CardHeader>تاریخ ها</CardHeader>
-        <CardBody>
-          <Card>
-            <CardHeader>ساخته شده در</CardHeader>
-            <CardBody>{toLocalDate(menu?.created_at)}</CardBody>
-          </Card>
-          <Card>
-            <CardHeader>بروز شده در</CardHeader>
-            <CardBody>{toLocalDate(menu?.updated_at)}</CardBody>
-          </Card>
-        </CardBody>
-      </Card>
+      <DatesCard createdAt={menu?.created_at} updatedAt={menu?.updated_at} />
     </Layout>
   )
 }

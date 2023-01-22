@@ -1,10 +1,10 @@
 import { Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import { HeaderButton, ModalBox } from 'components'
+import { DatesCard } from 'components/Card/DatesCard'
 import { FlexContainer } from 'components/Container/FlexContainer'
 import Layout from 'Layouts'
 import router from 'next/router'
 import { useState } from 'react'
-import styled, { css } from 'styled-components'
 import { PermissionEnum } from 'types'
 import { deleteStock, has, removeItem, toLocalDate, useStore, useUserStore } from 'utils'
 
@@ -113,17 +113,7 @@ export const SingleStockPage: React.FC = () => {
         <CardBody>{stock?.discount_end ?? '-'}</CardBody>
       </Card>
 
-      <Card>
-        <CardHeader>تاریخ ها</CardHeader>
-        <Card>
-          <CardHeader>ساخته شده در :</CardHeader>
-          <CardBody>{toLocalDate(stock?.created_at) ?? '-'}</CardBody>
-        </Card>
-        <Card>
-          <CardHeader>بروز شده شده در :</CardHeader>
-          <CardBody>{toLocalDate(stock?.updated_at) ?? '-'}</CardBody>
-        </Card>
-      </Card>
+      <DatesCard createdAt={stock?.created_at} updatedAt={stock?.updated_at} />
     </Layout>
   )
 }

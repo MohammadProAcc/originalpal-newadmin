@@ -1,10 +1,11 @@
-import { deleteOrder, has, numeralize, removeItem, translator, useStore, useUserStore } from 'utils'
-import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, Modal } from '@paljs/ui'
-import React, { useState } from 'react'
-import router from 'next/router'
 import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
+import { DatesCard } from 'components/Card/DatesCard'
+import Layout from 'Layouts'
+import router from 'next/router'
+import React, { useState } from 'react'
 import { PermissionEnum } from 'types'
+import { deleteOrder, has, numeralize, removeItem, translator, useStore, useUserStore } from 'utils'
 
 const clacTotalPrice = (orderItems: any[]) => {
   // const priceArr = order['order_items']
@@ -160,6 +161,8 @@ export const SingleOrderPage: React.FC = () => {
         <CardHeader>نوع ارسال</CardHeader>
         <CardBody>{translator(order?.delivery)}</CardBody>
       </Card>
+
+      <DatesCard createdAt={order?.created_at} updatedAt={order?.updated_at} />
     </Layout>
   )
 }

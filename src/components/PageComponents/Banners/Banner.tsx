@@ -8,6 +8,7 @@ import Image from 'next/image'
 import { deleteBanner } from 'utils/api/REST/actions/banners'
 import router from 'next/router'
 import { PermissionEnum } from 'types'
+import { DatesCard } from 'components/Card/DatesCard'
 
 export const Banner: React.FC = () => {
   const { banner } = useStore((state: any) => ({
@@ -128,6 +129,8 @@ export const Banner: React.FC = () => {
           <span>تگ title : {banner?.media?.t}</span>
         </CardBody>
       </Card>
+
+      <DatesCard createdAt={banner?.created_at} updatedAt={banner?.updated_at} />
     </Layout>
   )
 }

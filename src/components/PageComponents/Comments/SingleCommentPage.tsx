@@ -1,6 +1,13 @@
+import { Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
+import { FlexContainer, HeaderButton, ModalBox } from 'components'
+import { DatesCard } from 'components/Card/DatesCard'
+import Layout from 'Layouts'
+import router from 'next/router'
+import React, { useState } from 'react'
+import { toast } from 'react-toastify'
+import { PermissionEnum } from 'types'
 import {
   deleteComment,
-  deleteTag,
   editComment,
   getSingleComment,
   has,
@@ -9,13 +16,6 @@ import {
   useStore,
   useUserStore,
 } from 'utils'
-import Layout from 'Layouts'
-import { Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
-import React, { useState } from 'react'
-import { toast } from 'react-toastify'
-import { FlexContainer, HeaderButton, ModalBox } from 'components'
-import router from 'next/router'
-import { PermissionEnum } from 'types'
 
 export const SingleCommentPage: React.FC = () => {
   const { comment, updateComment } = useStore((state: any) => ({
@@ -121,19 +121,7 @@ export const SingleCommentPage: React.FC = () => {
         <CardBody>{toLocalDate(comment?.created_at) ?? '-'}</CardBody>
       </Card>
 
-      <Card>
-        <CardHeader>تاریخ ها</CardHeader>
-        <CardBody>
-          <Card>
-            <CardHeader>ساخته شده در</CardHeader>
-            <CardBody>{toLocalDate(comment?.created_at)}</CardBody>
-          </Card>
-          <Card>
-            <CardHeader>بروز شده در</CardHeader>
-            <CardBody>{toLocalDate(comment?.updated_at)}</CardBody>
-          </Card>
-        </CardBody>
-      </Card>
+      <DatesCard createdAt={comment?.created_at} updatedAt={comment?.updated_at} />
     </Layout>
   )
 }

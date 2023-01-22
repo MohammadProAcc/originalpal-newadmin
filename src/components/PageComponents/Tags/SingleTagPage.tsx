@@ -5,6 +5,7 @@ import { useState } from 'react'
 import router from 'next/router'
 import { FlexContainer, HeaderButton, ModalBox } from 'components'
 import { PermissionEnum } from 'types'
+import { DatesCard } from 'components/Card/DatesCard'
 
 export const SingleTagPage: React.FC = () => {
   const { tag } = useStore((state: any) => ({
@@ -90,19 +91,7 @@ export const SingleTagPage: React.FC = () => {
         <CardBody>{tag?.priority ?? '-'}</CardBody>
       </Card>
 
-      <Card>
-        <CardHeader>تاریخ ها</CardHeader>
-        <CardBody>
-          <Card>
-            <CardHeader>ساخته شده در</CardHeader>
-            <CardBody>{tag?.created_at}</CardBody>
-          </Card>
-          <Card>
-            <CardHeader>بروز شده در</CardHeader>
-            <CardBody>{tag?.updated_at}</CardBody>
-          </Card>
-        </CardBody>
-      </Card>
+      <DatesCard createdAt={tag?.created_at} updatedAt={tag?.updated_at} />
     </Layout>
   )
 }

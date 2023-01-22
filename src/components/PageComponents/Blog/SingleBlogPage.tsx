@@ -7,6 +7,7 @@ import React, { useState } from 'react'
 import router from 'next/router'
 import { FlexContainer, HeaderButton, ModalBox } from 'components'
 import { PermissionEnum } from 'types'
+import { DatesCard } from 'components/Card/DatesCard'
 
 export const SingleBlogPage: React.FC = () => {
   const { blog } = useStore((state: any) => ({
@@ -182,19 +183,7 @@ export const SingleBlogPage: React.FC = () => {
         </CardBody>
       </Card>
 
-      <Card>
-        <CardHeader>تاریخ ها</CardHeader>
-        <CardBody>
-          <Card>
-            <CardHeader>ساخته شده در</CardHeader>
-            <CardBody>{toLocalDate(blog?.created_at)}</CardBody>
-          </Card>
-          <Card>
-            <CardHeader>بروز شده در</CardHeader>
-            <CardBody>{toLocalDate(blog?.updated_at)}</CardBody>
-          </Card>
-        </CardBody>
-      </Card>
+      <DatesCard createdAt={blog?.created_at} updatedAt={blog?.updated_at} />
     </Layout>
   )
 }
