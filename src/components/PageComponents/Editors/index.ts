@@ -1,1 +1,2 @@
-export * from './BasicEditor';
+export * from './RichTextEditor'
+export * from './SunEditor'

@@ -1,10 +1,10 @@
-import { Button, Card, CardBody, CardHeader, Checkbox, InputGroup } from '@paljs/ui'
-import { BasicEditor } from 'components'
+import { Button, Card, CardBody, CardHeader, InputGroup } from '@paljs/ui'
+import { Editor } from 'components'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Controller, useForm, UseFormGetValues, UseFormSetValue } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import Select from 'react-select'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
@@ -82,7 +82,7 @@ export function CreateBlog() {
     <Layout title="انتشار مقاله">
       <Form onSubmit={handleSubmit(onSubmit)}>
         <h1>
-          <span style={{ margin: "0 0 0 1rem" }}>انتشار مقاله</span>
+          <span style={{ margin: '0 0 0 1rem' }}>انتشار مقاله</span>
           {/* <Controller */}
           {/*   name="is_news" */}
           {/*   control={control} */}
@@ -110,7 +110,7 @@ export function CreateBlog() {
             rules={{
               required: true,
             }}
-            render={({ field }) => <BasicEditor callback={field?.onChange} title="محتوا" />}
+            render={({ field }) => <Editor content="محتوای مقاله..." callback={field?.onChange} title="محتوا" />}
           />
         </InputGroup>
 
@@ -144,7 +144,7 @@ export function CreateBlog() {
           <Controller
             control={control}
             name="summary"
-            render={({ field }) => <BasicEditor callback={field?.onChange} title="خلاصه" />}
+            render={({ field }) => <Editor content="خلاصه مقاله..." callback={field?.onChange} title="خلاصه" />}
           />
         </InputGroup>
 

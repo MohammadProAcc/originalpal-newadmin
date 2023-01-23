@@ -7,12 +7,13 @@ import {
   CardBody as _CardBody,
   CardHeader as _CardHeader,
   InputGroup,
-  Modal, Select as _Select
+  Modal,
+  Select as _Select,
 } from '@paljs/ui'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
-import { BasicEditor, Button, FlexContainer, ModalBox, ProductImageCard, ProductVideoCard, StockItem } from 'components'
-import { UploadProductImage, UploadProductVideo } from 'components/Input'
+import { Button, Editor, FlexContainer, ModalBox, ProductImageCard, ProductVideoCard, StockItem } from 'components'
+import { PersianDatePicker, UploadProductImage, UploadProductVideo } from 'components/Input'
 import { useNonInitialEffect } from 'hooks'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
@@ -32,7 +33,7 @@ import {
   getSingleProduct,
   getTagsList,
   reqSucceed,
-  toLocalDate
+  toLocalDate,
 } from 'utils'
 import { StockForm } from '../Stock/components'
 
@@ -57,19 +58,19 @@ export const EditProductPage: React.FC = () => {
   const [videos, setVideos] = useState(product.video ? [...product?.video] : [])
 
   useNonInitialEffect(() => {
-    setImages(product?.media?.length > 0 ? [...product?.media] : []);
-    setVideos(product.video ? [...product?.video] : []);
+    setImages(product?.media?.length > 0 ? [...product?.media] : [])
+    setVideos(product.video ? [...product?.video] : [])
   }, [product])
 
   async function appendImage(image: any) {
     // setImages((_curr) => [..._curr, image])
-    productRefetch();
+    productRefetch()
     toast.success('تصویر با موفقیت بارگذاری شد')
   }
 
   function appendVideo(video: any) {
     // setVideos((_curr) => [..._curr, video])
-    productRefetch();
+    productRefetch()
     toast.success('فایل تصویری با موفقیت بارگذاری شد')
   }
 
@@ -166,7 +167,7 @@ export const EditProductPage: React.FC = () => {
     setLoading(true)
   }
 
-  const { register, handleSubmit, control } = useForm({
+  const { register, handleSubmit, control, watch } = useForm({
     defaultValues: {
       slug: product?.slug,
       Enable: product?.Enable,
@@ -205,7 +206,7 @@ export const EditProductPage: React.FC = () => {
 
     const response = await editProduct(product?.id, {
       ...finalForm,
-      tags: tags?.split(' ').map((tagId: string) => Number(tagId)),
+      // tags: tags?.split(' ').map((tagId: string) => Number(tagId)),
     })
 
     if (response !== null) {
@@ -307,12 +308,12 @@ export const EditProductPage: React.FC = () => {
       Cookies.get(process.env.TOKEN!) ?? '',
     )
     if (reqSucceed(response)) {
-      await productRefetch();
-      toast.success("ویدیو با موفقیت حذف شد");
+      await productRefetch()
+      toast.success('ویدیو با موفقیت حذف شد')
     } else {
-      toast.error("حذف ویدیو موفقیت آمیز نبود")
+      toast.error('حذف ویدیو موفقیت آمیز نبود')
     }
-    setVideoToRemove(null);
+    setVideoToRemove(null)
   }
 
   const [removeAllImageModal, setRemoveAllImagesModal] = useState(false)
@@ -384,9 +385,9 @@ export const EditProductPage: React.FC = () => {
               render={({ field }) => (
                 <MultiSelect
                   sx={{
-                    "div": {
-                      backgorundColor: "red"
-                    }
+                    div: {
+                      backgorundColor: 'red',
+                    },
                   }}
                   selectOnBlur
                   data={tagsOptions}
@@ -408,7 +409,7 @@ export const EditProductPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>قیمت</CardHeader>
+          <CardHeader>قیمت (ريال)</CardHeader>
           <CardBody>
             <InputGroup>
               <input placeholder="قیمت" type="number" {...register('price')} />
@@ -417,7 +418,7 @@ export const EditProductPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>قیمت با تخفیف</CardHeader>
+          <CardHeader>قیمت با تخفیف (ريال)</CardHeader>
           <CardBody>
             <InputGroup>
               <input placeholder="قیمت با تخفیف" type="number" {...register('discount_price')} />
@@ -541,9 +542,11 @@ export const EditProductPage: React.FC = () => {
           control={control}
           name="description"
           render={({ field: { onChange } }) => (
-            <BasicEditor initialValue={product?.description} callback={onChange} title="توضیحات محصول" />
+            <Editor title={<h5>توضیحات</h5>} content={product?.description} callback={onChange} />
           )}
         />
+
+        <br />
 
         <Card>
           <CardHeader>ترند</CardHeader>
@@ -589,7 +592,17 @@ export const EditProductPage: React.FC = () => {
           </CardHeader>
           <CardBody>
             <InputGroup>
-              <input type="date" {...register('discount_exp')} />
+              {/* <input type="date" {...register('discount_exp')} /> */}
+              <Controller
+                name="discount_exp"
+                control={control}
+                render={({ field }) => (
+                  <PersianDatePicker
+                    onSelect={(v) => field.onChange(new Date(v?.valueOf() as any))}
+                    value={watch('discount_exp')}
+                  />
+                )}
+              />
             </InputGroup>
           </CardBody>
         </Card>

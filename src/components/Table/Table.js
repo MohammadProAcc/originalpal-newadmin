@@ -53,18 +53,20 @@ export function BasicTable({ columns, rows, getSelections, isOrder = false }) {
                   {row.map((item, index) =>
                     index === 0 ? (
                       <TableCell primary align="right" component="th" scope="row">
-                        <Checkbox
-                          checked={selectedIds?.includes(row[0])}
-                          value={row[0]}
-                          onClick={() => handleSelection(row[0])}
-                        />
-                        {isOrder ? (
-                          <Popover placement="bottom" trigger="hover" overlay={<OrderDetails orderId={row[0]} />}>
-                            {item}
-                          </Popover>
-                        ) : (
-                          item
-                        )}
+                        <label style={{ display: 'flex', alignItems: 'center', cursor: "pointer" }}>
+                          <Checkbox
+                            checked={selectedIds?.includes(row[0])}
+                            value={row[0]}
+                            onClick={() => handleSelection(row[0])}
+                          />
+                          {isOrder ? (
+                            <Popover placement="bottom" trigger="hover" overlay={<OrderDetails orderId={row[0]} />}>
+                              {item}
+                            </Popover>
+                          ) : (
+                            item
+                          )}
+                        </label>
                       </TableCell>
                     ) : (
                       <TableCell align="right">{item}</TableCell>
@@ -99,7 +101,6 @@ const TableCell = styledEngine(_TableCell)`
       p.primary &&
       css`
         &:hover {
-          cursor: pointer;
           background-color: rgba(0, 149, 255, 0.3);
         }
       `}   

@@ -1,16 +1,18 @@
+import { Flex, Select as MantineSelect } from '@mantine/core'
 import { Add, Close } from '@material-ui/icons'
 import {
   Alert,
   Button,
   Card,
   CardBody,
-  CardHeader, Container,
+  CardHeader,
+  Container,
   InputGroup as _InputGroup,
   Modal,
-  Select
+  Select,
 } from '@paljs/ui'
 import { useQuery } from '@tanstack/react-query'
-import { BasicEditor, FlexContainer, HeaderButton, ModalBox } from 'components'
+import { Editor, FlexContainer, HeaderButton, ModalBox } from 'components'
 import { WriteOrderDetailsModal } from 'components/Modal/derived/WriteOrderDetails'
 import { useNonInitialEffect } from 'hooks'
 import Cookies from 'js-cookie'
@@ -30,18 +32,16 @@ import {
   editOrderAddress,
   getCouponsList,
   getSingleCoupon,
-  getSingleOrder, has, numeralize,
+  getSingleOrder,
+  has,
+  numeralize,
   removeItem,
   removeOrderItem,
   translator,
   update_order_status,
   useStore,
-  useUserStore
+  useUserStore,
 } from 'utils'
-import {
-  Flex,
-  Select as MantineSelect
-} from "@mantine/core"
 
 const statusOptions = [
   { label: 'در انتظار پرداخت', value: 'waiting' },
@@ -53,23 +53,27 @@ const statusOptions = [
 
 export const EditSingleOrderPage: React.FC = () => {
   const router = useRouter()
-  const orderId = router.query.order_id as string;
+  const orderId = router.query.order_id as string
 
-  const { data: { data: order }, refetch: refetchOrder } =
-    useQuery(["order", orderId], () => getSingleOrder(orderId));
-  const { data: { data: { data: stocks } }, refetch: refetchStocks }: any =
-    useQuery(["stocks"], () => admin().get('/stock/select'));
-  const { data: coupons } =
-    useQuery(["coupons"], () => getCouponsList({ page: "total" }));
+  const {
+    data: { data: order },
+    refetch: refetchOrder,
+  } = useQuery(['order', orderId], () => getSingleOrder(orderId))
+  const {
+    data: {
+      data: { data: stocks },
+    },
+    refetch: refetchStocks,
+  }: any = useQuery(['stocks'], () => admin().get('/stock/select'))
+  const { data: coupons } = useQuery(['coupons'], () => getCouponsList({ page: 'total' }))
 
-  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null)
 
   useNonInitialEffect(() => {
     if (order.coupon_id) {
-      getSingleCoupon(order.coupon_id)
-        .then(res => {
-          setAppliedCoupon(res.data);
-        })
+      getSingleCoupon(order.coupon_id).then((res) => {
+        setAppliedCoupon(res.data)
+      })
     }
   }, [order])
 
@@ -89,8 +93,8 @@ export const EditSingleOrderPage: React.FC = () => {
   const [couponOptions, setCouponOptions] = useState(
     coupons?.data?.data?.map((_coupon: Coupon) => ({
       label: `${_coupon.code} - ${_coupon.decription}`,
-      value: _coupon.id
-    })) ?? []
+      value: _coupon.id,
+    })) ?? [],
   )
 
   useNonInitialEffect(() => {
@@ -98,7 +102,7 @@ export const EditSingleOrderPage: React.FC = () => {
       stocks?.map((stock: any) => ({
         label: ` شناسه محصول: ${stock?.product_id} - سایز: ${stock?.size}`,
         value: stock,
-      }))
+      })),
     )
   }, [stocks])
 
@@ -106,8 +110,8 @@ export const EditSingleOrderPage: React.FC = () => {
     setCouponOptions(
       coupons?.data?.data?.map((_coupon: Coupon) => ({
         label: `${_coupon.code} - ${_coupon.decription}`,
-        value: _coupon.id
-      }))
+        value: _coupon.id,
+      })),
     )
   }, [coupons])
 
@@ -152,7 +156,7 @@ export const EditSingleOrderPage: React.FC = () => {
     if (response?.status === 'success') {
       const updatedOrder = await getSingleOrder(order?.id)
       updateOrder(updatedOrder.data)
-      refetchOrder({});
+      refetchOrder({})
       toast.success('محصول با موفقیت اضافه شد')
     } else {
       toast.error('افزودن محصول موفقیت آمیز نبود')
@@ -223,7 +227,7 @@ export const EditSingleOrderPage: React.FC = () => {
     if (response?.status === 'success') {
       clearOrderItems(stock?.id)
       setStockToRemove(null)
-      refetchOrder({});
+      refetchOrder({})
       toast.success('محصول با موفقیت از سبد خرید شما حذف شد')
     } else {
       toast.error('حذف محصول با موفقیت انجام شد')
@@ -292,7 +296,7 @@ export const EditSingleOrderPage: React.FC = () => {
           <input id="user-email" {...userRegister('email')} />
         </InputGroup>
 
-        <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline" >
+        <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline">
           اعمال تغییرات کاربر
         </Button>
       </form>
@@ -346,31 +350,20 @@ export const EditSingleOrderPage: React.FC = () => {
         <Card>
           <CardHeader>
             <Flex>کد تخفیف {appliedCoupon && `: ${appliedCoupon.code} - ${appliedCoupon.decription}`}</Flex>
-            {
-              coupons && (
-                <Controller
-                  name="coupon_id"
-                  control={control}
-                  render={({ field }) => (
-                    <CouponsSelect
-                      data={couponOptions}
-                      searchable
-                      {...field}
-                    />
-                  )}
-                />
-              )
-            }
+            {coupons && (
+              <Controller
+                name="coupon_id"
+                control={control}
+                render={({ field }) => <CouponsSelect data={couponOptions} searchable {...field} />}
+              />
+            )}
           </CardHeader>
-
         </Card>
 
         <Controller
           name="notes"
           control={control}
-          render={({ field }) => (
-            <BasicEditor callback={field.onChange} initialValue={order?.notes} title="یادداشت ها" />
-          )}
+          render={({ field }) => <Editor callback={field.onChange} content={order?.notes} title="یادداشت ها" />}
         />
         <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline">
           اعمال تغییرات
@@ -501,10 +494,10 @@ export const EditSingleOrderPage: React.FC = () => {
             جمع کل :{' '}
             {numeralize(
               order['order_items'] &&
-              order['order_items'].length > 0 &&
-              order['order_items']
-                ?.map((orderItem: any) => Number(orderItem?.price))
-                ?.reduce((prev: number, curr: number) => curr + prev),
+                order['order_items'].length > 0 &&
+                order['order_items']
+                  ?.map((orderItem: any) => Number(orderItem?.price))
+                  ?.reduce((prev: number, curr: number) => curr + prev),
             )}{' '}
             تومان
           </p>
