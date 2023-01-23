@@ -1,11 +1,10 @@
 import {
-  Table,
+  Paper, Table,
   TableBody,
   TableCell as _TableCell,
   TableContainer,
   TableHead,
-  TableRow as _TableRow,
-  Paper,
+  TableRow as _TableRow
 } from '@material-ui/core'
 import styledEngine from '@mui/styled-engine-sc'
 import { Popover } from '@paljs/ui'
@@ -87,6 +86,13 @@ const TableRow = styledEngine(_TableRow)`
 
     &:hover {
         background-color: rgba(0,149,255,0.2);
+    }
+
+    &::after {
+      content: "-",
+      position: absolute;
+      top: 0;
+      right: 0;
     }
 `
 

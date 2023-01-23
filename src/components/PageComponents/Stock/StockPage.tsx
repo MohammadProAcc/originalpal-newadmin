@@ -63,12 +63,13 @@ export const StockPage = () => {
     setLoading(false)
   }
 
-  const columns: any[] = ['شناسه انبار', 'شناسه محصول انبار', 'سایز', 'تعداد', 'قیمت', 'قیمت با تخفیف', 'فعالیت']
+  const columns: any[] = ['شناسه انبار', 'شناسه محصول انبار', 'کد', 'سایز', 'تعداد', 'قیمت', 'قیمت با تخفیف', 'فعالیت']
 
   const data = stocks?.data?.data?.map((stock: any) => [
     // =====>> Table Columns <<=====
     stock?.id,
     stock?.product_id,
+    stock?.code,
     stock?.size,
     stock?.count,
     `${numeralize(stock?.price)} تومان`,
