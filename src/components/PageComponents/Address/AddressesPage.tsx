@@ -134,8 +134,8 @@ export const AddressesPage = () => {
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
-          آیا از حذف آدرس مورد <span className="text-danger">{itemToRemove?.id}</span> با عنوان{' '}
-          <span className="text-danger">{itemToRemove?.user?.name ?? '?'}</span> اطمینان دارید؟
+          آیا از حذف آدرس با شناسه <span className="text-danger">{itemToRemove?.id}</span> {" "}
+         اطمینان دارید؟
           <ButtonGroup>
             <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>
               خیر، منصرم شدم

@@ -79,23 +79,23 @@ export function CreateBlog() {
   }
 
   return (
-    <Layout title="ساخت وبلاگ ">
+    <Layout title="انتشار مقاله">
       <Form onSubmit={handleSubmit(onSubmit)}>
         <h1>
-          <span style={{ margin: '0 0 0 1rem' }}>ساخت وبلاگ</span>
-          <Controller
-            name="is_news"
-            control={control}
-            render={({ field }) => (
-              <Checkbox
-                style={{ color: 'transparent' }}
-                checked={field.value}
-                onChange={(e: any) => field.onChange(e ? 1 : 0)}
-              >
-                اخبار
-              </Checkbox>
-            )}
-          />
+          <span style={{ margin: "0 0 0 1rem" }}>انتشار مقاله</span>
+          {/* <Controller */}
+          {/*   name="is_news" */}
+          {/*   control={control} */}
+          {/*   render={({ field }) => ( */}
+          {/*     <Checkbox */}
+          {/*       style={{ color: "transparent" }} */}
+          {/*       checked={field.value} */}
+          {/*       onChange={(e: any) => field.onChange(e ? 1 : 0)} */}
+          {/*     > */}
+          {/*       اخبار */}
+          {/*     </Checkbox> */}
+          {/*   )} */}
+          {/* /> */}
         </h1>
 
         <InputGroup className="col mb-4" fullWidth>

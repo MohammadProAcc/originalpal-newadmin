@@ -181,14 +181,21 @@ export const EditBlogPage: React.FC = () => {
 
         <Modal on={videoToRemove} toggle={closeVideoRemovalModal}>
           <ModalBox>
-            <div style={{ marginBottom: '1rem' }}>آیا از حذف ویدیو زیر اطمینان دارید؟</div>
-            <video src={`${process.env.VID_SRC}/${videoToRemove?.u}`} controls />
+            <div style={{ marginBottom: "1rem" }}>
+              آیا از حذف ویدیو زیر اطمینان دارید؟
+            </div>
+            <video
+              src={`${process.env.VID_SRC}/${videoToRemove?.u}`}
+              controls
+              style={{ maxHeight: "75vh" }}
+            />
             <FlexContainer jc="space-between">
               <Button onClick={closeVideoRemovalModal}>انصراف</Button>
               <Button onClick={() => removeVideo(videoToRemove)} status="Danger">
                 حذف
               </Button>
             </FlexContainer>
+
           </ModalBox>
         </Modal>
 

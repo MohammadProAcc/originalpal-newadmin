@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
-import { useStore, deleteUser, pluralRemove, $_delete_role, reqSucceed, useUserStore, has } from 'utils'
+import { useStore, deleteUser, pluralRemove, $_delete_role, reqSucceed, useUserStore, has, $_get_roles_list } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, FlexContainer, HeaderButton, InputGroup } from 'components'
@@ -8,13 +8,12 @@ import { Add } from '@material-ui/icons'
 import { toast } from 'react-toastify'
 import { CreateRoleModal, EditRoleModal } from 'components'
 import { PermissionEnum } from 'types'
+import { useQuery } from '@tanstack/react-query'
 
 export const RolesPage = () => {
-  const { roles, clearList, reloadRoles } = useStore((state) => ({
-    roles: state?.roles,
-    clearList: state?.clearList,
-    reloadRoles: state?.reloadRoles,
-  }))
+
+  const { data: roles, refetch: refetchRoles } = useQuery(["roles"], () => $_get_roles_list())
+
   const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
@@ -37,7 +36,7 @@ export const RolesPage = () => {
     setLoading(true)
     const response = await $_delete_role({ role_id: item.id })
     if (reqSucceed(response)) {
-      await reloadRoles()
+      await refetchRoles()
       toast.success(`نقش ${item.name} با موفقیت حذف شد`)
       setItemToRemove(null)
     } else {
@@ -56,7 +55,7 @@ export const RolesPage = () => {
     }
     setTableSelections([])
     setItemsToRemove(null)
-    await reloadRoles()
+    await refetchRoles()
     toast.success('نقش های مورد نظر با موفقیت حذف شدند')
     setLoading(false)
   }
@@ -146,7 +145,7 @@ export const RolesPage = () => {
         </ModalBox>
       </Modal>
 
-      <CreateRoleModal onClose={toggleCreationModal} opened={showCreationModal} callback={reloadRoles} />
+      <CreateRoleModal onClose={toggleCreationModal} opened={showCreationModal} callback={refetchRoles} />
 
       <EditRoleModal onClose={toggleRoleEditModal} opened={roleToEdit} defaultValues={roleToEdit} />
     </Layout>
@@ -156,7 +155,7 @@ export const RolesPage = () => {
 interface ModalBoxProps {
   mode?: string
 }
-const ModalBox = styled(Container)<ModalBoxProps>`
+const ModalBox = styled(Container) <ModalBoxProps>`
   padding: 2rem;
   border-radius: 0.5rem;
   background-color: #fff;

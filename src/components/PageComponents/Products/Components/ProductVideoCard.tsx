@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { Media } from 'types'
-import { editProductVideo, useStore } from 'utils'
+import { editProductVideo, mediaCoersion, useStore } from 'utils'
 
 interface ProductVideoCardProps {
   media: Media
@@ -28,7 +28,7 @@ export const ProductVideoCard: React.FC<ProductVideoCardProps> = ({
   const [loading, setLoading] = useState(false)
 
   const { register, handleSubmit } = useForm({
-    defaultValues: media,
+    defaultValues: mediaCoersion(media),
   })
 
   const onSubmit = async (form: any) => {

@@ -4,7 +4,7 @@ export interface Address {
   city: string
   address: string
   province: string
-  user_id: number
+  user_id: string
   created_at: string
   updated_at: string
 }

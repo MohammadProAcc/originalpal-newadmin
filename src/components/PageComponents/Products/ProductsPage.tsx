@@ -69,11 +69,12 @@ export const ProductsPage = () => {
     product?.brand?.name ? product?.brand?.name : product?.brand ?? '-',
     product?.Enable,
     <Container>
-      {/* <Link href={`/products/${product?.id}`}>
+      {/* FIXME: fix the url */}
+      <a target="_blank" href={`${process.env.WEBSITE_DOMAIN}/products/${product?.id}`}>
         <Button style={{ marginLeft: '1rem' }} status="Info">
           مشاهده
         </Button>
-      </Link> */}
+      </a>
       {has(permissions, PermissionEnum.editProduct) && (
         <Link href={`/products/edit/${product?.id}`}>
           <a>

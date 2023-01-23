@@ -1,7 +1,8 @@
+import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { EditProductPage } from 'components'
 import { GetServerSideProps, NextPage } from 'next'
 import { PermissionEnum } from 'types'
-import { asyncHas, getAllBrands, getBrandsList, getSingleProduct } from 'utils'
+import { asyncHas, getAllBrands, getSingleProduct, getTagsList } from 'utils'
 
 const SingleProduct: NextPage = () => <EditProductPage />
 export default SingleProduct
@@ -18,15 +19,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           destination: '/dashboard',
         },
       }
-    const product = await getSingleProduct(product_id as string, token)
-    const brands = await getAllBrands(token)
+    const queryClient = new QueryClient()
+
+    await queryClient.prefetchQuery(['product', product_id], () => getSingleProduct(product_id as string, token))
+    await queryClient.prefetchQuery(['brands'], () => getAllBrands(token))
+    await queryClient.prefetchQuery(['tags'], () => getTagsList({ pages: 'total' }, token))
 
     return {
       props: {
-        initialState: {
-          product,
-          brands: brands && brands.data,
-        },
+        dehydratedState: dehydrate(queryClient),
       },
     }
   } else {

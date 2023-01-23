@@ -1,3 +1,4 @@
+import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { RolesPage } from 'components'
 import { GetServerSideProps, NextPage } from 'next'
 import { PermissionEnum } from 'types'
@@ -18,15 +19,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       }
     const roles = await $_get_roles_list(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
+    console.log(roles)
 
-    if (!roles) {
-      return {
-        props: {},
-        redirect: {
-          destination: '/auth/login',
-        },
-      }
-    }
     return {
       props: {
         initialState: {

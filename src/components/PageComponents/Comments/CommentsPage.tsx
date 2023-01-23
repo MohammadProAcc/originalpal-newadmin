@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useStore, deleteComment, editComment, toLocalDate, pluralRemove, useUserStore, has } from 'utils'
+import { useStore, deleteComment, editComment, toLocalDate, pluralRemove, useUserStore, has, getCommentsList } from 'utils'
 import Layout from 'Layouts'
 import { Button, Container, Modal } from '@paljs/ui'
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar, AnswerCommentFormModal } from 'components'
@@ -8,15 +8,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { toast } from 'react-toastify'
 import { PermissionEnum } from 'types'
+import { useQuery } from '@tanstack/react-query'
 
 export const CommentsPage = () => {
   const router = useRouter()
 
-  const { comments, clearList, updateCommentCheck } = useStore((state) => ({
-    comments: state?.comments,
-    clearList: state?.clearList,
-    updateCommentCheck: state?.updateCommentCheck,
-  }))
+  const { data: comments, refetch: refetchComments } = useQuery(["comments"], () => getCommentsList(router?.query))
+
   const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
@@ -37,7 +35,7 @@ export const CommentsPage = () => {
     setLoading(true)
     const response = await deleteComment(item?.id)
     if (response?.status === 'success') {
-      clearList('comments', item?.id)
+      refetchComments();
       setItemToRemove(null)
       toast.success('نظر با موفقیت حذف شد')
       router.back()
@@ -51,7 +49,7 @@ export const CommentsPage = () => {
     setLoading(true)
     const response = await editComment(commentId, { admin_check })
     if (response?.status === 'success') {
-      updateCommentCheck(commentId, admin_check)
+      refetchComments();
       toast.success(`نظر ${commentId} ${admin_check ? 'تایید' : 'سلب تایید'} شد`)
     } else {
       toast.error('بررسی وضعیت نظر موفیت آمیز نبود')
@@ -68,7 +66,7 @@ export const CommentsPage = () => {
       selections,
       deleteComment,
       (entity: string, id: any) => {
-        clearList(entity, id)
+        refetchComments()
         toast.success(`مورد با شناسه ${id} حذف شد`)
       },
       async () => {
@@ -221,7 +219,7 @@ export const CommentsPage = () => {
         </ModalBox>
       </Modal>
 
-      <AnswerCommentFormModal show={!!commentToReply} toggle={closeReplyModal} comment={commentToReply} />
+      <AnswerCommentFormModal show={!!commentToReply} toggle={closeReplyModal} comment={commentToReply} callback={refetchComments} />
     </Layout>
   )
 }

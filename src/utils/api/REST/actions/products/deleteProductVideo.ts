@@ -2,7 +2,7 @@ import { admin } from 'utils'
 
 export const deleteProductVideo = async (product_id: string, u: string, token: string) => {
   try {
-    const { data } = await admin(token ?? '').delete(`${process.env.API}/admin/products/${product_id}/video`, {
+    const { data } = await admin(token ?? '').post(`${process.env.API}/admin/products/${product_id}/video/delete`, {
       data: {
         u,
       },

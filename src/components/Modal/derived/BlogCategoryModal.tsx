@@ -6,7 +6,7 @@ import React from 'react'
 export function BlogCategoryModal(props: CreateBlogCategoryModalProps) {
   const { defaultValues, readOnly, ...modalProps } = props
   return (
-    <MantineModal {...modalProps}>
+    <MantineModal {...modalProps} centered>
       <BlogCategoryForm callback={props.onClose} defaultValues={defaultValues} readOnly={readOnly} />
     </MantineModal>
   )

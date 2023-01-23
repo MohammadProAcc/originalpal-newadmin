@@ -1,9 +1,8 @@
-import { Checkbox } from "@mantine/core";
 import { Button, Card, CardBody, CardHeader, InputGroup } from "@paljs/ui";
 import Cookies from "js-cookie";
 import Layout from "Layouts";
 import router from "next/router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
 import { toast } from "react-toastify";
@@ -183,7 +182,7 @@ export function CreateCoupon() {
           <CardBody>
             <InputGroup>
               <input
-                {...register("user_id", { required: true })}
+                {...register("user_id")}
                 placeholder="شناسه کاربر"
               />
             </InputGroup>

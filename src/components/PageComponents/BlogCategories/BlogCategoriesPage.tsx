@@ -127,7 +127,7 @@ export const BlogCategoriesPage = () => {
             params={router.query}
             callback={(form: any) =>
               router.push({
-                pathname: '/blog/search',
+                pathname: '/blog-categories/search',
                 query: form,
               })
             }

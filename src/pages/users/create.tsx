@@ -2,7 +2,7 @@ import { CreateUser } from 'components'
 import { GetServerSideProps } from 'next'
 import React from 'react'
 import { PermissionEnum } from 'types'
-import { asyncHas } from 'utils'
+import { $_get_roles_list, asyncHas } from 'utils'
 
 const Create = () => <CreateUser />
 
@@ -25,8 +25,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           destination: '/dashboard',
         },
       }
+    const roles = await $_get_roles_list({}, context?.req?.cookies?.[process.env.TOKEN!])
     return {
-      props: {},
+      props: {
+        initialState: {
+          roles
+        }
+      },
     }
   }
 }

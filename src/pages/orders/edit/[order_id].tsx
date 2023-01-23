@@ -1,13 +1,16 @@
+import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { EditSingleOrderPage } from 'components'
 import { GetServerSideProps, NextPage } from 'next'
 import { PermissionEnum } from 'types'
-import { admin, asyncHas, getSingleOrder } from 'utils'
+import { admin, asyncHas, getCouponsList, getSingleOrder } from 'utils'
 
 const SingleOrder: NextPage = () => <EditSingleOrderPage />
 export default SingleOrder
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const orderId = context?.query?.order_id as string;
   const token = context?.req?.cookies?.[process.env.TOKEN!]
+
   if (token) {
     if (!(await asyncHas(PermissionEnum.editOrder, token)))
       return {
@@ -16,16 +19,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           destination: '/dashboard',
         },
       }
-    const order = await getSingleOrder(context?.query?.order_id as string, context?.req?.cookies?.[process.env.TOKEN!])
 
-    const { data: stocks } = await admin(context?.req?.cookies?.[process.env.TOKEN!]).get('/stock/select')
+    const queryClient = new QueryClient();
+
+    await queryClient.prefetchQuery(["order", orderId], () => getSingleOrder(orderId, token));
+    await queryClient.prefetchQuery(["stocks"], () => (admin(token).get('/stock/select')).then(res => res.data));
+    await queryClient.prefetchQuery(["coupons"], () => getCouponsList({ page: "total" }, token));
 
     return {
       props: {
-        initialState: {
-          order: order?.data,
-          stocks: stocks.data,
-        },
+        dehydratedState: dehydrate(queryClient)
       },
     }
   } else {
