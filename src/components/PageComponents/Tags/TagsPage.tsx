@@ -1,22 +1,21 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { useStore, deleteTag, pluralRemove, useUserStore, has } from 'utils'
-import Layout from 'Layouts'
+import { Add } from '@material-ui/icons'
 import { Button, Container, Modal } from '@paljs/ui'
+import { useQuery } from '@tanstack/react-query'
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
+import Layout from 'Layouts'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Add } from '@material-ui/icons'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
+import styled from 'styled-components'
 import { PermissionEnum } from 'types'
+import { deleteTag, getTagsList, has, pluralRemove, useUserStore } from 'utils'
 
 export const TagsPage = () => {
   const router = useRouter()
 
-  const { tags, clearList } = useStore((state) => ({
-    tags: state?.tags,
-    clearList: state?.clearList,
-  }))
+  // FIXME: migrate to react-query
+  const tagsQuery = useQuery(['tags', router.query], async () => await getTagsList(router?.query))
   const permissions = useUserStore().getPermissions()
 
   const [loading, setLoading] = useState(false)
@@ -33,7 +32,7 @@ export const TagsPage = () => {
     setLoading(true)
     const response = await deleteTag(item?.id)
     if (response?.status === 'success') {
-      clearList('tags', item?.id)
+      tagsQuery.refetch()
       setItemToRemove(null)
       toast.success('برچسب با موفقیت حذف شد')
     } else {
@@ -48,7 +47,7 @@ export const TagsPage = () => {
       selections,
       deleteTag,
       (entity: string, id: any) => {
-        clearList(entity, id)
+        tagsQuery.refetch()
         toast.success(`مورد با شناسه ${id} حذف شد`)
       },
       async () => {
@@ -61,7 +60,7 @@ export const TagsPage = () => {
 
   const columns: any[] = ['شناسه برچسب', 'نام برچسب', 'نوع برچسب', 'فعالیت ها']
 
-  const data = tags?.data?.data?.map((tag: any) => [
+  const data = tagsQuery?.data?.data?.data?.map((tag: any) => [
     // =====>> Table Columns <<=====
     tag?.id,
     tag?.name,
@@ -69,16 +68,20 @@ export const TagsPage = () => {
     <Container>
       {has(permissions, PermissionEnum.readTag) && (
         <Link href={`/tags/${tag?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Info">
-            مشاهده
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Info">
+              مشاهده
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.editTag) && (
         <Link href={`/tags/edit/${tag?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.deleteTag) && (
@@ -96,17 +99,19 @@ export const TagsPage = () => {
       <FlexContainer>
         {has(permissions, PermissionEnum.addTag) && (
           <Link href="/tags/create">
-            <Button
-              style={{
-                margin: '1rem 0 1rem 1rem',
-                display: 'flex',
-              }}
-              status="Success"
-              appearance="outline"
-            >
-              افزودن برچسب
-              <Add />
-            </Button>
+            <a>
+              <Button
+                style={{
+                  margin: '1rem 0 1rem 1rem',
+                  display: 'flex',
+                }}
+                status="Success"
+                appearance="outline"
+              >
+                افزودن برچسب
+                <Add />
+              </Button>
+            </a>
           </Link>
         )}
         {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteTag) && (
@@ -119,7 +124,7 @@ export const TagsPage = () => {
       {has(permissions, PermissionEnum.browseTag) && (
         <>
           <SearchBar
-            fields={tags.fields}
+            fields={tagsQuery?.data?.data?.fields}
             entity="tags"
             params={router.query}
             callback={(form: any) =>
@@ -132,7 +137,7 @@ export const TagsPage = () => {
 
           <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
           <PaginationBar
-            totalPages={tags?.data?.last_page}
+            totalPages={tagsQuery?.data?.data?.tags?.data?.last_page}
             activePage={router.query.page ? Number(router.query.page) : 1}
             router={router}
           />

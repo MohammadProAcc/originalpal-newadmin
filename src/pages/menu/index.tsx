@@ -12,7 +12,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (token) {
     const menu = await getMenusList(params, token)
-    console.log(menu)
     if (menu?.status === 401) {
       return {
         props: {},

@@ -37,30 +37,17 @@ export function DiscountList() {
     } else {
       function validate(entry: [any, any], target: string): any {
         if (!entry || !entry[1]) return false
-        if (typeof entry[1] === "object") {
-          return Object.entries(entry[1])
-            .some((entries) =>
-              validate(entries, target)
-            )
+        if (typeof entry[1] === 'object') {
+          return Object.entries(entry[1]).some((entries) => validate(entries, target))
         }
-        return String(entry[1]).includes(target);
+        return String(entry[1]).includes(target)
       }
 
       setStocks(
-        store.stocks
-          .filter((_item: any) =>
-            Object.entries(_item)
-              .some((entries) =>
-                validate(entries, e.target.value)
-              )
-          )
+        store.stocks.filter((_item: any) => Object.entries(_item).some((entries) => validate(entries, e.target.value))),
       )
     }
   }
-
-  useEffect(() => {
-    console.log(stocks)
-  }, [stocks])
 
   return (
     <FormProvider {...formMethods}>

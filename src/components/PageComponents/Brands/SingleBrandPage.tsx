@@ -1,9 +1,10 @@
-import { removeItem, toLocalDate, useStore } from 'utils'
+import { removeItem, toLocalDate, toLocalTime, useStore } from 'utils'
 import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import React, { useState } from 'react'
 import { Button, deleteBrand, FlexContainer, HeaderButton, ModalBox } from 'components'
 import router from 'next/router'
+import { DatesCard } from 'components/Card/DatesCard'
 
 export const SingleBrandPage: React.FC = () => {
   const { brand } = useStore((state: any) => ({
@@ -79,19 +80,7 @@ export const SingleBrandPage: React.FC = () => {
         <CardBody>{brand?.meta_keywords ?? '-'}</CardBody>
       </Card>
 
-      <Card>
-        <CardHeader>تاریخ ها</CardHeader>
-        <CardBody>
-          <Card>
-            <CardHeader>ساخته شده در</CardHeader>
-            <CardBody>{toLocalDate(brand?.created_at)}</CardBody>
-          </Card>
-          <Card>
-            <CardHeader>بروز شده در</CardHeader>
-            <CardBody>{toLocalDate(brand?.updated_at)}</CardBody>
-          </Card>
-        </CardBody>
-      </Card>
+      <DatesCard createdAt={brand?.created_at} updatedAt={brand?.updated_at} />
     </Layout>
   )
 }

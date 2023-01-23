@@ -1,5 +1,6 @@
 import { Alert, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import { Button, Dot, FlexContainer, HeaderButton, ModalBox } from 'components'
+import { DatesCard } from 'components/Card/DatesCard'
 import Layout from 'Layouts'
 import _Image from 'next/image'
 import router from 'next/router'
@@ -12,7 +13,6 @@ export const MainPage: React.FC = () => {
   const { banner } = useStore((state: any) => ({
     banner: state?.banner,
   }))
-  console.log(banner)
 
   const [loading, setLoading] = useState(false)
 
@@ -123,6 +123,8 @@ export const MainPage: React.FC = () => {
           <span>تگ title : {banner?.media?.t}</span>
         </CardBody>
       </Card>
+
+      <DatesCard createdAt={banner?.created_at} updatedAt={banner?.updated_at} />
     </Layout>
   )
 }

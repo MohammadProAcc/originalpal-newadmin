@@ -32,7 +32,6 @@ export const OrdersPage = () => {
 
   const removeItem = async (item: any) => {
     setLoading(true)
-    console.log(item)
     const response = await deleteOrder(item?.id)
     if (response?.status === 'success') {
       clearList('orders', item?.id)
@@ -41,7 +40,6 @@ export const OrdersPage = () => {
     } else {
       toast.error('عملیات حذف موفقیت آمیز نبود')
     }
-    console.log(response)
     setLoading(false)
   }
 
@@ -86,16 +84,20 @@ export const OrdersPage = () => {
     <Container>
       {has(permissions, PermissionEnum.readOrder) && (
         <Link href={`/orders/${order?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Info">
-            مشاهده
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Info">
+              مشاهده
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.editUser) && (
         <Link href={`/orders/edit/${order?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.deleteUser) && (

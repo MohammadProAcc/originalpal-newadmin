@@ -5,6 +5,7 @@ import React, { useState } from 'react'
 import { FlexContainer, HeaderButton, ModalBox } from 'components'
 import router from 'next/router'
 import { PermissionEnum } from 'types'
+import { DatesCard } from 'components/Card/DatesCard'
 
 export const SingleUserPage: React.FC = () => {
   const { user } = useStore((state: any) => ({
@@ -95,19 +96,7 @@ export const SingleUserPage: React.FC = () => {
         <CardBody>{user?.phone_number ?? '-'}</CardBody>
       </Card>
 
-      <Card>
-        <CardHeader>تاریخ ها</CardHeader>
-        <CardBody>
-          <Card>
-            <CardHeader>ساخته شده در</CardHeader>
-            <CardBody>{toLocalDate(user?.created_at)}</CardBody>
-          </Card>
-          <Card>
-            <CardHeader>بروز شده در</CardHeader>
-            <CardBody>{toLocalDate(user?.updated_at)}</CardBody>
-          </Card>
-        </CardBody>
-      </Card>
+      <DatesCard createdAt={user?.created_at} updatedAt={user?.updated_at} />
     </Layout>
   )
 }

@@ -48,7 +48,6 @@ export const StockPage = () => {
     if (selections?.length > 0) {
       const deletions = await selections?.map(async (id) => {
         const response = await deleteStock(id)
-        console.log(response)
 
         if (response?.status === 'success') {
           clearList('stocks', id)
@@ -76,14 +75,18 @@ export const StockPage = () => {
     `${numeralize(stock?.priceAfterDiscount)} تومان`,
     <Container>
       <Link href={`/stock/${stock?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
-          مشاهده
-        </Button>
+        <a>
+          <Button style={{ marginLeft: '1rem' }} status="Info">
+            مشاهده
+          </Button>
+        </a>
       </Link>
       <Link href={`/stock/edit/${stock?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Primary">
-          ویرایش
-        </Button>
+        <a>
+          <Button style={{ marginLeft: '1rem' }} status="Primary">
+            ویرایش
+          </Button>
+        </a>
       </Link>
       <Button status="Danger" onClick={() => setItemToRemove(stock)}>
         حذف
@@ -98,17 +101,19 @@ export const StockPage = () => {
       <FlexContainer>
         {has(permissions, PermissionEnum.editStock) && (
           <Link href="/stock/create">
-            <Button
-              style={{
-                margin: '1rem 0 1rem 1rem',
-                display: 'flex',
-              }}
-              status="Success"
-              appearance="outline"
-            >
-              افزودن انبار
-              <Add />
-            </Button>
+            <a>
+              <Button
+                style={{
+                  margin: '1rem 0 1rem 1rem',
+                  display: 'flex',
+                }}
+                status="Success"
+                appearance="outline"
+              >
+                افزودن انبار
+                <Add />
+              </Button>
+            </a>
           </Link>
         )}
         {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteStock) && (

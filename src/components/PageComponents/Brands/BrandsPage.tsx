@@ -37,6 +37,7 @@ export const BrandsPage = () => {
       clearList('brands', item?.id)
       setItemToRemove(null)
       toast.success('برند با موفقیت حذف شد')
+      router.back()
     } else {
       toast.error('حذف برند موفقیت آمیز نبود')
     }
@@ -68,17 +69,21 @@ export const BrandsPage = () => {
     brand?.name,
     <Container>
       {has(permissions, PermissionEnum.readBrand) && (
-        <Link href={`/brands/${brand?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Info">
-            مشاهده
-          </Button>
+        <Link href={`/brands/${brand?.id}`} passHref>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Info">
+              مشاهده
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.editBrand) && (
-        <Link href={`/brands/edit/${brand?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+        <Link href={`/brands/edit/${brand?.id}`} passHref>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.deleteBrand) && (
@@ -94,20 +99,22 @@ export const BrandsPage = () => {
       <h1>برند ها</h1>
 
       <FlexContainer>
-        <Link href="/brands/create">
-          {has(permissions, PermissionEnum.editBrand) && (
-            <Button
-              style={{
-                margin: '1rem 0 1rem 1rem',
-                display: 'flex',
-              }}
-              status="Success"
-              appearance="outline"
-            >
-              افزودن برند
-              <Add />
-            </Button>
-          )}
+        <Link href="/brands/create" passHref>
+          <a>
+            {has(permissions, PermissionEnum.editBrand) && (
+              <Button
+                style={{
+                  margin: '1rem 0 1rem 1rem',
+                  display: 'flex',
+                }}
+                status="Success"
+                appearance="outline"
+              >
+                افزودن برند
+                <Add />
+              </Button>
+            )}
+          </a>
         </Link>
         {tableSelections?.length > 0 && has(permissions, PermissionEnum.browseBrand) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>

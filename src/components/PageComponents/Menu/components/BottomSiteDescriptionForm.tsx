@@ -35,11 +35,8 @@ export const BottomSiteDescriptionForm: React.FC<IBottomSiteDescriptionFormProps
     menu?.findIndex((_menu) => _menu?.title === description?.title)
 
   const findParagraphIndex = (description: BottomSiteDescription, paragraph: string) => {
-    console.log('selected descriotion >', description)
     const descIndex = findDescriptionIndex(description)
-    console.log('desc index :', descIndex)
     const paragraphIndex = menu[descIndex]?.paragraphs?.findIndex((_paragraph) => _paragraph === paragraph)
-    console.log('paragraph index :', paragraphIndex)
     return paragraphIndex
   }
 
@@ -64,8 +61,6 @@ export const BottomSiteDescriptionForm: React.FC<IBottomSiteDescriptionFormProps
       produce(_menu, (draft) => {
         const descriptionIndex = findDescriptionIndex(selectedDescription!)
         const paragraphIndex = findParagraphIndex(selectedDescription!, selectedParagraph!)
-        console.log('description index >', descriptionIndex)
-        console.log('paragraph index >', paragraphIndex)
 
         if (descriptionIndex >= 0) {
           if (paragraphIndex >= 0) {
@@ -109,7 +104,6 @@ export const BottomSiteDescriptionForm: React.FC<IBottomSiteDescriptionFormProps
   }
 
   const deleteDescription = (description: BottomSiteDescription) => {
-    console.log(findDescriptionIndex(description))
     setMenu((_menu) =>
       produce(_menu, (draft) => {
         draft?.splice(findDescriptionIndex(description), 1)

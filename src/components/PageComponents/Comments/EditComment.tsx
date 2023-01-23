@@ -57,7 +57,6 @@ export const EditCommentPage: React.FC = () => {
     const response = await editComment(commentId, { admin_check })
     if (response?.status === 'success') {
       const { data: updatedComment } = await getSingleComment(comment?.id)
-      console.log(updatedComment)
       updateComment(updatedComment)
       toast.success(`نظر ${commentId} ${admin_check ? 'تایید' : 'سلب تایید'} شد`)
     } else {

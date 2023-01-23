@@ -66,12 +66,9 @@ export const MenuPage = () => {
   const [menuToEdit, setMenuToEdit] = useState<any>(null)
   const [editMenuState, setEditMenuState] = useState<any>(null)
 
-  useEffect(() => console.log(editMenuState), [editMenuState])
-
   const updateMenu = async (form: any) => {
     setLoading(true)
 
-    console.log(editMenuState)
     const response = await editMenu(menuToEdit?.id, { items: editMenuState })
 
     if (response?.status === 'success') {
@@ -94,9 +91,11 @@ export const MenuPage = () => {
     <Container>
       {has(permissions, PermissionEnum.editMenu) && (
         <Link href={`/menu/edit/${menu?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
     </Container>,

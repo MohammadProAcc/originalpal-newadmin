@@ -37,6 +37,7 @@ export const BlogCategoriesPage = () => {
       clearList('blogCategories', item?.id)
       setItemToRemove(null)
       toast.success('دسته‌بندی مقاله با موفقیت حذف شد')
+      router.back()
     } else {
       toast.error('حذف دسته‌بندی مقاله موفقیت آمیز نبود')
     }

@@ -4,6 +4,7 @@ import { Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import React, { useState } from 'react'
 import { FlexContainer, HeaderButton, ModalBox } from 'components'
 import router from 'next/router'
+import { DatesCard } from 'components/Card/DatesCard'
 
 export const SingleCouponPage: React.FC = () => {
   const { coupon } = useStore((state: any) => ({
@@ -108,25 +109,7 @@ export const SingleCouponPage: React.FC = () => {
         <CardBody>{coupon?.user_id ?? '-'}</CardBody>
       </Card>
 
-      <Card>
-        <CardHeader>تاریخ ها</CardHeader>
-        <CardBody>
-          <Card>
-            <CardHeader>ساخته شده در</CardHeader>
-            <CardBody>{toLocalDate(coupon?.created_at) ?? '-'}</CardBody>
-          </Card>
-
-          <Card>
-            <CardHeader>بروز شده در</CardHeader>
-            <CardBody>{toLocalDate(coupon?.updated_at) ?? '-'}</CardBody>
-          </Card>
-
-          <Card>
-            <CardHeader>حذف شده در</CardHeader>
-            <CardBody>{toLocalDate(coupon?.delelted_at) ?? '-'}</CardBody>
-          </Card>
-        </CardBody>
-      </Card>
+      <DatesCard createdAt={coupon?.created_at} updatedAt={coupon?.updated_at} deletedAt={coupon?.deleted_at} />
     </Layout>
   )
 }

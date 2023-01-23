@@ -1,102 +1,82 @@
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Checkbox,
-  InputGroup
-} from "@paljs/ui";
-import { BasicEditor } from "components";
-import Cookies from "js-cookie";
-import Layout from "Layouts";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import {
-  Controller,
-  useForm
-} from "react-hook-form";
-import Select from "react-select";
-import { toast } from "react-toastify";
-import styled from "styled-components";
-import { PostLink } from "types";
-import { createBlog, search_in, uploadBlogImage, uploadBlogVideo } from "utils";
-import { handlePostLink, postLinkOptions } from "./handlePostLink";
+import { Button, Card, CardBody, CardHeader, Checkbox, InputGroup } from '@paljs/ui'
+import { BasicEditor } from 'components'
+import Cookies from 'js-cookie'
+import Layout from 'Layouts'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { Controller, useForm, UseFormGetValues, UseFormSetValue } from 'react-hook-form'
+import Select from 'react-select'
+import { toast } from 'react-toastify'
+import styled from 'styled-components'
+import { PostLink } from 'types'
+import { createBlog, search_in, uploadBlogImage, uploadBlogVideo } from 'utils'
+import { handlePostLink, postLinkOptions } from './handlePostLink'
 
 export function CreateBlog() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [postLinkToAdd, setPostLinkToAdd] = useState<PostLink | null>(null);
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [postLinkToAdd, setPostLinkToAdd] = useState<PostLink | null>(null)
 
-  const { register, handleSubmit, control, getValues, setValue } = useForm();
+  const { register, handleSubmit, control, getValues, setValue } = useForm()
 
   const onSubmit = async (form: any) => {
-    setLoading(true);
+    setLoading(true)
 
-    const video = form.video;
-    delete form.video;
+    const video = form.video
+    delete form.video
 
     // FIXME: temporary
-    const srcvideo = form?.srcvideo;
-    delete form?.srcvideo;
+    const srcvideo = form?.srcvideo
+    delete form?.srcvideo
 
-    const thumb = form?.thumb[0];
-    delete form?.thumb;
+    const thumb = form?.thumb[0]
+    delete form?.thumb
 
-    const endImage = form?.endimage[0];
-    delete form?.endimage;
+    const endImage = form?.endimage[0]
+    delete form?.endimage
 
-    const response = await createBlog(form, Cookies.get(process.env.TOKEN!));
+    const response = await createBlog(form, Cookies.get(process.env.TOKEN!))
     if (response !== null) {
       const { data: blogs } = await search_in(
-        "blog",
+        'blog',
         {
-          key: "title",
-          type: "=",
+          key: 'title',
+          type: '=',
           value: form?.title,
         },
         router?.query,
-      );
-      const blogId = blogs?.data[blogs?.total - 1]?.id;
-      console.log("blogId", blogId);
+      )
+      const blogId = blogs?.data[blogs?.total - 1]?.id
 
       if (thumb) {
-        const thumbUploadResponse = await uploadBlogImage(
-          blogId,
-          "thumb",
-          thumb,
-        );
-        if (thumbUploadResponse?.status === "success") {
-          toast.success("تصویر بنر وبلاگ آپلود شد");
+        const thumbUploadResponse = await uploadBlogImage(blogId, 'thumb', thumb)
+        if (thumbUploadResponse?.status === 'success') {
+          toast.success('تصویر بنر وبلاگ آپلود شد')
         }
       }
 
       if (endImage) {
-        const endimageUploadResponse = await uploadBlogImage(
-          blogId,
-          "endimage",
-          endImage,
-        );
-        if (endimageUploadResponse?.status === "success") {
-          toast.success("تصویر پایانی وبلاگ آپلود شد");
+        const endimageUploadResponse = await uploadBlogImage(blogId, 'endimage', endImage)
+        if (endimageUploadResponse?.status === 'success') {
+          toast.success('تصویر پایانی وبلاگ آپلود شد')
         }
       }
 
       if (video[0]) {
-        const videoUploadResponse = await uploadBlogVideo(blogId, video[0]);
-        console.log(videoUploadResponse);
-        if (videoUploadResponse?.status === "success") {
-          toast.success("ویدیو وبلاگ آپلود شد");
+        const videoUploadResponse = await uploadBlogVideo(blogId, video[0])
+        if (videoUploadResponse?.status === 'success') {
+          toast.success('ویدیو وبلاگ آپلود شد')
         }
       }
 
-      toast.success("وبلاگ با موفقیت ساخته شد");
-      router.push(`/blog/edit/${blogId}`);
+      toast.success('وبلاگ با موفقیت ساخته شد')
+      router.push(`/blog/edit/${blogId}`)
     } else {
-      toast.error("ساخت وبلاگ موفقیت آمیز نبود");
+      toast.error('ساخت وبلاگ موفقیت آمیز نبود')
     }
 
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   return (
     <Layout title="انتشار مقاله">
@@ -120,10 +100,7 @@ export function CreateBlog() {
 
         <InputGroup className="col mb-4" fullWidth>
           <label>عنوان (H1)</label>
-          <input
-            {...register("title", { required: true })}
-            placeholder="عنوان"
-          />
+          <input {...register('title', { required: true })} placeholder="عنوان" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
@@ -133,38 +110,33 @@ export function CreateBlog() {
             rules={{
               required: true,
             }}
-            render={({ field }) => (
-              <BasicEditor callback={field?.onChange} title="محتوا" />
-            )}
+            render={({ field }) => <BasicEditor callback={field?.onChange} title="محتوا" />}
           />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>اسلاگ</label>
-          <input
-            {...register("slug", { required: true })}
-            placeholder="اسلاگ"
-          />
+          <input {...register('slug', { required: true })} placeholder="اسلاگ" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>نویسنده</label>
-          <input {...register("writer")} placeholder="نویسنده" />
+          <input {...register('writer')} placeholder="نویسنده" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>برچسب ها</label>
-          <input {...register("labels")} placeholder="برچسب ها" />
+          <input {...register('labels')} placeholder="برچسب ها" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>دسته بندی ها</label>
-          <input {...register("show_categories")} placeholder="دسته بندی ها" />
+          <input {...register('show_categories')} placeholder="دسته بندی ها" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>تصویر بنر</label>
-          <input type="file" {...register("thumb")} placeholder="تصویر بنر" />
+          <input type="file" {...register('thumb')} placeholder="تصویر بنر" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
@@ -172,9 +144,7 @@ export function CreateBlog() {
           <Controller
             control={control}
             name="summary"
-            render={({ field }) => (
-              <BasicEditor callback={field?.onChange} title="خلاصه" />
-            )}
+            render={({ field }) => <BasicEditor callback={field?.onChange} title="خلاصه" />}
           />
         </InputGroup>
 
@@ -183,28 +153,22 @@ export function CreateBlog() {
           <CardBody>
             <InputGroup className="col" fullWidth>
               <label>کلمات مترادف (meta_keywords)</label>
-              <input
-                {...register("meta_keywords")}
-                placeholder="کلمات مترادف"
-              />
+              <input {...register('meta_keywords')} placeholder="کلمات مترادف" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>عنوان متا</label>
-              <input {...register("meta_title")} placeholder="عنوان متا" />
+              <input {...register('meta_title')} placeholder="عنوان متا" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>توضیحات متا</label>
-              <input
-                {...register("meta_description")}
-                placeholder="توضیحات متا"
-              />
+              <input {...register('meta_description')} placeholder="توضیحات متا" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>عنوان صفحه (title)</label>
-              <input {...register("title_page")} placeholder="عنوان" />
+              <input {...register('title_page')} placeholder="عنوان" />
             </InputGroup>
           </CardBody>
         </Card>
@@ -214,35 +178,27 @@ export function CreateBlog() {
           <CardBody>
             <InputGroup className="col" fullWidth>
               <label>تصویر پایانی</label>
-              <input
-                type="file"
-                {...register("endimage")}
-                placeholder="تصویر پایانی"
-              />
+              <input type="file" {...register('endimage')} placeholder="تصویر پایانی" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>عنوان پایانی</label>
-              <input {...register("endtitle")} placeholder="عنوان پایانی" />
+              <input {...register('endtitle')} placeholder="عنوان پایانی" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>تگ آلت تصویر پایانی</label>
-              <input
-                {...register("endtitle")}
-                placeholder="تگ آلت تصویر پایانی"
-              />
+              <input {...register('endtitle')} placeholder="تگ آلت تصویر پایانی" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>متن تصویر پایانی</label>
-              <input {...register("endtext")} placeholder="متن تصویر پایانی" />
+              <input {...register('endtext')} placeholder="متن تصویر پایانی" />
             </InputGroup>
           </CardBody>
         </Card>
 
-        {
-          /* <InputGroup className="col" fullWidth>
+        {/* <InputGroup className="col" fullWidth>
           <label>is board</label>
           <Controller
             control={control}
@@ -276,12 +232,11 @@ export function CreateBlog() {
             name="iscast"
             render={({ field }) => <Checkbox style={{ color: 'transparent' }} checked={field?.value} {...field} />}
           />
-        </InputGroup> */
-        }
+        </InputGroup> */}
 
         <InputGroup className="col" fullWidth>
           <label>ویدیو</label>
-          <input type="file" placeholder="ویدیو بنر" {...register("video")} />
+          <input type="file" placeholder="ویدیو بنر" {...register('video')} />
         </InputGroup>
 
         {/* <InputGroup className="col" fullWidth> */}
@@ -296,7 +251,7 @@ export function CreateBlog() {
 
         <InputGroup className="col" fullWidth>
           <label>ترند</label>
-          <input {...register("trend")} placeholder="ترند" />
+          <input {...register('trend')} placeholder="ترند" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
@@ -308,14 +263,15 @@ export function CreateBlog() {
                 setPostLinkToAdd((_curr) =>
                   _curr
                     ? {
-                      ..._curr,
-                      name: value,
-                    }
+                        ..._curr,
+                        name: value,
+                      }
                     : {
-                      name: value,
-                      href: "",
-                    }
-                )}
+                        name: value,
+                        href: '',
+                      },
+                )
+              }
             />
             <input
               placeholder="پیوند پست"
@@ -325,10 +281,11 @@ export function CreateBlog() {
                   _curr
                     ? { ..._curr, href: e.target.value }
                     : {
-                      name: "",
-                      href: e.target.value,
-                    }
-                )}
+                        name: '',
+                        href: e.target.value,
+                      },
+                )
+              }
             />
             <Button
               status="Success"
@@ -337,30 +294,25 @@ export function CreateBlog() {
                 handlePostLink(
                   postLinkToAdd,
                   getValues,
-                  (value: PostLink[]) => setValue("post_links", value),
+                  (value: PostLink[]) => setValue('post_links', value),
                   () => {
-                    setPostLinkToAdd((_curr: any) => ({ ..._curr, href: "" }));
-                    (document.getElementById("post-link-name")! as any).value =
-                      "";
+                    setPostLinkToAdd((_curr: any) => ({ ..._curr, href: '' }))
+                    ;(document.getElementById('post-link-name')! as any).value = ''
                   },
-                )}
+                )
+              }
             >
               افزودن پیوند پست
             </Button>
           </InputGroup>
         </InputGroup>
 
-        <Button
-          disabled={loading}
-          style={{ width: "10rem", marginTop: "3rem" }}
-          status="Success"
-          appearance="outline"
-        >
-          {loading ? "..." : "ساخت وبلاگ"}
+        <Button disabled={loading} style={{ width: '10rem', marginTop: '3rem' }} status="Success" appearance="outline">
+          {loading ? '...' : 'ساخت وبلاگ'}
         </Button>
       </Form>
     </Layout>
-  );
+  )
 }
 
 const Form = styled.form`
@@ -383,4 +335,4 @@ const Form = styled.form`
   label {
     margin-bottom: 1rem;
   }
-`;
+`

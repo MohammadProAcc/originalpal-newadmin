@@ -15,7 +15,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           destination: '/dashboard',
         },
       }
-    const { data: orders } = await search_in(
+    const response = await search_in(
       'orders',
       {
         key: context?.query?.key,
@@ -26,11 +26,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       context.req.cookies[process.env.TOKEN!],
     )
 
+    if (!response) {
+      return {
+        props: {},
+        redirect: {
+          destination: '/orders',
+          permanent: false,
+        },
+      }
+    }
+
     return {
       props: {
         initialState: {
           orders: {
-            data: orders,
+            data: response?.data,
             fields: [
               'id',
               'number',

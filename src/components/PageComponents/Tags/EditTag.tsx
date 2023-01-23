@@ -25,6 +25,7 @@ export const EditTagPage: React.FC = () => {
     const response = await editTag(tag?.id, form)
     if (response?.status === 'success') {
       toast.success('برچسب بروز شد')
+      router.back()
     } else {
       toast.error('بروزرسانی برچسب موفقیت آمیز نبود')
     }

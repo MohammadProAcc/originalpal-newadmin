@@ -31,7 +31,6 @@ export const AddressesPage = () => {
 
   const removeItem = async (item: any) => {
     setLoading(true)
-    console.log(item)
     const response = await deleteAddress(item?.id)
     if (response?.status === 'success') {
       clearList('addresses', item?.id)
@@ -40,7 +39,6 @@ export const AddressesPage = () => {
     } else {
       toast.error('عملیات حذف موفقیت آمیز نبود')
     }
-    console.log(response)
     setLoading(false)
   }
 
@@ -75,17 +73,21 @@ export const AddressesPage = () => {
     address?.postalcode,
     <Container>
       {has(permissions, PermissionEnum.readAddress) && (
-        <Link href={`/address/${address?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Info">
-            مشاهده
-          </Button>
+        <Link href={`/address/${address?.id}`} passHref>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Info">
+              مشاهده
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.editAddress) && (
-        <Link href={`/address/edit/${address?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+        <Link href={`/address/edit/${address?.id}`} passHref>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.deleteAddress) && (

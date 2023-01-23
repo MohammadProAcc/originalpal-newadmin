@@ -1,14 +1,15 @@
-import { deleteUser, editUser, getSingleUser, has, removeItem, translator, useStore, useUserStore } from 'utils'
-import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, InputGroup, Modal, Select } from '@paljs/ui'
 import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
-import { Controller, useForm } from 'react-hook-form'
+import Layout from 'Layouts'
+import { useRouter } from 'next/router'
 import React, { useState } from 'react'
-import router from 'next/router'
+import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { PermissionEnum } from 'types'
+import { deleteUser, editUser, getSingleUser, has, removeItem, translator, useStore, useUserStore } from 'utils'
 
 export const EditUserPage: React.FC = () => {
+  const router = useRouter()
   const { user, updateUser, storeRoles } = useStore((state: any) => ({
     user: state?.user,
     storeRoles: state?.roles,
@@ -50,13 +51,13 @@ export const EditUserPage: React.FC = () => {
     delete form.phone
     delete form.email
 
-    console.log(form)
     form.roles = form.roles?.map((_role: any) => _role.value)
     const response = await editUser(user?.id, form)
     if (response?.status === 'success') {
       const updatedUser = await getSingleUser(user?.id)
       updateUser(updatedUser)
       toast.success('کاربر بروز شد')
+      router.back()
     } else {
       toast.error('بروزرسانی کاربر موفقیت آمیز نبود')
     }

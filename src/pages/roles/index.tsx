@@ -18,12 +18,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           destination: '/dashboard',
         },
       }
-    const queryClient = new QueryClient();
-    await queryClient.prefetchQuery(['roles'], () => $_get_roles_list(token))
+    const roles = await $_get_roles_list(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
+    console.log(roles)
 
     return {
       props: {
-        dehydratedState: dehydrate(queryClient)
+        initialState: {
+          roles,
+        },
       },
     }
   } else {

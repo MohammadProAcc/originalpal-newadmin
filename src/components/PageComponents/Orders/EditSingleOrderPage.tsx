@@ -181,6 +181,7 @@ export const EditSingleOrderPage: React.FC = () => {
     const response = await editOrder(order.id, { user: form })
     if (response?.status === 'success') {
       toast.success('تغییرات کاربر اعمال شد')
+      router.back()
     } else {
       toast.error('اعمال تغییرات کاربر موفقیت آمیز نبود')
     }
@@ -194,9 +195,9 @@ export const EditSingleOrderPage: React.FC = () => {
 
   const addressOnSubmit = async (form: any) => {
     const response = await editOrderAddress(order?.id, order?.address?.id, form)
-    console.log(response)
     if (response?.status === 'success') {
       toast.success('آدرس با موفقیت بروز شد')
+      router.back()
     } else {
       toast.error('بروزرسانی آدرس موفقیت آمیز نبود')
     }
@@ -208,19 +209,13 @@ export const EditSingleOrderPage: React.FC = () => {
       const { data: response } = await admin().put(`/orders/${router?.query?.order_id}`, form)
       if (response?.status === 'success') {
         toast.success('سفارش با موفقیت بروز شد')
+        router.back()
       }
     } catch (err) {
-      console.log(err)
       toast.error('بروزرسانی سفارش موفقیت آمیز نبود')
     }
     setLoading(false)
   }
-
-  // const { register: smsRegister, handleSubmit: smsHandleSubmit } = useForm()
-
-  // const submitSmsForm = async (form: any) => {
-  //   console.log(form)
-  // }
 
   const removeStock = async (stock: any) => {
     setLoading(true)

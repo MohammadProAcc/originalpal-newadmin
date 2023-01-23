@@ -47,6 +47,7 @@ export const SingleAddressPage: React.FC = () => {
         )}
       </h1>
 
+      {/* FIXME: make it static */}
       {Object.keys(address).map((key) => (
         <Card key={key}>
           <CardHeader>{translator(key)}</CardHeader>

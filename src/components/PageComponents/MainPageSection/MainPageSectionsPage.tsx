@@ -50,7 +50,6 @@ export const MainPageSectionPage = () => {
       const deletions = selections?.map(async (id) => {
         const response = await deleteMainPageSection(id)
 
-        console.log('delete section response >>> ', response)
         if (response?.status === 'success') {
           clearList(id)
 
@@ -67,7 +66,6 @@ export const MainPageSectionPage = () => {
 
   const columns: any[] = ['شناسه بخش ', 'نوع بخش ', 'عنوان', 'اولویت', 'فعالیت']
 
-  console.log(mainPageSections)
   const data = mainPageSections?.data?.map((mainPageSection: any) => [
     // =====>> Table Columns <<=====
     mainPageSection?.id,
@@ -77,16 +75,20 @@ export const MainPageSectionPage = () => {
     <Container>
       {has(permissions, PermissionEnum.readMainPageSection) && (
         <Link href={`/main-page-sections/${mainPageSection?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Info">
-            مشاهده
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Info">
+              مشاهده
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.editMainPageSection) && (
         <Link href={`/main-page-sections/edit/${mainPageSection?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.deleteMainPageSection) && (
@@ -104,17 +106,19 @@ export const MainPageSectionPage = () => {
       <FlexContainer>
         {has(permissions, PermissionEnum.editMainPageSection) && (
           <Link href="/main-page-sections/create">
-            <Button
-              style={{
-                margin: '1rem 0 1rem 1rem',
-                display: 'flex',
-              }}
-              status="Success"
-              appearance="outline"
-            >
-              افزودن بخش های صفحه اصلی
-              <Add />
-            </Button>
+            <a>
+              <Button
+                style={{
+                  margin: '1rem 0 1rem 1rem',
+                  display: 'flex',
+                }}
+                status="Success"
+                appearance="outline"
+              >
+                افزودن بخش های صفحه اصلی
+                <Add />
+              </Button>
+            </a>
           </Link>
         )}
         {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteMainPageSection) && (

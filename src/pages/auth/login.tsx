@@ -25,7 +25,6 @@ export default function Login() {
     const user = await login(form)
     if (user !== null) {
       Cookies.set(process.env.TOKEN!, user.token)
-      console.log("^^^^^^^^^^^^^ USER HERE ^^^^^^^^^^^^^^",user);
       setUser!(user ?? initialLoginResponseUser)
       toast.success('خوش آمدید')
       router.push('/dashboard')

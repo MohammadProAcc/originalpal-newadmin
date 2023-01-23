@@ -16,18 +16,28 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           destination: '/dashboard',
         },
       }
-    const { data: result } = await search_in(
+    const response = await search_in(
       'main-page/sections',
       context.query,
       context.query,
       context.req.cookies[process.env.TOKEN!],
     )
 
+    if (!response) {
+      return {
+        props: {},
+        redirect: {
+          destination: '/main-page-sections',
+          permanent: false,
+        },
+      }
+    }
+
     return {
       props: {
         initialState: {
           mainPageSections: {
-            data: result,
+            data: response?.data,
             fields: [],
           },
         },

@@ -68,17 +68,21 @@ export const BlogsPage = () => {
     blog?.title,
     <Container>
       {has(permissions, PermissionEnum.readBlog) && (
-        <Link href={`/blog/${blog?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Info">
-            مشاهده
-          </Button>
+        <Link href={`/blog/${blog?.id}`} passHref>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Info">
+              مشاهده
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.editBlog) && (
-        <Link href={`/blog/edit/${blog?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+        <Link href={`/blog/edit/${blog?.id}`} passHref>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.deleteBlog) && (
@@ -95,18 +99,20 @@ export const BlogsPage = () => {
 
       <FlexContainer>
         {has(permissions, PermissionEnum.editBlog) && (
-          <Link href="/blog/create">
-            <Button
-              style={{
-                margin: '1rem 0 1rem 1rem',
-                display: 'flex',
-              }}
-              status="Success"
-              appearance="outline"
-            >
-              افزودن وبلاگ
-              <Add />
-            </Button>
+          <Link href="/blog/create" passHref>
+            <a>
+              <Button
+                style={{
+                  margin: '1rem 0 1rem 1rem',
+                  display: 'flex',
+                }}
+                status="Success"
+                appearance="outline"
+              >
+                افزودن وبلاگ
+                <Add />
+              </Button>
+            </a>
           </Link>
         )}
         {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteBlog) && (

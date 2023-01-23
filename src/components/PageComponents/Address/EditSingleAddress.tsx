@@ -1,14 +1,15 @@
-import { deleteAddress, editAddress, removeItem, useStore, has, useUserStore } from 'utils'
-import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, InputGroup, Modal } from '@paljs/ui'
 import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
+import Layout from 'Layouts'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
-import { useState } from 'react'
-import router from 'next/router'
 import { PermissionEnum } from 'types'
+import { deleteAddress, editAddress, has, removeItem, useStore, useUserStore } from 'utils'
 
 export const EditAddressPage: React.FC = () => {
+  const router = useRouter()
   const { address } = useStore((state: any) => ({
     address: state?.address,
   }))
@@ -20,9 +21,9 @@ export const EditAddressPage: React.FC = () => {
 
   const onSubmit = async (form: any) => {
     const response = await editAddress(address?.id, form)
-    console.log(response)
     if (response === null) {
       toast.success('آدرس بروز شد')
+      router.back()
     } else {
       toast.error('بروزرسانی آدرس موفقیت آمیز نبود')
     }

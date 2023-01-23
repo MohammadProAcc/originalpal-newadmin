@@ -99,17 +99,17 @@ export const EditProductPage: React.FC = () => {
     }
   }
 
-  // useNonInitialEffect(
-  //   () =>
-  //     setImages(
-  //       product?.site_main_picture && product?.media?.length > 0
-  //         ? [product?.site_main_picture, ...product?.media]
-  //         : product?.site_main_picture
-  //           ? [product?.site_main_picture]
-  //           : [null],
-  //     ),
-  //   [product],
-  // )
+  useNonInitialEffect(
+    () =>
+      setImages(
+        product?.site_main_picture && product?.media?.length > 0
+          ? [product?.site_main_picture, ...product?.media]
+          : product?.site_main_picture
+          ? [product?.site_main_picture]
+          : [null],
+      ),
+    [product],
+  )
 
   const [showAddStockModal, setShowAddStockModal] = useState(false)
 
@@ -211,6 +211,7 @@ export const EditProductPage: React.FC = () => {
     if (response !== null) {
       await productRefetch()
       toast.success('محصول بروز شد')
+      router.back()
     } else {
       toast.error('بروزرسانی محصول موفقیت آمیز نبود')
     }
@@ -816,16 +817,16 @@ interface CardFamilyProps {
   overflow?: boolean
 }
 
-const Card = styled(_Card) <CardFamilyProps>`
+const Card = styled(_Card)<CardFamilyProps>`
   overflow: ${(props) => props.overflow && 'initial'};
   overflow: initial;
 `
 
-const CardBody = styled(_CardBody) <CardFamilyProps>`
+const CardBody = styled(_CardBody)<CardFamilyProps>`
   overflow: initial;
 `
 
-const CardHeader = styled(_CardHeader) <CardFamilyProps>`
+const CardHeader = styled(_CardHeader)<CardFamilyProps>`
   overflow: ${(props) => props.overflow && 'initial'};
   overflow: initial;
 `

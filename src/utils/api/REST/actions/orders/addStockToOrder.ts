@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from 'axios'
 
 export const add_stock_option = async (order_id: string, form: any, token: string) => {
   try {
@@ -10,10 +10,9 @@ export const add_stock_option = async (order_id: string, form: any, token: strin
           Authorization: `Bearer ${token}`,
         },
       },
-    );
-    return stock_options;
+    )
+    return stock_options
   } catch (err) {
-    console.log(err);
-    return false;
+    return false
   }
-};
+}

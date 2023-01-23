@@ -1,12 +1,12 @@
-import { editBrand, has, removeItem, useStore, useUserStore } from 'utils'
-import Layout from 'Layouts'
 import { Card, CardBody, CardHeader, InputGroup, Modal } from '@paljs/ui'
 import { Button, deleteBrand, FlexContainer, HeaderButton, ModalBox } from 'components'
+import Layout from 'Layouts'
+import router from 'next/router'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
-import React, { useState } from 'react'
-import router from 'next/router'
 import { PermissionEnum } from 'types'
+import { editBrand, has, removeItem, useStore, useUserStore } from 'utils'
 
 export const EditBrandPage: React.FC = () => {
   const { brand } = useStore((state: any) => ({
@@ -27,9 +27,9 @@ export const EditBrandPage: React.FC = () => {
     delete form.created_at
     delete form.updated_at
     const response = await editBrand(brand?.id, form)
-    console.log(response)
     if (response?.status === 'success') {
       toast.success('برند بروز شد')
+      router.back()
     } else {
       toast.error('بروزرسانی برند موفقیت آمیز نبود')
     }
@@ -83,7 +83,7 @@ export const EditBrandPage: React.FC = () => {
         <Card>
           <CardHeader>نام برند</CardHeader>
           <CardBody>
-            <InputGroup>
+            <InputGroup fullWidth>
               <input {...register('name', { required: true })} />
             </InputGroup>
           </CardBody>
@@ -92,7 +92,7 @@ export const EditBrandPage: React.FC = () => {
         <Card>
           <CardHeader>عنوان صفحه</CardHeader>
           <CardBody>
-            <InputGroup>
+            <InputGroup fullWidth>
               <input {...register('title_page')} />
             </InputGroup>
           </CardBody>
@@ -101,7 +101,7 @@ export const EditBrandPage: React.FC = () => {
         <Card>
           <CardHeader>عنوان متا</CardHeader>
           <CardBody>
-            <InputGroup>
+            <InputGroup fullWidth>
               <input {...register('meta_title')} />
             </InputGroup>
           </CardBody>
@@ -110,8 +110,8 @@ export const EditBrandPage: React.FC = () => {
         <Card>
           <CardHeader>توضیحات متا</CardHeader>
           <CardBody>
-            <InputGroup>
-              <input {...register('meta_description')} />
+            <InputGroup fullWidth>
+              <textarea {...register('meta_description')} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -119,8 +119,8 @@ export const EditBrandPage: React.FC = () => {
         <Card>
           <CardHeader>کلمات کلیدی متا</CardHeader>
           <CardBody>
-            <InputGroup>
-              <input {...register('meta_keywords')} />
+            <InputGroup fullWidth>
+              <textarea {...register('meta_keywords')} />
             </InputGroup>
           </CardBody>
         </Card>

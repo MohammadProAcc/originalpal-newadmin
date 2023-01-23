@@ -7,7 +7,6 @@ export const search_in = async (entity: string, form: any, params: any, token?: 
     })
     return data
   } catch (err) {
-    console.log(err)
     return null
   }
 }

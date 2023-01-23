@@ -77,9 +77,11 @@ export const ProductsPage = () => {
       </a>
       {has(permissions, PermissionEnum.editProduct) && (
         <Link href={`/products/edit/${product?.id}`}>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
-            ویرایش
-          </Button>
+          <a>
+            <Button style={{ marginLeft: '1rem' }} status="Primary">
+              ویرایش
+            </Button>
+          </a>
         </Link>
       )}
       {has(permissions, PermissionEnum.deleteProduct) && (
@@ -117,17 +119,19 @@ export const ProductsPage = () => {
       <FlexContainer>
         {has(permissions, PermissionEnum.editProduct) && (
           <Link href="/products/create">
-            <Button
-              style={{
-                margin: '1rem 0 1rem 1rem',
-                display: 'flex',
-              }}
-              status="Success"
-              appearance="outline"
-            >
-              افزودن محصول
-              <Add />
-            </Button>
+            <a>
+              <Button
+                style={{
+                  margin: '1rem 0 1rem 1rem',
+                  display: 'flex',
+                }}
+                status="Success"
+                appearance="outline"
+              >
+                افزودن محصول
+                <Add />
+              </Button>
+            </a>
           </Link>
         )}
         {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteProduct) && (

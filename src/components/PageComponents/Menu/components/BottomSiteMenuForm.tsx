@@ -24,9 +24,6 @@ interface BottomSiteMenuFormProps {
 export const ProductsBottomSiteMenuForm: React.FC<BottomSiteMenuFormProps> = ({ loading, callback, defaultValues }) => {
   const [menu, setMenu] = useState<ProductsBottomSiteColumn[]>(defaultValues)
 
-  // FIXME: temp
-  useEffect(() => console.log(menu), [menu])
-
   const findColumnIndex = (targetColumn: ProductsBottomSiteColumn) => {
     return menu?.findIndex(
       (_column) =>

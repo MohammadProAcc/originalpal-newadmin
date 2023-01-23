@@ -20,7 +20,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       }
     const mainPageSection = await getSingleMainPageSection(id, token)
-    console.log(mainPageSection)
 
     return {
       props: {

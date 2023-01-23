@@ -110,8 +110,6 @@ export const EditMainPageSectionPage: React.FC = () => {
   })
 
   const onSubmit = async (form: any) => {
-    console.log(form)
-
     const final = {
       ...form,
       tags: form?.tags ? form?.tags?.split(' ')?.map((tag: string) => Number(tag)) : [],
@@ -121,13 +119,11 @@ export const EditMainPageSectionPage: React.FC = () => {
       inStock: form?.inStock ? 1 : 0,
     }
 
-    console.log('final', final)
-
     setLoading(true)
     const response = await editMainPageSection(mainPageSection?.id, final, Cookies.get(process.env.TOKEN!))
     if (response?.status === 'success') {
       toast.success('بخش صفحه اصلی  با موفقیت بروز شد')
-      router.push('/main-page-sections')
+      router.back()
       reset()
     } else {
       toast.error('بروزرسانی بخش صفحه اصلی  موفقیت آمیز نبود')
@@ -263,7 +259,6 @@ export const EditMainPageSectionPage: React.FC = () => {
 
               <AddLinkButton
                 onClick={() => {
-                  console.log('clicked')
                   addLink()
                 }}
               >
