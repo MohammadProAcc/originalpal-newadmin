@@ -1,10 +1,12 @@
 import {
-  Paper, Table,
+  Checkbox,
+  Paper,
+  Table,
   TableBody,
   TableCell as _TableCell,
   TableContainer,
   TableHead,
-  TableRow as _TableRow
+  TableRow as _TableRow,
 } from '@material-ui/core'
 import styledEngine from '@mui/styled-engine-sc'
 import { Popover } from '@paljs/ui'
@@ -50,13 +52,12 @@ export function BasicTable({ columns, rows, getSelections, isOrder = false }) {
                 <TableRow selected={selectedIds?.includes(row[0])} key={row.number}>
                   {row.map((item, index) =>
                     index === 0 ? (
-                      <TableCell
-                        primary
-                        align="right"
-                        component="th"
-                        scope="row"
-                        onClick={() => handleSelection(row[0])}
-                      >
+                      <TableCell primary align="right" component="th" scope="row">
+                        <Checkbox
+                          checked={selectedIds?.includes(row[0])}
+                          value={row[0]}
+                          onClick={() => handleSelection(row[0])}
+                        />
                         {isOrder ? (
                           <Popover placement="bottom" trigger="hover" overlay={<OrderDetails orderId={row[0]} />}>
                             {item}
@@ -80,19 +81,14 @@ export function BasicTable({ columns, rows, getSelections, isOrder = false }) {
 }
 
 const TableRow = styledEngine(_TableRow)`
+    position: relative;
+    
     transition: 150ms;
 
     background-color ${(p) => p.selected && 'rgba(0,149,255,0.25)'};
 
     &:hover {
         background-color: rgba(0,149,255,0.2);
-    }
-
-    &::after {
-      content: "-",
-      position: absolute;
-      top: 0;
-      right: 0;
     }
 `
 
