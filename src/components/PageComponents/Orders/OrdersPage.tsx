@@ -77,8 +77,8 @@ export const OrdersPage = () => {
   const data = orders?.data?.data?.map((order: any) => [
     order?.id,
     translator(order?.status),
-    `${order?.user?.name ?? '?'} ${order?.user?.lastnam ?? ''}`,
-    'در پاسخ درخواست از سرور برنمیگردد',
+    `${order?.user?.name ?? '?'} ${order?.user?.lastname ?? ''}`,
+    order?.payment_id,
     order?.address?.address,
     <OrderNotes notes={order.notes} />,
     toLocalDate(order.created_at) + ' - ' + toLocalTime(order.created_at),
@@ -110,6 +110,11 @@ export const OrdersPage = () => {
     <Layout title="سفارشات">
       <h1>
         سفارشات
+        <Link href="/orders/create">
+          <a target="_blank">
+            <Button style={{ marginRight: '1rem' }}>ثبت سفارش جدید</Button>
+          </a>
+        </Link>
         {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteUser) && (
           <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
             حذف موارد انتخاب شده

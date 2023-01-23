@@ -211,6 +211,7 @@ export const EditBlogPage: React.FC = () => {
             <video
               src={`${process.env.VID_SRC}/${videoToRemove?.u}`}
               controls
+              style={{ maxHeight: "75vh" }}
             />
             <FlexContainer jc="space-between">
               <Button onClick={closeVideoRemovalModal}>انصراف</Button>
@@ -221,6 +222,7 @@ export const EditBlogPage: React.FC = () => {
                 حذف
               </Button>
             </FlexContainer>
+
           </ModalBox>
         </Modal>
 

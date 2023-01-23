@@ -27,6 +27,7 @@ export function AnswerCommentForm(props: AnswerCommentFormProps) {
     reset();
     if (response !== null) {
       toast.success(`پاسخ نظر ${props.comment.id} داده شد`)
+      props.callback && props.callback(props.comment);
     } else {
       toast.error('پاسخ به نظر موفقیت آمیز نبود')
     }
@@ -66,6 +67,7 @@ export function AnswerCommentForm(props: AnswerCommentFormProps) {
 
 interface AnswerCommentFormProps {
   comment: Comment
+  callback?: any
 }
 
 const Details = styled.div`

@@ -4,15 +4,15 @@ import {
   Button,
   Card,
   CardBody,
-  CardHeader,
-  Checkbox,
-  Container,
+  CardHeader, Container,
   InputGroup as _InputGroup,
   Modal,
-  Select,
+  Select
 } from '@paljs/ui'
+import { useQuery } from '@tanstack/react-query'
 import { BasicEditor, FlexContainer, HeaderButton, ModalBox } from 'components'
 import { WriteOrderDetailsModal } from 'components/Modal/derived/WriteOrderDetails'
+import { useNonInitialEffect } from 'hooks'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
 import Link from 'next/link'
@@ -21,23 +21,27 @@ import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled, { css } from 'styled-components'
+import { Coupon, PermissionEnum } from 'types'
 import {
   add_stock_option,
   admin,
   deleteOrder,
   editOrder,
   editOrderAddress,
-  getSingleOrder,
-  numeralize,
+  getCouponsList,
+  getSingleCoupon,
+  getSingleOrder, has, numeralize,
   removeItem,
   removeOrderItem,
   translator,
   update_order_status,
   useStore,
-  useUserStore,
-  has,
+  useUserStore
 } from 'utils'
-import { PermissionEnum } from 'types'
+import {
+  Flex,
+  Select as MantineSelect
+} from "@mantine/core"
 
 const statusOptions = [
   { label: 'در انتظار پرداخت', value: 'waiting' },
@@ -49,27 +53,64 @@ const statusOptions = [
 
 export const EditSingleOrderPage: React.FC = () => {
   const router = useRouter()
+  const orderId = router.query.order_id as string;
 
-  const { order, updateOrder, stocks, clearOrderItems, reload } = useStore((state: any) => ({
-    order: state?.order,
+  const { data: { data: order }, refetch: refetchOrder } =
+    useQuery(["order", orderId], () => getSingleOrder(orderId));
+  const { data: { data: { data: stocks } }, refetch: refetchStocks }: any =
+    useQuery(["stocks"], () => admin().get('/stock/select'));
+  const { data: coupons } =
+    useQuery(["coupons"], () => getCouponsList({ page: "total" }));
+
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+
+  useNonInitialEffect(() => {
+    if (order.coupon_id) {
+      getSingleCoupon(order.coupon_id)
+        .then(res => {
+          setAppliedCoupon(res.data);
+        })
+    }
+  }, [order])
+
+  const { updateOrder, clearOrderItems, reload } = useStore((state: any) => ({
     updateOrder: state?.updateOrder,
-    stocks: state?.stocks,
     clearOrderItems: state?.clearOrderItems,
-    reload: state?.reload,
   }))
   const permissions = useUserStore().getPermissions()
 
-  const reloadOrder = async () => {
-    const { data: updatedOrder } = await getSingleOrder(order?.id)
-    reload('order', updatedOrder)
-  }
-
   const [stockOptions, setStockOptions] = useState(
     stocks?.map((stock: any) => ({
-      label: ` شناسه محصول: ${stock?.product_id} سایز: ${stock?.size}`,
+      label: ` شناسه محصول: ${stock?.product_id} - سایز: ${stock?.size}`,
       value: stock,
     })),
   )
+
+  const [couponOptions, setCouponOptions] = useState(
+    coupons?.data?.data?.map((_coupon: Coupon) => ({
+      label: `${_coupon.code} - ${_coupon.decription}`,
+      value: _coupon.id
+    })) ?? []
+  )
+
+  useNonInitialEffect(() => {
+    setStockOptions(
+      stocks?.map((stock: any) => ({
+        label: ` شناسه محصول: ${stock?.product_id} - سایز: ${stock?.size}`,
+        value: stock,
+      }))
+    )
+  }, [stocks])
+
+  useNonInitialEffect(() => {
+    setCouponOptions(
+      coupons?.data?.data?.map((_coupon: Coupon) => ({
+        label: `${_coupon.code} - ${_coupon.decription}`,
+        value: _coupon.id
+      }))
+    )
+  }, [coupons])
+
   const [status, setStatus] = useState<any>()
   const [sms, setSms] = useState<any>(false)
 
@@ -111,6 +152,7 @@ export const EditSingleOrderPage: React.FC = () => {
     if (response?.status === 'success') {
       const updatedOrder = await getSingleOrder(order?.id)
       updateOrder(updatedOrder.data)
+      refetchOrder({});
       toast.success('محصول با موفقیت اضافه شد')
     } else {
       toast.error('افزودن محصول موفقیت آمیز نبود')
@@ -137,7 +179,7 @@ export const EditSingleOrderPage: React.FC = () => {
 
   async function onUserFormSubmit(form: any) {
     const response = await editOrder(order.id, { user: form })
-    if (response.status === 'success') {
+    if (response?.status === 'success') {
       toast.success('تغییرات کاربر اعمال شد')
     } else {
       toast.error('اعمال تغییرات کاربر موفقیت آمیز نبود')
@@ -186,6 +228,7 @@ export const EditSingleOrderPage: React.FC = () => {
     if (response?.status === 'success') {
       clearOrderItems(stock?.id)
       setStockToRemove(null)
+      refetchOrder({});
       toast.success('محصول با موفقیت از سبد خرید شما حذف شد')
     } else {
       toast.error('حذف محصول با موفقیت انجام شد')
@@ -238,23 +281,23 @@ export const EditSingleOrderPage: React.FC = () => {
       <form onSubmit={userHandleSubmit(onUserFormSubmit)}>
         <InputGroup fullWidth className="user">
           <label htmlFor="user-name">نام کاربر : </label>
-          <input id="user-name" {...userRegister('name')} disabled />
+          <input id="user-name" {...userRegister('name')} />
         </InputGroup>
 
         <InputGroup fullWidth className="user">
           <label htmlFor="user-lastname">نام خانوادگی کاربر : </label>
-          <input {...userRegister('lastname')} disabled />
+          <input {...userRegister('lastname')} />
         </InputGroup>
         <InputGroup fullWidth className="user">
           <label htmlFor="user-phone">شماره همراه کاربر : </label>
-          <input id="user-phone" {...userRegister('phone')} disabled />
+          <input id="user-phone" {...userRegister('phone')} />
         </InputGroup>
         <InputGroup fullWidth className="user">
           <label htmlFor="user-email">ایمیل </label>
-          <input id="user-email" {...userRegister('email')} disabled />
+          <input id="user-email" {...userRegister('email')} />
         </InputGroup>
 
-        <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline" disabled>
+        <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline" >
           اعمال تغییرات کاربر
         </Button>
       </form>
@@ -306,12 +349,25 @@ export const EditSingleOrderPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>شناسه کد تخفیف</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input {...register('coupon_id')} />
-            </InputGroup>
-          </CardBody>
+          <CardHeader>
+            <Flex>کد تخفیف {appliedCoupon && `: ${appliedCoupon.code} - ${appliedCoupon.decription}`}</Flex>
+            {
+              coupons && (
+                <Controller
+                  name="coupon_id"
+                  control={control}
+                  render={({ field }) => (
+                    <CouponsSelect
+                      data={couponOptions}
+                      searchable
+                      {...field}
+                    />
+                  )}
+                />
+              )
+            }
+          </CardHeader>
+
         </Card>
 
         <Controller
@@ -450,10 +506,10 @@ export const EditSingleOrderPage: React.FC = () => {
             جمع کل :{' '}
             {numeralize(
               order['order_items'] &&
-                order['order_items'].length > 0 &&
-                order['order_items']
-                  ?.map((orderItem: any) => Number(orderItem?.price))
-                  ?.reduce((prev: number, curr: number) => curr + prev),
+              order['order_items'].length > 0 &&
+              order['order_items']
+                ?.map((orderItem: any) => Number(orderItem?.price))
+                ?.reduce((prev: number, curr: number) => curr + prev),
             )}{' '}
             تومان
           </p>
@@ -531,7 +587,7 @@ export const EditSingleOrderPage: React.FC = () => {
             </Link>
           </Container>
 
-          <Container>
+          {/* <Container>
             <Button status="Info" appearance="hero" className="ml-1 mb-1">
               پرینت برگه ارسال ( A5 )
             </Button>
@@ -567,7 +623,7 @@ export const EditSingleOrderPage: React.FC = () => {
             <Button status="Info" appearance="hero" className="ml-1 mb-1">
               پرینت برگه برگشت تیپاکس ( A5 ) سیطره
             </Button>
-          </Container>
+          </Container> */}
         </CardBody>
       </Card>
 
@@ -638,4 +694,8 @@ const InputGroup = styled(_InputGroup)`
       min-width: 8rem;
     }
   }
+`
+
+const CouponsSelect = styled(MantineSelect)`
+  margin-top: 1rem;
 `

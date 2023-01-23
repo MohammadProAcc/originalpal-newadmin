@@ -64,11 +64,11 @@ export function SendSmsForm() {
 
     const response = await $_send_sms(finalForm as any);
     if (reqSucceed(response)) {
-      toast.success("پیامک با موفیت ارسال شد");
+      toast.success("پیامک با موفقیت ارسال شد");
       reset();
       setPhoneNumbers([]);
     } else {
-      toast.error("ارسال پیامک موفیت آمیز نیود ");
+      toast.error("ارسال پیامک موفقیت آمیز نیود ");
     }
   }
 

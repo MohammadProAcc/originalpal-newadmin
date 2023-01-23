@@ -9,4 +9,8 @@ export interface Tag {
   priority: number;
   updated_at: string;
   created_at: string;
+  pivot?: {
+    product_id: string,
+    tag_id: string
+  }
 }

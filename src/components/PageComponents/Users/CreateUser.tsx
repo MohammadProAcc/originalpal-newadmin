@@ -5,16 +5,23 @@ import { Controller, useForm } from 'react-hook-form'
 import styled from 'styled-components'
 import Cookies from 'js-cookie'
 import { toast } from 'react-toastify'
-import { createUser } from 'utils'
+import { createUser, useStore } from 'utils'
 import router from 'next/router'
 
-const roleOptions = [
-  { label: 'ادمین', value: 'admin' },
-  { label: 'بدون نقش', value: null },
-]
 
 export function CreateUser() {
   const [loading, setLoading] = useState(false)
+
+  const {storeRoles } = useStore((state: any) => ({
+    storeRoles: state?.roles,
+  }))
+
+  const roleOptions = [
+    ...storeRoles.map((_role: any) => ({
+      label: _role.name,
+      value: _role.id,
+    })),
+  ]
 
   const { register, handleSubmit, control, reset } = useForm()
 
@@ -59,11 +66,11 @@ export function CreateUser() {
 
         <InputGroup fullWidth style={{ display: 'flex', flexDirection: 'column' }}>
           <label>نقش</label>
-          <Controller
-            control={control}
-            name="role"
-            render={({ field }) => <Select options={roleOptions} onChange={(e: any) => field?.onChange(e?.value)} />}
-          />
+            <Controller
+              control={control}
+              name="roles"
+              render={({ field }) => <Select options={roleOptions} isMulti {...field} />}
+            />
         </InputGroup>
 
         <Button disabled={loading} style={{ width: '10rem', marginTop: '3rem' }} status="Success" appearance="outline">

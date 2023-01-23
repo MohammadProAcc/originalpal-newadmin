@@ -8,7 +8,7 @@ export function AnswerCommentFormModal(props: AnswerCommentFormModalProps) {
   return (
     <Modal on={props.show} toggle={props.toggle}>
       <ModalBox style={{minWidth: "70vw"}}>
-        {props.comment && <AnswerCommentForm comment={props.comment} />}
+        {props.comment && <AnswerCommentForm comment={props.comment} callback={props.callback} />}
       </ModalBox>
     </Modal>
   )
@@ -18,4 +18,5 @@ interface AnswerCommentFormModalProps {
   comment: Comment;
   show: boolean;
   toggle: () => void;
+  callback?: any;
 }

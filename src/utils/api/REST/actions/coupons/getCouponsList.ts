@@ -1,6 +1,6 @@
 import { admin } from 'utils';
 
-export const getCouponsList: any = async (params: any, token: any) => {
+export const getCouponsList = async (params: any, token?: any) => {
   try {
     const { data: coupons } = await admin(token ?? null).get(`/coupons`, {
       params,

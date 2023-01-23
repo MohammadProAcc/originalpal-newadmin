@@ -1,17 +1,24 @@
-import { deleteCoupon, editCoupon, getSingleCoupon, removeItem, toLocalDate, useStore } from 'utils'
-import Layout from 'Layouts'
-import { Card, CardBody, CardHeader, InputGroup, Modal } from '@paljs/ui'
-import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
-import { useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
-import React, { useState } from 'react'
-import router from 'next/router'
+import { Card, CardBody, CardHeader, InputGroup, Modal } from "@paljs/ui";
+import { Button, FlexContainer, HeaderButton, ModalBox } from "components";
+import Layout from "Layouts";
+import router from "next/router";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import {
+  deleteCoupon,
+  editCoupon,
+  getSingleCoupon,
+  removeItem,
+  toLocalDate,
+  useStore,
+} from "utils";
 
 export const EditCouponPage: React.FC = () => {
   const { coupon, updateCoupon } = useStore((state: any) => ({
     coupon: state?.coupon,
     updateCoupon: state?.updateCoupon,
-  }))
+  }));
 
   const {
     register,
@@ -19,30 +26,36 @@ export const EditCouponPage: React.FC = () => {
     formState: { dirtyFields },
   } = useForm({
     defaultValues: coupon,
-  })
+  });
 
   const onSubmit = async (form: any) => {
-    const response = await editCoupon(coupon?.id, form)
-    if (response?.status === 'success') {
-      toast.success('کوپن بروز شد')
+    const response = await editCoupon(coupon?.id, form);
+    if (response?.status === "success") {
+      toast.success("کوپن بروز شد");
     } else {
-      toast.error('بروزرسانی کوپن موفقیت آمیز نبود')
+      toast.error("بروزرسانی کوپن موفقیت آمیز نبود");
     }
-  }
+  };
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
-  const closeRemovalModal = () => setItemToRemove(false)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const closeRemovalModal = () => setItemToRemove(false);
 
   const remove = async (removeId: any) => {
-    await removeItem('coupons', removeId, deleteCoupon, () => router.push('/coupons'), [
-      `کوپن ${removeId} با موفقیت حذف شد`,
-      'حذف کوپن موفقیت آمیز نبود',
-    ])
-  }
+    await removeItem(
+      "coupons",
+      removeId,
+      deleteCoupon,
+      () => router.push("/coupons"),
+      [
+        `کوپن ${removeId} با موفقیت حذف شد`,
+        "حذف کوپن موفقیت آمیز نبود",
+      ],
+    );
+  };
 
   return (
     <Layout title={`ویراریش کوپن ${coupon?.id}`}>
-      <h1 style={{ marginBottom: '4rem' }}>
+      <h1 style={{ marginBottom: "4rem" }}>
         ویرایش کوپن {coupon?.code}
         <HeaderButton status="Info" href={`/coupons/${coupon?.id}`}>
           مشاهده
@@ -55,7 +68,7 @@ export const EditCouponPage: React.FC = () => {
       {/* ....:::::: Modals :::::.... */}
       <Modal on={itemToRemove} toggle={closeRemovalModal}>
         <ModalBox>
-          <div style={{ marginBottom: '1rem' }}>
+          <div style={{ marginBottom: "1rem" }}>
             آیا از حذف برچسب
             <span className="mx-1">{itemToRemove?.id}</span>
             اطمینان دارید؟
@@ -74,7 +87,7 @@ export const EditCouponPage: React.FC = () => {
           <CardHeader>کد کوپن</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('code', { required: true })} placeholder="کد کوپن" />
+              <input {...register("code")} placeholder="کد کوپن" disabled />
             </InputGroup>
           </CardBody>
         </Card>
@@ -83,7 +96,10 @@ export const EditCouponPage: React.FC = () => {
           <CardHeader>توضیحات</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('decription', { required: true })} placeholder="توضیحات" />
+              <input
+                {...register("decription", { required: true })}
+                placeholder="توضیحات"
+              />
             </InputGroup>
           </CardBody>
         </Card>
@@ -92,7 +108,10 @@ export const EditCouponPage: React.FC = () => {
           <CardHeader>نوع</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('type', { required: true })} placeholder="نوع" />
+              <input
+                {...register("type", { required: true })}
+                placeholder="نوع"
+              />
             </InputGroup>
           </CardBody>
         </Card>
@@ -101,7 +120,11 @@ export const EditCouponPage: React.FC = () => {
           <CardHeader>مقدار</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('amount', { required: true })} type="number" placeholder="مقدار" />
+              <input
+                {...register("amount", { required: true })}
+                type="number"
+                placeholder="مقدار"
+              />
             </InputGroup>
           </CardBody>
         </Card>
@@ -110,7 +133,11 @@ export const EditCouponPage: React.FC = () => {
           <CardHeader>شروع : {toLocalDate(coupon?.start)}</CardHeader>
           <CardBody>
             <InputGroup>
-              <input type="date" {...register('start', { required: true })} placeholder="شروع" />
+              <input
+                type="date"
+                {...register("start", { required: true })}
+                placeholder="شروع"
+              />
             </InputGroup>
           </CardBody>
         </Card>
@@ -119,7 +146,11 @@ export const EditCouponPage: React.FC = () => {
           <CardHeader>انقضاء : {toLocalDate(coupon?.expiration)}</CardHeader>
           <CardBody>
             <InputGroup>
-              <input type="date" {...register('expiration', { required: true })} placeholder="انقضاء" />
+              <input
+                type="date"
+                {...register("expiration", { required: true })}
+                placeholder="انقضاء"
+              />
             </InputGroup>
           </CardBody>
         </Card>
@@ -128,7 +159,10 @@ export const EditCouponPage: React.FC = () => {
           <CardHeader>حداکثر</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('max', { required: true })} placeholder="حداکثر" />
+              <input
+                {...register("max", { required: true })}
+                placeholder="حداکثر"
+              />
             </InputGroup>
           </CardBody>
         </Card>
@@ -137,7 +171,10 @@ export const EditCouponPage: React.FC = () => {
           <CardHeader>deny_off</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('deny_off', { required: true })} placeholder="deny_off" />
+              <input
+                {...register("deny_off", { required: true })}
+                placeholder="deny_off"
+              />
             </InputGroup>
           </CardBody>
         </Card>
@@ -146,7 +183,10 @@ export const EditCouponPage: React.FC = () => {
           <CardHeader>محدودیت</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('limit', { required: true })} placeholder="محدودیت" />
+              <input
+                {...register("limit", { required: true })}
+                placeholder="محدودیت"
+              />
             </InputGroup>
           </CardBody>
         </Card>
@@ -155,7 +195,10 @@ export const EditCouponPage: React.FC = () => {
           <CardHeader>شناسه کاربر</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('user_id', { required: true })} placeholder="شناسه کاربر" />
+              <input
+                {...register("user_id", { required: true })}
+                placeholder="شناسه کاربر"
+              />
             </InputGroup>
           </CardBody>
         </Card>
@@ -165,5 +208,5 @@ export const EditCouponPage: React.FC = () => {
         </Button>
       </form>
     </Layout>
-  )
-}
+  );
+};

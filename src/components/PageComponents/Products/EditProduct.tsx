@@ -1,3 +1,4 @@
+import { MultiSelect } from '@mantine/core'
 import {
   Accordion,
   AccordionItem,
@@ -6,10 +7,9 @@ import {
   CardBody as _CardBody,
   CardHeader as _CardHeader,
   InputGroup,
-  Modal,
-  Popover,
-  Select as _Select,
+  Modal, Select as _Select
 } from '@paljs/ui'
+import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { BasicEditor, Button, FlexContainer, ModalBox, ProductImageCard, ProductVideoCard, StockItem } from 'components'
 import { UploadProductImage, UploadProductVideo } from 'components/Input'
@@ -22,30 +22,30 @@ import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
-import { Media, ProductBrand } from 'types'
+import { Media, ProductBrand, Tag } from 'types'
 import {
   deleteProductMedia,
   deleteProductVideo,
   deleteStock,
   editProduct,
+  getAllBrands,
   getSingleProduct,
-  toLocalDate,
-  useStore,
+  getTagsList,
+  reqSucceed,
+  toLocalDate
 } from 'utils'
 import { StockForm } from '../Stock/components'
 
 // TODO: add search brand mechanism
 export const EditProductPage: React.FC = () => {
   const router = useRouter()
+  const productId = router.query.product_id as string
+
   const [loading, setLoading] = useState(false)
 
-  const { product, updateProduct, brands, updateProductAfterMediaRemoval, reload } = useStore((state: any) => ({
-    product: state?.product,
-    brands: state?.brands,
-    updateProductAfterMediaRemoval: state?.updateProductAfterMediaRemoval,
-    updateProduct: state?.updateProduct,
-    reload: state?.reload,
-  }))
+  const { data: product, refetch: productRefetch } = useQuery(['product', productId], () => getSingleProduct(productId))
+  const { data: brands, refetch: brandsRefetch } = useQuery(['brands'], () => getAllBrands())
+  const { data: tags, refetch: tagsRefetch } = useQuery(['tags'], () => getTagsList({ pages: 'total' }))
 
   const [mainImage, setMainImage] = useState(product?.site_main_picture)
   function upadteMainImage(image: any) {
@@ -56,13 +56,20 @@ export const EditProductPage: React.FC = () => {
   const [images, setImages] = useState(product?.media?.length > 0 ? [...product?.media] : [])
   const [videos, setVideos] = useState(product.video ? [...product?.video] : [])
 
-  function appendImage(image: any) {
-    setImages((_curr) => [..._curr, image])
+  useNonInitialEffect(() => {
+    setImages(product?.media?.length > 0 ? [...product?.media] : []);
+    setVideos(product.video ? [...product?.video] : []);
+  }, [product])
+
+  async function appendImage(image: any) {
+    // setImages((_curr) => [..._curr, image])
+    productRefetch();
     toast.success('تصویر با موفقیت بارگذاری شد')
   }
 
   function appendVideo(video: any) {
-    setVideos((_curr) => [..._curr, video])
+    // setVideos((_curr) => [..._curr, video])
+    productRefetch();
     toast.success('فایل تصویری با موفقیت بارگذاری شد')
   }
 
@@ -92,17 +99,17 @@ export const EditProductPage: React.FC = () => {
     }
   }
 
-  useNonInitialEffect(
-    () =>
-      setImages(
-        product?.site_main_picture && product?.media?.length > 0
-          ? [product?.site_main_picture, ...product?.media]
-          : product?.site_main_picture
-            ? [product?.site_main_picture]
-            : [null],
-      ),
-    [product],
-  )
+  // useNonInitialEffect(
+  //   () =>
+  //     setImages(
+  //       product?.site_main_picture && product?.media?.length > 0
+  //         ? [product?.site_main_picture, ...product?.media]
+  //         : product?.site_main_picture
+  //           ? [product?.site_main_picture]
+  //           : [null],
+  //     ),
+  //   [product],
+  // )
 
   const [showAddStockModal, setShowAddStockModal] = useState(false)
 
@@ -111,8 +118,16 @@ export const EditProductPage: React.FC = () => {
     value: brand?.id,
   }))
 
+  const tagsOptions = tags?.data?.data?.map((tag: Tag) => ({
+    label: tag?.name,
+    value: {
+      id: tag?.id,
+      name: tag?.name,
+    },
+  }))
+
   const afterStockCreation = async (response: any) => {
-    await resetProduct()
+    await productRefetch()
     setShowAddStockModal(false)
   }
 
@@ -141,7 +156,7 @@ export const EditProductPage: React.FC = () => {
 
     const response = await deleteStock(stockId)
     if (response !== null) {
-      await resetProduct()
+      await productRefetch()
       setStockToRemove(null)
       toast.success('انبار با موفقیت حذف شد')
     } else {
@@ -171,14 +186,9 @@ export const EditProductPage: React.FC = () => {
       title: product?.title,
       title_page: product?.title_page,
       trend: product?.trend,
-      tags: product?.tags?.map((tag: any) => tag?.id)?.join(' '),
+      tags: product?.tags,
     },
   })
-
-  const resetProduct = async () => {
-    const updatedProduct = await getSingleProduct(product?.id)
-    reload('product', updatedProduct)
-  }
 
   const onSubmit = async (form: any) => {
     setLoading(true)
@@ -199,7 +209,7 @@ export const EditProductPage: React.FC = () => {
     })
 
     if (response !== null) {
-      await resetProduct()
+      await productRefetch()
       toast.success('محصول بروز شد')
     } else {
       toast.error('بروزرسانی محصول موفقیت آمیز نبود')
@@ -222,7 +232,7 @@ export const EditProductPage: React.FC = () => {
         })
         .then(() => {
           getSingleProduct(product?.id).then((updatedProduct) => {
-            updateProduct(updatedProduct)
+            productRefetch({})
           })
           toast.success('تصویر با موفقیت آپلود شد')
         })
@@ -242,7 +252,7 @@ export const EditProductPage: React.FC = () => {
         })
         .then(() => {
           getSingleProduct(product?.id).then((updatedProduct) => {
-            updateProduct(updatedProduct)
+            productRefetch({})
             toast.success('تصویر اصلی با موفقیت بارگذاری شد')
           })
           toast.success('تصویر با موفقیت آپلود شد')
@@ -271,7 +281,11 @@ export const EditProductPage: React.FC = () => {
   const [imageToRemove, setImageToRemove] = useState<any>(null)
 
   const removeProductImage = async (media: Media) => {
-    const response = await deleteProductMedia(router?.query?.product_id as string, media?.u, Cookies.get(process.env.TOKEN!) ?? '')
+    const response = await deleteProductMedia(
+      router?.query?.product_id as string,
+      media?.u,
+      Cookies.get(process.env.TOKEN!) ?? '',
+    )
     if (response?.includes('operation done successfully')) {
       setImages((_curr) => _curr.filter((_image) => !_.isEqual(_image, media)))
       setImageToRemove(null)
@@ -286,16 +300,18 @@ export const EditProductPage: React.FC = () => {
 
   // TODO: complete video remove process
   const removeProductVideo = async (media: Media) => {
-    const response = await deleteProductVideo(router?.query?.product_id as string, media?.u, Cookies.get(process.env.TOKEN!) ?? '')
-    console.error(response);
-    // if (response?.includes('operation done successfully')) {
-    //   setVideos((_curr) => _curr.filter((_image) => !_.isEqual(_image, media)))
-    //   setVideoToRemove(null)
-    //   // await resetProduct()
-    //   toast.success('ویدیو با موفقیت حذف شد')
-    // } else {
-    //   toast.error('حذف ویدیو موفقیت آمیز نبود')
-    // }
+    const response = await deleteProductVideo(
+      router?.query?.product_id as string,
+      media?.u,
+      Cookies.get(process.env.TOKEN!) ?? '',
+    )
+    if (reqSucceed(response)) {
+      await productRefetch();
+      toast.success("ویدیو با موفقیت حذف شد");
+    } else {
+      toast.error("حذف ویدیو موفقیت آمیز نبود")
+    }
+    setVideoToRemove(null);
   }
 
   const [removeAllImageModal, setRemoveAllImagesModal] = useState(false)
@@ -361,16 +377,23 @@ export const EditProductPage: React.FC = () => {
         <Card>
           <CardHeader>برچسب ها : {product?.tags?.map((tag: any) => tag?.name)?.join('-') ?? '-'}</CardHeader>
           <CardBody>
-            <InputGroup fullWidth>
-              <Popover
-                trigger="focus"
-                overlay="شناسه برچسب ها را با فاصله(space) وارد کنید. مثال: 1 12 9"
-                placement="top"
-                style={{ width: '100%' }}
-              >
-                <input {...register('tags')} placeholder="برجسب ها" />
-              </Popover>
-            </InputGroup>
+            <Controller
+              name="tags"
+              control={control}
+              render={({ field }) => (
+                <MultiSelect
+                  sx={{
+                    "div": {
+                      backgorundColor: "red"
+                    }
+                  }}
+                  selectOnBlur
+                  data={tagsOptions}
+                  placeholder="برچسب مورد نظر را انتخاب کنید"
+                  {...field}
+                />
+              )}
+            />
           </CardBody>
         </Card>
 
@@ -692,7 +715,7 @@ export const EditProductPage: React.FC = () => {
                     </strong>
                   }
                 >
-                  <StockItem callback={resetProduct} stock={stock} />
+                  <StockItem callback={productRefetch} stock={stock} />
                 </AccordionItem>
               ))
             ) : (
@@ -732,7 +755,15 @@ export const EditProductPage: React.FC = () => {
                 انصراف
               </Button>
             </div>
-            {<video controls className="mb-2" width="100px" height="100px" src={`${process.env.VID_SRC}/${videoToRemove?.u}`} />}{' '}
+            {
+              <video
+                controls
+                className="mb-2"
+                width="100px"
+                height="100px"
+                src={`${process.env.VID_SRC}/${videoToRemove?.u}`}
+              />
+            }{' '}
           </CardBody>
         </Card>
       </Modal>

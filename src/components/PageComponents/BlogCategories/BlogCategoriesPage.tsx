@@ -1,8 +1,7 @@
 import { Add } from '@material-ui/icons'
 import { Button, Container, Modal } from '@paljs/ui'
-import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar, BlogCategoryModal } from 'components'
+import { BasicTable, BlogCategoryModal, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
 import Layout from 'Layouts'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
@@ -127,7 +126,7 @@ export const BlogCategoriesPage = () => {
             params={router.query}
             callback={(form: any) =>
               router.push({
-                pathname: '/blog/search',
+                pathname: '/blog-categories/search',
                 query: form,
               })
             }

@@ -6,10 +6,15 @@ function CommentReply(props: CommentReplyProps) {
   return (
     <Li>
       <Card>
-        <CardHeader><strong>عنوان : </strong>{props.comment.title}</CardHeader>
+        <CardHeader>
+          <strong>
+            عنوان :
+          </strong>
+          {props.comment.title}
+        </CardHeader>
         <CardBody>
           <strong>
-            متن : 
+            متن :
           </strong>
           <p>{props.comment.content}</p>
         </CardBody>
@@ -52,4 +57,8 @@ const Ul = styled.ul`
 
 const Li = styled.li`
   list-style: none;
+
+  strong {
+    display: inline-block;
+    margin-bottom: 0.5rem  }
 `
