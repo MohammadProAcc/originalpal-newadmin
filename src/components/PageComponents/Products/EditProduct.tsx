@@ -1,8 +1,6 @@
-import { Group, MultiSelect, Text } from '@mantine/core'
+import { Badge, Button as MantineButton, Collapse, Divider, Flex, Group, MultiSelect, Text } from '@mantine/core'
 import { Dropzone, IMAGE_MIME_TYPE, MIME_TYPES } from '@mantine/dropzone'
 import {
-  Accordion,
-  AccordionItem,
   Alert,
   Card as _Card,
   CardBody as _CardBody,
@@ -14,7 +12,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { Button, Editor, FlexContainer, ModalBox, ProductImageCard, ProductVideoCard, StockItem } from 'components'
-import { PersianDatePicker, UploadProductVideo } from 'components/Input'
+import { PersianDatePicker } from 'components/Input'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
 import { useRouter } from 'next/router'
@@ -24,7 +22,6 @@ import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { Media, ProductBrand, Tag } from 'types'
 import {
-  preppend,
   deleteProductMedia,
   deleteProductVideo,
   deleteStock,
@@ -32,6 +29,7 @@ import {
   getAllBrands,
   getSingleProduct,
   getTagsList,
+  preppend,
   reqSucceed,
   toLocalDate,
 } from 'utils'
@@ -51,23 +49,23 @@ export const EditProductPage: React.FC = () => {
 
   const [showAddStockModal, setShowAddStockModal] = useState(false)
   const [removeAllImageModal, setRemoveAllImagesModal] = useState(false)
+  const [openStocksCollapses, setOpenStocksCollapses] = useState<string[]>([])
 
   const [stockToRemove, setStockToRemove] = useState<any>(null)
   const [imageToRemove, setImageToRemove] = useState<any>(null)
   const [videoToRemove, setVideoToRemove] = useState<any>(null)
-
   // <<<=====------ Select Options ------=====>>>
   const brandsOptions = brands?.data?.map((brand: ProductBrand) => ({
     label: brand?.name,
     value: brand?.id,
   }))
 
-  const tagsOptions = tags?.data?.data?.map((tag: Tag) => ({
+  const tagsOptions: {
+    label: string
+    value: string
+  }[] = tags?.data?.data?.map((tag: Tag) => ({
     label: tag?.name,
-    value: {
-      id: tag?.id,
-      name: tag?.name,
-    },
+    value: tag?.id?.toString(),
   }))
 
   const activationOptions = [
@@ -108,11 +106,21 @@ export const EditProductPage: React.FC = () => {
       title: product?.title,
       title_page: product?.title_page,
       trend: product?.trend,
-      tags: product?.tags,
+      tags: product?.tags?.map((tag: any) => tag?.id?.toString()),
     },
   })
 
   // <<<=====------ Functions ------=====>>>
+  function handleStocksCollapses(stockId: number) {
+    setOpenStocksCollapses((current) => {
+      if (current.includes(stockId.toString())) {
+        return current.filter((id) => id !== stockId.toString())
+      } else {
+        return [...current, stockId.toString()]
+      }
+    })
+  }
+
   function getImages() {
     let images: Media[] = []
     if (product?.media?.length > 0) images = [...product?.media]
@@ -127,17 +135,7 @@ export const EditProductPage: React.FC = () => {
     delete form?.url
     delete form?.color
 
-    const tags = form?.tags
-    delete form?.tags
-
-    const finalForm = {
-      ...form,
-    }
-
-    const response = await editProduct(product?.id, {
-      ...finalForm,
-      // tags: tags?.split(' ').map((tagId: string) => Number(tagId)),
-    })
+    const response = await editProduct(product?.id, form)
 
     if (response !== null) {
       await productRefetch()
@@ -161,13 +159,13 @@ export const EditProductPage: React.FC = () => {
     const response = await deleteStock(stockId)
     if (response !== null) {
       await productRefetch()
+      toast.success(`انبار شماره ${stockToRemove?.id} به سایز ${stockToRemove?.size} با موفقیت حذف شد`)
       setStockToRemove(null)
-      toast.success('انبار با موفقیت حذف شد')
     } else {
       toast.success('حذف انبار موفقیت آمیز نبود')
     }
 
-    setLoading(true)
+    setLoading(false)
   }
 
   async function removeProductImage(media: Media) {
@@ -391,7 +389,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>H1 صفحه</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('title')} />
+              <input {...register('title', { required: true })} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -400,7 +398,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>کد</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('code')} />
+              <input {...register('code', { required: true })} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -413,35 +411,36 @@ export const EditProductPage: React.FC = () => {
                 name="brand_id"
                 control={control}
                 render={({ field }) => (
-                  <Select options={brandsOptions} onChange={(e: any) => field.onChange(e?.value)} />
+                  <Select
+                    options={brandsOptions}
+                    onChange={(e: any) => field.onChange(e?.value)}
+                    placeholder="برای تغییر دادن برند ضربه بزنید"
+                  />
                 )}
               />
             </InputGroup>
           </CardBody>
         </Card>
 
-        <Card>
-          <CardHeader>برچسب ها : {product?.tags?.map((tag: any) => tag?.name)?.join('-') ?? '-'}</CardHeader>
-          <CardBody>
-            <Controller
-              name="tags"
-              control={control}
-              render={({ field }) => (
-                <MultiSelect
-                  sx={{
-                    div: {
-                      backgorundColor: 'red',
-                    },
-                  }}
-                  selectOnBlur
-                  data={tagsOptions}
-                  placeholder="برچسب مورد نظر را انتخاب کنید"
-                  {...field}
-                />
-              )}
-            />
-          </CardBody>
-        </Card>
+        <Flex direction="column">
+          <Text mb="sm">
+            <strong>برچسب ها</strong>
+          </Text>
+          <Controller
+            name="tags"
+            control={control}
+            render={({ field }) => (
+              <MultiSelect
+                selectOnBlur
+                data={tagsOptions as any}
+                placeholder="برچسب مورد نظر را انتخاب کنید"
+                {...field}
+              />
+            )}
+          />
+        </Flex>
+
+        <br />
 
         <Card>
           <CardHeader>نام</CardHeader>
@@ -640,12 +639,7 @@ export const EditProductPage: React.FC = () => {
               <Controller
                 name="discount_exp"
                 control={control}
-                render={({ field }) => (
-                  <PersianDatePicker
-                    onSelect={(v) => field.onChange(new Date(v?.valueOf() as any))}
-                    value={watch('discount_exp')}
-                  />
-                )}
+                render={({ field }) => <PersianDatePicker onSelect={field.onChange} value={watch('discount_exp')} />}
               />
             </InputGroup>
           </CardBody>
@@ -755,32 +749,40 @@ export const EditProductPage: React.FC = () => {
           </Button>
         </CardHeader>
         <CardBody>
-          <Accordion>
+          <Flex direction="column">
             {product?.stock?.length > 0 ? (
-              product?.stock?.map((stock: any) => (
-                <AccordionItem
-                  uniqueKey={stock?.id}
-                  title={
-                    <strong>
+              product?.stock?.map((stock: any, index: number, stocks: any[]) => (
+                <>
+                  <Flex gap="1rem" align="center">
+                    <Badge color="cyan" size="xl">
                       سایز :{stock?.size}{' '}
-                      <Button
-                        onClick={() => setStockToRemove(stock)}
-                        className="mr-3"
-                        appearance="outline"
-                        status="Danger"
-                      >
-                        حذف انبار
-                      </Button>
-                    </strong>
-                  }
-                >
-                  <StockItem callback={productRefetch} stock={stock} />
-                </AccordionItem>
+                    </Badge>
+
+                    <MantineButton
+                      onClick={() => {
+                        handleStocksCollapses(stock?.id)
+                      }}
+                      className="mr-3"
+                      variant="light"
+                      color={openStocksCollapses.includes(stock?.id?.toString()) ? 'orange' : 'green'}
+                    >
+                      {openStocksCollapses.includes(stock?.id?.toString()) ? 'بستن' : 'باز کردن'}
+                    </MantineButton>
+
+                    <MantineButton onClick={() => setStockToRemove(stock)} className="mr-3" variant="light" color="red">
+                      حذف انبار
+                    </MantineButton>
+                  </Flex>
+                  <Collapse in={openStocksCollapses.includes(stock?.id?.toString())} transitionDuration={500}>
+                    <StockItem callback={productRefetch} stock={stock} />
+                  </Collapse>
+                  {index !== stocks?.length - 1 && <Divider color="gray" my="md" />}
+                </>
               ))
             ) : (
               <Alert status="Warning">این محصول در انبار موجود نیست</Alert>
             )}
-          </Accordion>
+          </Flex>
         </CardBody>
       </Card>
 
@@ -833,21 +835,34 @@ export const EditProductPage: React.FC = () => {
       </Modal>
 
       <Modal on={showAddStockModal} toggle={() => setShowAddStockModal(false)}>
-        <ModalBox>
+        <ModalBox style={{ width: '50vw' }}>
           <StockForm callback={afterStockCreation} />
         </ModalBox>
       </Modal>
 
       <Modal on={stockToRemove} toggle={() => setStockToRemove(null)}>
         <ModalBox>
-          آیا از حذف انبار شماره {stockToRemove?.id} مربوط به محصول {product?.name} با سایز {stockToRemove?.size}{' '}
+          آیا از حذف انبار شماره
+          <Badge size="lg" mx="md">
+            {stockToRemove?.id}
+          </Badge>{' '}
+          مربوط به محصول
+          <Badge size="lg" mx="md">
+            {product?.name}
+          </Badge>{' '}
+          با سایز
+          <Badge size="lg" mx="md">
+            {stockToRemove?.size}
+          </Badge>
           اطمینان دارید؟
-          <FlexContainer className="mt-3 flex justify-content-between">
-            <Button onClick={() => setStockToRemove(null)}>انصراف</Button>
-            <Button status="Danger" onClick={() => removeStock(stockToRemove?.id)}>
+          <Flex gap="md" mt="md">
+            <Button onClick={() => setStockToRemove(null)} disabled={loading}>
+              انصراف
+            </Button>
+            <Button status="Danger" onClick={() => removeStock(stockToRemove?.id)} disabled={loading}>
               حذف
             </Button>
-          </FlexContainer>
+          </Flex>
         </ModalBox>
       </Modal>
 
@@ -891,10 +906,4 @@ const CardBody = styled(_CardBody)<CardFamilyProps>`
 const CardHeader = styled(_CardHeader)<CardFamilyProps>`
   overflow: ${(props) => props.overflow && 'initial'};
   overflow: initial;
-`
-
-const DropZoneWrapper = styled.div`
-  img {
-    display: none;
-  }
 `
