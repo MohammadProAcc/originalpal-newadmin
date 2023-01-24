@@ -1,4 +1,5 @@
-import { MultiSelect } from '@mantine/core'
+import { Group, MultiSelect, Text } from '@mantine/core'
+import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import {
   Accordion,
   AccordionItem,
@@ -13,11 +14,9 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { Button, Editor, FlexContainer, ModalBox, ProductImageCard, ProductVideoCard, StockItem } from 'components'
-import { DropZone, PersianDatePicker, UploadProductImage, UploadProductVideo } from 'components/Input'
-import { useNonInitialEffect } from 'hooks'
+import { PersianDatePicker, UploadProductVideo } from 'components/Input'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
-import _ from 'lodash'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -42,78 +41,22 @@ export const EditProductPage: React.FC = () => {
   const router = useRouter()
   const productId = router.query.product_id as string
 
-  const [loading, setLoading] = useState(false)
-
   const { data: product, refetch: productRefetch } = useQuery(['product', productId], () => getSingleProduct(productId))
   const { data: brands, refetch: brandsRefetch } = useQuery(['brands'], () => getAllBrands())
   const { data: tags, refetch: tagsRefetch } = useQuery(['tags'], () => getTagsList({ pages: 'total' }))
 
-  const [mainImage, setMainImage] = useState(product?.site_main_picture)
-  function upadteMainImage(image: any) {
-    setMainImage(image)
-    toast.success('تصویر اصلی با موفقیت بارگذاری شد')
-  }
-
-  const [images, setImages] = useState(product?.media?.length > 0 ? [...product?.media] : [])
-  const [videos, setVideos] = useState(product.video ? [...product?.video] : [])
-
-  useNonInitialEffect(() => {
-    setImages(product?.media?.length > 0 ? [...product?.media] : [])
-    setVideos(product.video ? [...product?.video] : [])
-  }, [product])
-
-  async function appendImage(image: any) {
-    // setImages((_curr) => [..._curr, image])
-    productRefetch()
-    toast.success('تصویر با موفقیت بارگذاری شد')
-  }
-
-  function appendVideo(video: any) {
-    // setVideos((_curr) => [..._curr, video])
-    productRefetch()
-    toast.success('فایل تصویری با موفقیت بارگذاری شد')
-  }
-
-  function updateMediaCallback(media: any, isMain?: boolean, isVideo?: boolean) {
-    if (isMain) {
-      setMainImage(media)
-    } else if (isVideo) {
-      setVideos((_curr) =>
-        _curr?.map((_media) => {
-          if (_media.u === media.u) {
-            return media
-          } else {
-            return _media
-          }
-        }),
-      )
-    } else {
-      setImages((_curr) =>
-        _curr?.map((_media) => {
-          if (_media.u === media.u) {
-            return media
-          } else {
-            return _media
-          }
-        }),
-      )
-    }
-  }
-
-  useNonInitialEffect(
-    () =>
-      setImages(
-        product?.site_main_picture && product?.media?.length > 0
-          ? [product?.site_main_picture, ...product?.media]
-          : product?.site_main_picture
-          ? [product?.site_main_picture]
-          : [null],
-      ),
-    [product],
-  )
+  // <<<=====------ States ------=====>>>
+  const [loading, setLoading] = useState(false)
+  const [videos, setVideos] = useState(product?.video ? [...product?.video] : [])
 
   const [showAddStockModal, setShowAddStockModal] = useState(false)
+  const [removeAllImageModal, setRemoveAllImagesModal] = useState(false)
 
+  const [stockToRemove, setStockToRemove] = useState<any>(null)
+  const [imageToRemove, setImageToRemove] = useState<any>(null)
+  const [videoToRemove, setVideoToRemove] = useState<any>(null)
+
+  // <<<=====------ Select Options ------=====>>>
   const brandsOptions = brands?.data?.map((brand: ProductBrand) => ({
     label: brand?.name,
     value: brand?.id,
@@ -126,11 +69,6 @@ export const EditProductPage: React.FC = () => {
       name: tag?.name,
     },
   }))
-
-  const afterStockCreation = async (response: any) => {
-    await productRefetch()
-    setShowAddStockModal(false)
-  }
 
   const activationOptions = [
     { label: 'فعال', value: '1' },
@@ -149,23 +87,6 @@ export const EditProductPage: React.FC = () => {
   ]
 
   const categoryOptions = [{ label: 'کفش', value: 'shoe' }]
-
-  const [stockToRemove, setStockToRemove] = useState<any>(null)
-
-  const removeStock = async (stockId: number) => {
-    setLoading(true)
-
-    const response = await deleteStock(stockId)
-    if (response !== null) {
-      await productRefetch()
-      setStockToRemove(null)
-      toast.success('انبار با موفقیت حذف شد')
-    } else {
-      toast.success('حذف انبار موفقیت آمیز نبود')
-    }
-
-    setLoading(true)
-  }
 
   const { register, handleSubmit, control, watch } = useForm({
     defaultValues: {
@@ -191,7 +112,16 @@ export const EditProductPage: React.FC = () => {
     },
   })
 
-  const onSubmit = async (form: any) => {
+  // <<<=====------ Functions ------=====>>>
+  function getImages() {
+    let images: Media[] = []
+    if (product?.media?.length > 0) images = [...product?.media]
+
+    if (product?.site_main_picture) images.unshift(product?.site_main_picture)
+    return images
+  }
+
+  async function onSubmit(form: any) {
     setLoading(true)
 
     delete form?.url
@@ -220,88 +150,45 @@ export const EditProductPage: React.FC = () => {
     setLoading(false)
   }
 
-  // called every time a file's `status` changes
-  const handleChangeStatus = ({ meta, file }: any, status: any) => {
-    if (status === 'done') {
-      const formData = new FormData()
-      formData.append('media[]', file)
-
-      axios
-        .post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
-          },
-        })
-        .then(() => {
-          getSingleProduct(product?.id).then((updatedProduct) => {
-            productRefetch({})
-          })
-          toast.success('تصویر با موفقیت آپلود شد')
-        })
-        .catch((error) => console.warn(error?.response?.data))
-    }
-  }
-  const handleMainChangeStatus = ({ meta, file }: any, status: any) => {
-    if (status === 'done') {
-      const formData = new FormData()
-      formData.append('site_main_picture', file)
-
-      axios
-        .post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
-          headers: {
-            Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
-          },
-        })
-        .then(() => {
-          getSingleProduct(product?.id).then((updatedProduct) => {
-            productRefetch({})
-            toast.success('تصویر اصلی با موفقیت بارگذاری شد')
-          })
-          toast.success('تصویر با موفقیت آپلود شد')
-        })
-        .catch((error) => {
-          console.warn(error?.response?.data)
-          toast.error('بارکذاری تصویر اصلی موفیت آمیز نبود')
-        })
-    }
+  async function afterStockCreation(response: any) {
+    await productRefetch()
+    setShowAddStockModal(false)
   }
 
-  const handleImageUpload = async (type: 'media' | 'site_main_picture', file: File) => {
+  async function removeStock(stockId: number) {
     setLoading(true)
-    const formData = new FormData()
-    formData?.append(type, file)
 
-    const { data: response } = await axios.post(`${process.env.API}/admin/products/${product?.id}/image`, formData, {
-      headers: {
-        Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
-        'Content-Type': 'multipart/form-data',
-      },
-    })
-    setLoading(false)
+    const response = await deleteStock(stockId)
+    if (response !== null) {
+      await productRefetch()
+      setStockToRemove(null)
+      toast.success('انبار با موفقیت حذف شد')
+    } else {
+      toast.success('حذف انبار موفقیت آمیز نبود')
+    }
+
+    setLoading(true)
   }
 
-  const [imageToRemove, setImageToRemove] = useState<any>(null)
-
-  const removeProductImage = async (media: Media) => {
+  async function removeProductImage(media: Media) {
+    setLoading(true)
     const response = await deleteProductMedia(
       router?.query?.product_id as string,
       media?.u,
       Cookies.get(process.env.TOKEN!) ?? '',
     )
     if (response?.includes('operation done successfully')) {
-      setImages((_curr) => _curr.filter((_image) => !_.isEqual(_image, media)))
-      setImageToRemove(null)
-      // await resetProduct()
       toast.success('تصویر با موفقیت حذف شد')
+      setImageToRemove(null)
+      productRefetch()
     } else {
       toast.error('حذف تصویر موفیت آمیز نبود')
     }
+    setLoading(false)
   }
 
-  const [videoToRemove, setVideoToRemove] = useState<any>(null)
-
   // TODO: complete video remove process
-  const removeProductVideo = async (media: Media) => {
+  async function removeProductVideo(media: Media) {
     const response = await deleteProductVideo(
       router?.query?.product_id as string,
       media?.u,
@@ -316,12 +203,12 @@ export const EditProductPage: React.FC = () => {
     setVideoToRemove(null)
   }
 
-  const [removeAllImageModal, setRemoveAllImagesModal] = useState(false)
-
-  const removeAllImages = async () => {
+  async function removeAllImages() {
     setLoading(true)
 
-    for (let i = 0; i < images?.length; i++) {
+    let images = getImages()
+
+    for (let i = 0; i < images.length; i++) {
       await removeProductImage(images[i])
     }
 
@@ -330,6 +217,95 @@ export const EditProductPage: React.FC = () => {
     setLoading(false)
   }
 
+  async function handleMainImageUpload(file: File[]) {
+    setLoading(true)
+    const formData = new FormData()
+    formData?.append('site_main_picture', file[0])
+
+    await axios.post(`${process.env.API}/admin/products/${productId}/image`, formData, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+
+    productRefetch()
+    toast.success('تصویر اصلی با موفقیت تغییر کرد')
+
+    setLoading(false)
+  }
+
+  async function handleImagesUpload(files: File[]) {
+    const imagesToUpload = []
+
+    for (let file of files) {
+      const formData = new FormData()
+      formData?.append('media', file)
+      imagesToUpload.push(formData)
+    }
+
+    setLoading(true)
+
+    // VORTEX: why it's not working?
+    // const imagesAsyncIterator = new AsyncIterator(
+    //   imagesToUpload,
+    //   (item: FormData) => {
+    //     await axios.post(
+    //       `${process.env.API}/admin/products/${productId}/image`,
+    //       item,
+    //       {
+    //         headers: {
+    //           Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
+    //           'Content-Type': 'multipart/form-data',
+    //         },
+    //       }
+    //     )
+    //   }
+    // );
+
+    let range = {
+      items: imagesToUpload,
+
+      [Symbol.asyncIterator]() {
+        // (1)
+        return {
+          items: this.items,
+
+          async next() {
+            // (2)
+            const item = this.items.pop()
+            const response = item
+              ? await axios.post(`${process.env.API}/admin/products/${productId}/image`, item, {
+                  headers: {
+                    Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
+                    'Content-Type': 'multipart/form-data',
+                  },
+                })
+              : null
+
+            if (item) {
+              return { done: false, value: response }
+            } else {
+              return { done: true }
+            }
+          },
+        }
+      },
+    }
+
+    ;(async () => {
+      for await (let response of range) {
+        // (4)
+        console.log(response)
+      }
+
+      toast.success('بارگذاری با موفقیت انجام شد')
+      productRefetch()
+      setLoading(false)
+    })()
+  }
+
+  // <<<=====------ JSX ------=====>>>
   return (
     <Layout title={`ویرایش محصول ${product?.id}`}>
       <h1 style={{ marginBottom: '4rem' }}>محصول "{product?.name}"</h1>
@@ -623,12 +599,17 @@ export const EditProductPage: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <h3 style={{ marginBottom: '1rem' }}>
-            تصاویر
-            <span style={{ fontSize: '1rem' }}>
-              ( برای اضافه کردن تصویر, از طریق ورودی زیر عکس مورد نظر را بارگذاری کنید )
-            </span>
-            {images?.length > 0 && (
+          <h3 style={{ marginBottom: '1rem' }}>تصاویر </h3>
+          <Group sx={{ gap: '1rem' }}>
+            <Dropzone accept={IMAGE_MIME_TYPE} multiple={false} onDrop={handleMainImageUpload} loading={loading}>
+              <Text align="center">بارگذاری تصویر اصلی</Text>
+            </Dropzone>
+
+            <Dropzone accept={IMAGE_MIME_TYPE} onDrop={handleImagesUpload} loading={loading}>
+              <Text align="center">بارگذاری تصاویر</Text>
+            </Dropzone>
+
+            {getImages()?.length > 0 && (
               <Button
                 status="Danger"
                 appearance="outline"
@@ -638,38 +619,32 @@ export const EditProductPage: React.FC = () => {
                 حذف تمام تصاویر
               </Button>
             )}
-          </h3>
-          <InputGroup>
-            <label>تصویر اصلی</label>
-            {/* <UploadProductImage productId={product?.id} type="site_main_picture" callback={upadteMainImage} /> */}
-            <DropZone />
-            <ProductImageCard
-              index={0}
-              media={mainImage}
-              removalCallback={setImageToRemove}
-              updateCallback={updateMediaCallback}
-            />
-          </InputGroup>
-          <InputGroup>
-            <label>تصویر</label>
-            <UploadProductImage productId={product?.id} type="media" callback={appendImage} />
-          </InputGroup>
+          </Group>
         </CardHeader>
         <CardBody
           style={{
-            maxHeight: '100vh',
             overflow: 'scroll',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '1.5rem',
           }}
         >
-          {/* {product?.main_site_picture && (
-            <ProductImageCard index={0} media={product?.main_site_picture} removalCallback={setItemToRemove} />
-          )} */}
-          {images?.map((media: Media, index: number) => (
+          {product?.site_main_picture && (
             <ProductImageCard
+              productId={product?.id}
+              index={0}
+              media={product?.site_main_picture}
+              removalCallback={setImageToRemove}
+              updateCallback={productRefetch}
+            />
+          )}
+          {product?.media?.map((media: Media, index: number) => (
+            <ProductImageCard
+              productId={product?.id}
               index={index + 1}
               media={media}
               removalCallback={setImageToRemove}
-              updateCallback={updateMediaCallback}
+              updateCallback={productRefetch}
             />
           ))}
         </CardBody>
@@ -680,7 +655,7 @@ export const EditProductPage: React.FC = () => {
           <h3 style={{ marginBottom: '1rem' }}>ویدیو ها</h3>
           <InputGroup>
             <label>تصویر</label>
-            <UploadProductVideo productId={product.id} callback={appendVideo} />
+            <UploadProductVideo productId={product?.id} callback={productRefetch} />
           </InputGroup>
         </CardHeader>
         <CardBody
@@ -697,7 +672,7 @@ export const EditProductPage: React.FC = () => {
               index={index + 1}
               media={media}
               removalCallback={setVideoToRemove}
-              updateCallback={updateMediaCallback}
+              updateCallback={productRefetch}
             />
           ))}
         </CardBody>
@@ -746,10 +721,10 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>آیا از حذف تصویر زیر اطمینان دارید؟</CardHeader>
           <CardBody className="flex">
             <div className="flex col justify-content-between">
-              <Button onClick={() => removeProductImage(imageToRemove)} status="Danger">
+              <Button onClick={() => removeProductImage(imageToRemove)} status="Danger" disabled={loading}>
                 بله، حذف شود
               </Button>
-              <Button onClick={() => setImageToRemove(null)} status="Info">
+              <Button onClick={() => setImageToRemove(null)} status="Info" disabled={loading}>
                 انصراف
               </Button>
             </div>
@@ -816,7 +791,6 @@ export const EditProductPage: React.FC = () => {
     </Layout>
   )
 }
-
 const Form = styled.form`
   input {
     min-width: 100%;

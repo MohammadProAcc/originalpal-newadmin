@@ -1,40 +1,51 @@
-import { Close } from '@material-ui/icons'
 // import { Alert, Badge, Button, Card, CardBody, CardHeader, Container, InputGroup as _InputGroup } from '@paljs/ui'
-import Cookies from 'js-cookie'
 // import Image from 'next/image'
+import {
+  ActionIcon,
+  Badge,
+  Button,
+  Card,
+  Group,
+  Image,
+  LoadingOverlay,
+  NumberInput,
+  Text,
+  TextInput,
+} from '@mantine/core'
+import { useForm } from '@mantine/form'
+import { IconTrash } from '@tabler/icons'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { Media } from 'types'
-import { deleteProductMedia, editProductImage, editProductMainImage, getSingleProduct, useStore } from 'utils'
-import { Card, Image, Text, Badge, Button, Group } from '@mantine/core';
+import { editProductImage, editProductMainImage, useStore } from 'utils'
 import { append } from 'utils/general/append'
 
 interface ProductImageCardProps {
   media: Media
   index: number
   removalCallback: Function
-  updateCallback: (media: any, isMain: boolean) => void
+  updateCallback: () => Promise<any>
+  productId: number
 }
 export const ProductImageCard: React.FC<ProductImageCardProps> = ({
   media,
   index,
   removalCallback,
   updateCallback,
+  productId,
 }) => {
-  const router = useRouter()
-
-  const { productId, updateProduct } = useStore((state: any) => ({
-    productId: state?.product?.id,
-    updateProduct: state?.updateProduct,
-  }))
-
   const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit } = useForm({
-    defaultValues: media,
+  const imageForm = useForm({
+    initialValues: {
+      a: media?.a,
+      t: media?.t,
+      p: media?.p,
+      s: media?.s,
+      u: media?.u,
+    },
   })
 
   const onSubmit = async (form: any) => {
@@ -49,13 +60,14 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({
     }
 
     if (response.status === 'success') {
-      updateCallback({ ...media, ...form }, index === 0)
-      toast.success('اطلاعات تصویر با موفقیت بروز شد')
+      updateCallback().then(() => {
+        toast.success('اطلاعات تصویر با موفقیت بروز شد')
+        setLoading(false)
+      })
     } else {
       toast.error('بروزرسانی اطلاعات تصویر موفقیت آمیز نبود')
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   // return (
@@ -133,40 +145,53 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({
   //   </Card>
   // )
   return (
-    <Card shadow="sm" p="lg" radius="md" withBorder>
-      <Card.Section>
-        <Image
-          src={append(media?.u)}
-          height={160}
-          alt="product main picture"
-        />
+    <Card shadow="sm" p="lg" radius="md" withBorder w="20rem" pos="relative">
+      <LoadingOverlay visible={loading} />
+      <Card.Section sx={{ figure: { display: 'flex', justifyContent: 'center' }, position: 'relative' }}>
+        <Image src={append(media?.u)} height={160} alt="product main picture" />
+
+        <ActionIcon
+          color="red"
+          variant="light"
+          pos="absolute"
+          top="-0.5rem"
+          left="0.75rem"
+          sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          onClick={() => removalCallback(media)}
+        >
+          ❌
+        </ActionIcon>
       </Card.Section>
 
       <Group position="apart" mt="md" mb="xs">
-        <Text weight={500}>تصویر شماره {index}</Text>
-        {
-          index === 0 && (
-            <Badge color="blue" variant="light">
-              تصویر اصلی
-            </Badge>
-          )
-        }
+        <Text weight={500}>تصویر شماره {index + 1}</Text>
+
+        {index === 0 && (
+          <Badge color="teal" variant="light">
+            تصویر اصلی
+          </Badge>
+        )}
       </Group>
 
-      <Text size="sm" color="dimmed">
-        تگ alt: 
-      </Text>
-      <Text size="sm" color="dimmed">
-        تگ 
-      </Text>
-      <Text size="sm" color="dimmed">
-        With Fjord Tours you can explore more of the magical fjord landscapes with tours and
-        activities on and around the fjords of Norway
-      </Text>
+      <hr />
 
-      <Button variant="light" color="blue" fullWidth mt="md" radius="md">
-        Book classic tour now
-      </Button>
+      <form onSubmit={imageForm.onSubmit(onSubmit)}>
+        <TextInput defaultValue={media?.a} label="برچسب alt" {...imageForm.getInputProps('a')} />
+        <TextInput defaultValue={media?.t} label="برچسب title" {...imageForm.getInputProps('t')} />
+        <NumberInput defaultValue={media?.p} label="ترتیب" {...imageForm.getInputProps('p')} />
+
+        <Button
+          variant="light"
+          color="blue"
+          fullWidth
+          mt="md"
+          radius="md"
+          type="submit"
+          disabled={!(imageForm.isDirty('a') || imageForm.isDirty('t') || imageForm.isDirty('p'))}
+        >
+          بروزرسانی اطلاعات تصویر
+        </Button>
+      </form>
     </Card>
   )
 }
