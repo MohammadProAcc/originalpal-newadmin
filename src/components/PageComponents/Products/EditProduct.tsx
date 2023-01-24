@@ -13,7 +13,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { Button, Editor, FlexContainer, ModalBox, ProductImageCard, ProductVideoCard, StockItem } from 'components'
-import { PersianDatePicker, UploadProductImage, UploadProductVideo } from 'components/Input'
+import { DropZone, PersianDatePicker, UploadProductImage, UploadProductVideo } from 'components/Input'
 import { useNonInitialEffect } from 'hooks'
 import Cookies from 'js-cookie'
 import Layout from 'Layouts'
@@ -641,7 +641,8 @@ export const EditProductPage: React.FC = () => {
           </h3>
           <InputGroup>
             <label>تصویر اصلی</label>
-            <UploadProductImage productId={product?.id} type="site_main_picture" callback={upadteMainImage} />
+            {/* <UploadProductImage productId={product?.id} type="site_main_picture" callback={upadteMainImage} /> */}
+            <DropZone />
             <ProductImageCard
               index={0}
               media={mainImage}

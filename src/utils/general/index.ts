@@ -6,3 +6,4 @@ export * from './toLocalTime'
 export * from './reqSucceed'
 export * from "./has"
 export * from "./mediaCoersion"
+export * from "./prefix"

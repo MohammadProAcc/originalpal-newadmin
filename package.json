@@ -8,6 +8,7 @@
     "@ckeditor/ckeditor5-build-classic": "29.2.0",
     "@ckeditor/ckeditor5-react": "3.0.2",
     "@mantine/core": "^5.10.1",
+    "@mantine/dropzone": "^5.10.1",
     "@mantine/hooks": "^5.10.1",
     "@mantine/rte": "^5.9.4",
     "@mantine/tiptap": "^5.10.1",
