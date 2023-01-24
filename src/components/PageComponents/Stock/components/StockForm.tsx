@@ -100,7 +100,7 @@ export const StockForm: React.FC<IStockFormProps> = ({ defaultValues, callback }
         </InputGroup>
 
         <InputGroup fullWidth style={{ flexDirection: 'column' }}>
-          <label>مقدار تخفیف (ريال یا درصد)</label>
+          <label>مقدار تخفیف (تومان یا درصد)</label>
           <input {...register('discount_amout')} placeholder="مقدار تخفیف" />
         </InputGroup>
 
@@ -151,10 +151,7 @@ export const StockForm: React.FC<IStockFormProps> = ({ defaultValues, callback }
   )
 }
 
-export const Component = styled.div`
-  overflow-y: scroll;
-  height: 90vh;
-`
+export const Component = styled.div` `
 
 const Form = styled.form`
   width: 100%;

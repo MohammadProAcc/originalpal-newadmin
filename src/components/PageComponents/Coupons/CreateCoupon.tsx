@@ -138,7 +138,7 @@ export function CreateCoupon() {
         </Card>
 
         <Card>
-          <CardHeader>حداکثر مبلغ تخفیف به ریال (برای تخفیفات درصدی)</CardHeader>
+          <CardHeader>حداکثر مبلغ تخفیف (برای تخفیفات درصدی)</CardHeader>
           <CardBody>
             <InputGroup>
               <input

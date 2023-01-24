@@ -82,7 +82,7 @@ export const StockItem: React.FC<IStockItemProps> = ({ stock, callback }) => {
       </InputGroup>
 
       <InputGroup fullWidth style={{ flexDirection: 'column' }}>
-        <label>قیمت (ريال)</label>
+        <label>قیمت</label>
         <input {...register('price')} placeholder="قیمت" />
       </InputGroup>
 
@@ -105,7 +105,7 @@ export const StockItem: React.FC<IStockItemProps> = ({ stock, callback }) => {
         </InputGroup>
 
         <InputGroup fullWidth style={{ flex: '1', flexDirection: 'column' }}>
-          <label>مقدار تخفیف (ريال یا درصد)</label>
+          <label>مقدار تخفیف (تومان یا درصد)</label>
           <input {...register('discount_amout')} placeholder="مقدار تخفیف" />
         </InputGroup>
 
@@ -113,7 +113,7 @@ export const StockItem: React.FC<IStockItemProps> = ({ stock, callback }) => {
           <Badge color="cyan" size="lg">
             قیمت بعد از تخفیف:
           </Badge>
-          {numeralize(watch('priceAfterDiscount'))} ريال
+          {numeralize(watch('priceAfterDiscount'))} تومان
         </Flex>
       </Flex>
 

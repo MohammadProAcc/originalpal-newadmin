@@ -1,5 +1,5 @@
-import { Badge, Button as MantineButton, Collapse, Divider, Flex, Group, MultiSelect, Text } from '@mantine/core'
-import { Dropzone, IMAGE_MIME_TYPE, MIME_TYPES } from '@mantine/dropzone'
+import { Badge, Button as MantineButton, Collapse, Divider, Flex, Group, MultiSelect, Text } from "@mantine/core";
+import { Dropzone, IMAGE_MIME_TYPE, MIME_TYPES } from "@mantine/dropzone";
 import {
   Alert,
   Card as _Card,
@@ -8,19 +8,19 @@ import {
   InputGroup,
   Modal,
   Select as _Select,
-} from '@paljs/ui'
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
-import { Button, Editor, FlexContainer, ModalBox, ProductImageCard, ProductVideoCard, StockItem } from 'components'
-import { PersianDatePicker } from 'components/Input'
-import Cookies from 'js-cookie'
-import Layout from 'Layouts'
-import { useRouter } from 'next/router'
-import React, { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
-import styled from 'styled-components'
-import { Media, ProductBrand, Tag } from 'types'
+} from "@paljs/ui";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { Button, Editor, FlexContainer, ModalBox, ProductImageCard, ProductVideoCard, StockItem } from "components";
+import { PersianDatePicker } from "components/Input";
+import Cookies from "js-cookie";
+import Layout from "Layouts";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import styled from "styled-components";
+import { Media, ProductBrand, Tag } from "types";
 import {
   deleteProductMedia,
   deleteProductVideo,
@@ -32,59 +32,61 @@ import {
   preppend,
   reqSucceed,
   toLocalDate,
-} from 'utils'
-import { StockForm } from '../Stock/components'
+} from "utils";
+import { StockForm } from "../Stock/components";
 
 // TODO: add search brand mechanism
 export const EditProductPage: React.FC = () => {
-  const router = useRouter()
-  const productId = router.query.product_id as string
+  const router = useRouter();
+  const productId = router.query.product_id as string;
 
-  const { data: product, refetch: productRefetch } = useQuery(['product', productId], () => getSingleProduct(productId))
-  const { data: brands, refetch: brandsRefetch } = useQuery(['brands'], () => getAllBrands())
-  const { data: tags, refetch: tagsRefetch } = useQuery(['tags'], () => getTagsList({ pages: 'total' }))
+  const { data: product, refetch: productRefetch } = useQuery(["product", productId], () =>
+    getSingleProduct(productId),
+  );
+  const { data: brands, refetch: brandsRefetch } = useQuery(["brands"], () => getAllBrands());
+  const { data: tags, refetch: tagsRefetch } = useQuery(["tags"], () => getTagsList({ pages: "total" }));
 
   // <<<=====------ States ------=====>>>
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
-  const [showAddStockModal, setShowAddStockModal] = useState(false)
-  const [removeAllImageModal, setRemoveAllImagesModal] = useState(false)
-  const [openStocksCollapses, setOpenStocksCollapses] = useState<string[]>([])
+  const [showAddStockModal, setShowAddStockModal] = useState(false);
+  const [removeAllImageModal, setRemoveAllImagesModal] = useState(false);
+  const [openStocksCollapses, setOpenStocksCollapses] = useState<string[]>([]);
 
-  const [stockToRemove, setStockToRemove] = useState<any>(null)
-  const [imageToRemove, setImageToRemove] = useState<any>(null)
-  const [videoToRemove, setVideoToRemove] = useState<any>(null)
+  const [stockToRemove, setStockToRemove] = useState<any>(null);
+  const [imageToRemove, setImageToRemove] = useState<any>(null);
+  const [videoToRemove, setVideoToRemove] = useState<any>(null);
   // <<<=====------ Select Options ------=====>>>
   const brandsOptions = brands?.data?.map((brand: ProductBrand) => ({
     label: brand?.name,
     value: brand?.id,
-  }))
+  }));
 
   const tagsOptions: {
-    label: string
-    value: string
+    label: string;
+    value: string;
   }[] = tags?.data?.data?.map((tag: Tag) => ({
     label: tag?.name,
     value: tag?.id?.toString(),
-  }))
+  }));
 
   const activationOptions = [
-    { label: 'فعال', value: '1' },
-    { label: 'غیرفعال', value: '0' },
-  ]
+    { label: "فعال", value: "1" },
+    { label: "غیرفعال", value: "0" },
+  ];
 
   const onesizeOptions = [
-    { label: 'تک سایز', value: '1' },
-    { label: 'غیر تک سایز', value: '0' },
-  ]
+    { label: "تک سایز", value: "1" },
+    { label: "غیر تک سایز", value: "0" },
+  ];
 
   const typeOptions = [
-    { label: 'جدید', value: 'new' },
-    { label: 'دوباره موجود شده در انبار', value: 'restock' },
-    { label: 'بزودی', value: 'comingsoon' },
-  ]
+    { label: "جدید", value: "new" },
+    { label: "دوباره موجود شده در انبار", value: "restock" },
+    { label: "بزودی", value: "comingsoon" },
+  ];
 
-  const categoryOptions = [{ label: 'کفش', value: 'shoe' }]
+  const categoryOptions = [{ label: "کفش", value: "shoe" }];
 
   const { register, handleSubmit, control, watch } = useForm({
     defaultValues: {
@@ -108,138 +110,138 @@ export const EditProductPage: React.FC = () => {
       trend: product?.trend,
       tags: product?.tags?.map((tag: any) => tag?.id?.toString()),
     },
-  })
+  });
 
   // <<<=====------ Functions ------=====>>>
   function handleStocksCollapses(stockId: number) {
     setOpenStocksCollapses((current) => {
       if (current.includes(stockId.toString())) {
-        return current.filter((id) => id !== stockId.toString())
+        return current.filter((id) => id !== stockId.toString());
       } else {
-        return [...current, stockId.toString()]
+        return [...current, stockId.toString()];
       }
-    })
+    });
   }
 
   function getImages() {
-    let images: Media[] = []
-    if (product?.media?.length > 0) images = [...product?.media]
+    let images: Media[] = [];
+    if (product?.media?.length > 0) images = [...product?.media];
 
-    if (product?.site_main_picture) images.unshift(product?.site_main_picture)
-    return images
+    if (product?.site_main_picture) images.unshift(product?.site_main_picture);
+    return images;
   }
 
   async function onSubmit(form: any) {
-    setLoading(true)
+    setLoading(true);
 
-    delete form?.url
-    delete form?.color
+    delete form?.url;
+    delete form?.color;
 
-    const response = await editProduct(product?.id, form)
+    const response = await editProduct(product?.id, form);
 
     if (response !== null) {
-      await productRefetch()
-      toast.success('محصول بروز شد')
-      router.back()
+      await productRefetch();
+      toast.success("محصول بروز شد");
+      router.back();
     } else {
-      toast.error('بروزرسانی محصول موفقیت آمیز نبود')
+      toast.error("بروزرسانی محصول موفقیت آمیز نبود");
     }
 
-    setLoading(false)
+    setLoading(false);
   }
 
   async function afterStockCreation(response: any) {
-    await productRefetch()
-    setShowAddStockModal(false)
+    await productRefetch();
+    setShowAddStockModal(false);
   }
 
   async function removeStock(stockId: number) {
-    setLoading(true)
+    setLoading(true);
 
-    const response = await deleteStock(stockId)
+    const response = await deleteStock(stockId);
     if (response !== null) {
-      await productRefetch()
-      toast.success(`انبار شماره ${stockToRemove?.id} به سایز ${stockToRemove?.size} با موفقیت حذف شد`)
-      setStockToRemove(null)
+      await productRefetch();
+      toast.success(`انبار شماره ${stockToRemove?.id} به سایز ${stockToRemove?.size} با موفقیت حذف شد`);
+      setStockToRemove(null);
     } else {
-      toast.success('حذف انبار موفقیت آمیز نبود')
+      toast.success("حذف انبار موفقیت آمیز نبود");
     }
 
-    setLoading(false)
+    setLoading(false);
   }
 
   async function removeProductImage(media: Media) {
-    setLoading(true)
+    setLoading(true);
     const response = await deleteProductMedia(
       router?.query?.product_id as string,
       media?.u,
-      Cookies.get(process.env.TOKEN!) ?? '',
-    )
-    if (response?.includes('operation done successfully')) {
-      toast.success('تصویر با موفقیت حذف شد')
-      setImageToRemove(null)
-      productRefetch()
+      Cookies.get(process.env.TOKEN!) ?? "",
+    );
+    if (response?.includes("operation done successfully")) {
+      toast.success("تصویر با موفقیت حذف شد");
+      setImageToRemove(null);
+      productRefetch();
     } else {
-      toast.error('حذف تصویر موفیت آمیز نبود')
+      toast.error("حذف تصویر موفیت آمیز نبود");
     }
-    setLoading(false)
+    setLoading(false);
   }
 
   // TODO: complete video remove process
   async function removeProductVideo(media: Media) {
-    const response = await deleteProductVideo(product?.id, media?.u, Cookies.get(process.env.TOKEN!) ?? '')
+    const response = await deleteProductVideo(product?.id, media?.u, Cookies.get(process.env.TOKEN!) ?? "");
     if (reqSucceed(response)) {
-      productRefetch()
-      toast.success('ویدیو با موفقیت حذف شد')
+      productRefetch();
+      toast.success("ویدیو با موفقیت حذف شد");
     } else {
-      console.log(response)
-      toast.error('حذف ویدیو موفقیت آمیز نبود')
+      console.log(response);
+      toast.error("حذف ویدیو موفقیت آمیز نبود");
     }
-    setVideoToRemove(null)
+    setVideoToRemove(null);
   }
 
   async function removeAllImages() {
-    setLoading(true)
+    setLoading(true);
 
-    let images = getImages()
+    let images = getImages();
 
     for (let i = 0; i < images.length; i++) {
-      await removeProductImage(images[i])
+      await removeProductImage(images[i]);
     }
 
-    setRemoveAllImagesModal(false)
+    setRemoveAllImagesModal(false);
 
-    setLoading(false)
+    setLoading(false);
   }
 
   async function handleMainImageUpload(file: File[]) {
-    setLoading(true)
-    const formData = new FormData()
-    formData?.append('site_main_picture', file[0])
+    setLoading(true);
+    const formData = new FormData();
+    formData?.append("site_main_picture", file[0]);
 
     await axios.post(`${process.env.API}/admin/products/${productId}/image`, formData, {
       headers: {
         Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
-    })
+    });
 
-    productRefetch()
-    toast.success('تصویر اصلی با موفقیت تغییر کرد')
+    productRefetch();
+    toast.success("تصویر اصلی با موفقیت تغییر کرد");
 
-    setLoading(false)
+    setLoading(false);
   }
 
   async function handleImagesUpload(files: File[]) {
-    const imagesToUpload = []
+    const imagesToUpload = [];
 
     for (let file of files) {
-      const formData = new FormData()
-      formData?.append('media', file)
-      imagesToUpload.push(formData)
+      const formData = new FormData();
+      formData?.append("media", file);
+      imagesToUpload.push(formData);
     }
 
-    setLoading(true)
+    setLoading(true);
 
     // VORTEX: why it's not working?
     // const imagesAsyncIterator = new AsyncIterator(
@@ -268,49 +270,49 @@ export const EditProductPage: React.FC = () => {
 
           async next() {
             // (2)
-            const item = this.items.pop()
+            const item = this.items.pop();
             const response = item
               ? await axios.post(`${process.env.API}/admin/products/${productId}/image`, item, {
                   headers: {
                     Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
-                    'Content-Type': 'multipart/form-data',
+                    "Content-Type": "multipart/form-data",
                   },
                 })
-              : null
+              : null;
 
             if (item) {
-              return { done: false, value: response }
+              return { done: false, value: response };
             } else {
-              return { done: true }
+              return { done: true };
             }
           },
-        }
+        };
       },
-    }
+    };
 
-    ;(async () => {
+    (async () => {
       for await (let response of range) {
         if (response?.status == 200) {
-          toast.success('فایل تصویر با موفقیت بارگذاری شد')
+          toast.success("فایل تصویر با موفقیت بارگذاری شد");
         }
       }
 
-      toast.info('بارگذاری تصاویر به اتمام رسید')
-      productRefetch()
-      setLoading(false)
-    })()
+      toast.info("بارگذاری تصاویر به اتمام رسید");
+      productRefetch();
+      setLoading(false);
+    })();
   }
 
   async function handleVideosUpload(files: File[]) {
-    const imagesToUpload = []
+    const imagesToUpload = [];
 
     for (let file of files) {
-      const formData = new FormData()
-      formData?.append('product_video', file)
-      imagesToUpload.push(formData)
+      const formData = new FormData();
+      formData?.append("product_video", file);
+      imagesToUpload.push(formData);
     }
 
-    setLoading(true)
+    setLoading(true);
 
     // VORTEX: why it's not working?
     // const imagesAsyncIterator = new AsyncIterator(
@@ -337,44 +339,44 @@ export const EditProductPage: React.FC = () => {
           items: this.items,
 
           async next() {
-            const item = this.items.pop()
+            const item = this.items.pop();
             const response = item
               ? await axios.post(`${process.env.API}/admin/products/${productId}/video`, item, {
                   headers: {
                     Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
-                    'Content-Type': 'multipart/form-data',
+                    "Content-Type": "multipart/form-data",
                   },
                 })
-              : null
+              : null;
 
             if (item) {
-              return { done: false, value: response }
+              return { done: false, value: response };
             } else {
-              return { done: true }
+              return { done: true };
             }
           },
-        }
+        };
       },
-    }
+    };
 
-    ;(async () => {
+    (async () => {
       for await (let response of range) {
         if (response?.status === 200) {
-          toast.success('ویدیو با موفقیت بارگذاری شد')
+          toast.success("ویدیو با موفقیت بارگذاری شد");
         }
       }
 
-      toast.info('بارگذاری ویدیو ها به اتمام رسید')
+      toast.info("بارگذاری ویدیو ها به اتمام رسید");
 
-      productRefetch()
-      setLoading(false)
-    })()
+      productRefetch();
+      setLoading(false);
+    })();
   }
 
   // <<<=====------ JSX ------=====>>>
   return (
     <Layout title={`ویرایش محصول ${product?.id}`}>
-      <h1 style={{ marginBottom: '4rem' }}>محصول "{product?.name}"</h1>
+      <h1 style={{ marginBottom: "4rem" }}>محصول "{product?.name}"</h1>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Card>
           <CardHeader>َUrl منحصر به فرد</CardHeader>
@@ -389,7 +391,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>H1 صفحه</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('title', { required: true })} />
+              <input {...register("title", { required: true })} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -398,13 +400,13 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>کد</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('code', { required: true })} />
+              <input {...register("code", { required: true })} />
             </InputGroup>
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader>برند : {product?.brand?.name ?? '-'}</CardHeader>
+          <CardHeader>برند : {product?.brand?.name ?? "-"}</CardHeader>
           <CardBody>
             <InputGroup>
               <Controller
@@ -446,31 +448,31 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>نام</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('name', { required: true })} />
+              <input {...register("name", { required: true })} />
             </InputGroup>
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader>قیمت (ريال)</CardHeader>
+          <CardHeader>قیمت</CardHeader>
           <CardBody>
             <InputGroup>
-              <input placeholder="قیمت" type="number" {...register('price')} />
+              <input placeholder="قیمت" type="number" {...register("price")} />
             </InputGroup>
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader>قیمت با تخفیف (ريال)</CardHeader>
+          <CardHeader>قیمت با تخفیف</CardHeader>
           <CardBody>
             <InputGroup>
-              <input placeholder="قیمت با تخفیف" type="number" {...register('discount_price')} />
+              <input placeholder="قیمت با تخفیف" type="number" {...register("discount_price")} />
             </InputGroup>
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader>فعال یا غیرفعال کردن محصول : {product?.Enable ? 'فعال' : 'غیر فعال'}</CardHeader>
+          <CardHeader>فعال یا غیرفعال کردن محصول : {product?.Enable ? "فعال" : "غیر فعال"}</CardHeader>
           <CardBody>
             <InputGroup>
               <Controller
@@ -488,7 +490,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>وضعیت</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('state')} />
+              <input {...register("state")} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -500,7 +502,7 @@ export const EditProductPage: React.FC = () => {
               <CardHeader>عنوان صفحه (tag title)</CardHeader>
               <CardBody>
                 <InputGroup>
-                  <input {...register('title_page')} />
+                  <input {...register("title_page")} />
                 </InputGroup>
               </CardBody>
             </Card>
@@ -509,7 +511,7 @@ export const EditProductPage: React.FC = () => {
               <CardHeader>عنوان سئو (meta title)</CardHeader>
               <CardBody>
                 <InputGroup>
-                  <input {...register('meta_title')} placeholder="عنوان سئو (tag title)" />
+                  <input {...register("meta_title")} placeholder="عنوان سئو (tag title)" />
                 </InputGroup>
               </CardBody>
             </Card>
@@ -518,7 +520,7 @@ export const EditProductPage: React.FC = () => {
               <CardHeader>مترادف ها (meta_keywords)</CardHeader>
               <CardBody>
                 <InputGroup>
-                  <textarea style={{ minWidth: '100%', height: '8rem' }} {...register('meta_keywords')} />
+                  <textarea style={{ minWidth: "100%", height: "8rem" }} {...register("meta_keywords")} />
                 </InputGroup>
               </CardBody>
             </Card>
@@ -527,7 +529,7 @@ export const EditProductPage: React.FC = () => {
               <CardHeader>توضیح متا (meta_description)</CardHeader>
               <CardBody>
                 <InputGroup>
-                  <textarea style={{ minWidth: '100%', height: '8rem' }} {...register('meta_description')} />
+                  <textarea style={{ minWidth: "100%", height: "8rem" }} {...register("meta_description")} />
                 </InputGroup>
               </CardBody>
             </Card>
@@ -576,7 +578,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>خلاصه</CardHeader>
           <CardBody>
             <InputGroup>
-              <textarea style={{ minWidth: '100%', height: '8rem' }} {...register('summary')} />
+              <textarea style={{ minWidth: "100%", height: "8rem" }} {...register("summary")} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -595,7 +597,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>ترند</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('trend')} placeholder="ترند" />
+              <input {...register("trend")} placeholder="ترند" />
             </InputGroup>
           </CardBody>
         </Card>
@@ -604,7 +606,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>میزان فروش</CardHeader>
           <CardBody>
             <InputGroup>
-              <input type="number" {...register('sold')} placeholder="میزان فروش" />
+              <input type="number" {...register("sold")} placeholder="میزان فروش" />
             </InputGroup>
           </CardBody>
         </Card>
@@ -630,7 +632,7 @@ export const EditProductPage: React.FC = () => {
 
         <Card>
           <CardHeader>
-            پایان تخفیف : {toLocalDate(product?.discount_exp) ?? '-'} (برای بروزرسانی تاریخ پایان تخفیف، تاریخ موردنظر
+            پایان تخفیف : {toLocalDate(product?.discount_exp) ?? "-"} (برای بروزرسانی تاریخ پایان تخفیف، تاریخ موردنظر
             خود را وارد کنید.)
           </CardHeader>
           <CardBody>
@@ -639,7 +641,7 @@ export const EditProductPage: React.FC = () => {
               <Controller
                 name="discount_exp"
                 control={control}
-                render={({ field }) => <PersianDatePicker onSelect={field.onChange} value={watch('discount_exp')} />}
+                render={({ field }) => <PersianDatePicker onSelect={field.onChange} value={watch("discount_exp")} />}
               />
             </InputGroup>
           </CardBody>
@@ -649,7 +651,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>اسلاگ</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('slug')} />
+              <input {...register("slug")} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -661,8 +663,8 @@ export const EditProductPage: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <h3 style={{ marginBottom: '1rem' }}>تصاویر </h3>
-          <Group sx={{ gap: '1rem' }}>
+          <h3 style={{ marginBottom: "1rem" }}>تصاویر </h3>
+          <Group sx={{ gap: "1rem" }}>
             <Dropzone accept={IMAGE_MIME_TYPE} multiple={false} onDrop={handleMainImageUpload} loading={loading}>
               <Text align="center">بارگذاری تصویر اصلی</Text>
             </Dropzone>
@@ -675,7 +677,7 @@ export const EditProductPage: React.FC = () => {
               <Button
                 status="Danger"
                 appearance="outline"
-                style={{ display: 'inline-block', marginRight: '0.5rem' }}
+                style={{ display: "inline-block", marginRight: "0.5rem" }}
                 onClick={() => setRemoveAllImagesModal(true)}
               >
                 حذف تمام تصاویر
@@ -685,10 +687,10 @@ export const EditProductPage: React.FC = () => {
         </CardHeader>
         <CardBody
           style={{
-            overflow: 'scroll',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '1.5rem',
+            overflow: "scroll",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "1.5rem",
           }}
         >
           {product?.site_main_picture && (
@@ -714,7 +716,7 @@ export const EditProductPage: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <h3 style={{ marginBottom: '1rem' }}>ویدیو ها</h3>
+          <h3 style={{ marginBottom: "1rem" }}>ویدیو ها</h3>
 
           <Group>
             <Dropzone accept={[MIME_TYPES.mp4]} onDrop={handleVideosUpload} loading={loading}>
@@ -724,9 +726,9 @@ export const EditProductPage: React.FC = () => {
         </CardHeader>
         <CardBody
           style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '1rem',
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "1rem",
           }}
         >
           {product?.video?.map((media: Media, index: number) => (
@@ -743,7 +745,7 @@ export const EditProductPage: React.FC = () => {
 
       <Card>
         <CardHeader className="flex ali-center">
-          انبار{' '}
+          انبار{" "}
           <Button className="mx-3" status="Success" appearance="hero" onClick={() => setShowAddStockModal(true)}>
             افزودن انبار
           </Button>
@@ -755,18 +757,18 @@ export const EditProductPage: React.FC = () => {
                 <>
                   <Flex gap="1rem" align="center">
                     <Badge color="cyan" size="xl">
-                      سایز :{stock?.size}{' '}
+                      سایز :{stock?.size}{" "}
                     </Badge>
 
                     <MantineButton
                       onClick={() => {
-                        handleStocksCollapses(stock?.id)
+                        handleStocksCollapses(stock?.id);
                       }}
                       className="mr-3"
                       variant="light"
-                      color={openStocksCollapses.includes(stock?.id?.toString()) ? 'orange' : 'green'}
+                      color={openStocksCollapses.includes(stock?.id?.toString()) ? "orange" : "green"}
                     >
-                      {openStocksCollapses.includes(stock?.id?.toString()) ? 'بستن' : 'باز کردن'}
+                      {openStocksCollapses.includes(stock?.id?.toString()) ? "بستن" : "باز کردن"}
                     </MantineButton>
 
                     <MantineButton onClick={() => setStockToRemove(stock)} className="mr-3" variant="light" color="red">
@@ -799,7 +801,7 @@ export const EditProductPage: React.FC = () => {
                 انصراف
               </Button>
             </div>
-            {<img className="mb-2" width="100px" height="100px" src={`${process.env.SRC}/${imageToRemove?.u}`} />}{' '}
+            {<img className="mb-2" width="100px" height="100px" src={`${process.env.SRC}/${imageToRemove?.u}`} />}{" "}
           </CardBody>
         </Card>
       </Modal>
@@ -814,15 +816,15 @@ export const EditProductPage: React.FC = () => {
               width="auto"
               height="auto"
               style={{
-                objectFit: 'contain',
-                objectPosition: 'center',
-                maxWidth: '75vw',
-                maxHeight: '75vh',
+                objectFit: "contain",
+                objectPosition: "center",
+                maxWidth: "75vw",
+                maxHeight: "75vh",
               }}
-              src={preppend(videoToRemove?.u, 'vid')}
+              src={preppend(videoToRemove?.u, "vid")}
             />
 
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ display: "flex", gap: "1rem" }}>
               <Button onClick={() => setVideoToRemove(null)} status="Info">
                 انصراف
               </Button>
@@ -835,7 +837,7 @@ export const EditProductPage: React.FC = () => {
       </Modal>
 
       <Modal on={showAddStockModal} toggle={() => setShowAddStockModal(false)}>
-        <ModalBox style={{ width: '50vw' }}>
+        <ModalBox style={{ width: "50vw", height: "90vh" }}>
           <StockForm callback={afterStockCreation} />
         </ModalBox>
       </Modal>
@@ -845,11 +847,11 @@ export const EditProductPage: React.FC = () => {
           آیا از حذف انبار شماره
           <Badge size="lg" mx="md">
             {stockToRemove?.id}
-          </Badge>{' '}
+          </Badge>{" "}
           مربوط به محصول
           <Badge size="lg" mx="md">
             {product?.name}
-          </Badge>{' '}
+          </Badge>{" "}
           با سایز
           <Badge size="lg" mx="md">
             {stockToRemove?.size}
@@ -878,32 +880,32 @@ export const EditProductPage: React.FC = () => {
         </ModalBox>
       </Modal>
     </Layout>
-  )
-}
+  );
+};
 const Form = styled.form`
   input {
     min-width: 100%;
   }
-`
+`;
 
 const Select = styled(_Select)`
   width: 100%;
-`
+`;
 
 interface CardFamilyProps {
-  overflow?: boolean
+  overflow?: boolean;
 }
 
 const Card = styled(_Card)<CardFamilyProps>`
-  overflow: ${(props) => props.overflow && 'initial'};
+  overflow: ${(props) => props.overflow && "initial"};
   overflow: initial;
-`
+`;
 
 const CardBody = styled(_CardBody)<CardFamilyProps>`
   overflow: initial;
-`
+`;
 
 const CardHeader = styled(_CardHeader)<CardFamilyProps>`
-  overflow: ${(props) => props.overflow && 'initial'};
+  overflow: ${(props) => props.overflow && "initial"};
   overflow: initial;
-`
+`;
