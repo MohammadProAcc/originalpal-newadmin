@@ -1,5 +1,5 @@
 import { Group, MultiSelect, Text } from '@mantine/core'
-import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone'
+import { Dropzone, IMAGE_MIME_TYPE, MIME_TYPES } from '@mantine/dropzone'
 import {
   Accordion,
   AccordionItem,
@@ -24,6 +24,7 @@ import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { Media, ProductBrand, Tag } from 'types'
 import {
+  preppend,
   deleteProductMedia,
   deleteProductVideo,
   deleteStock,
@@ -47,7 +48,6 @@ export const EditProductPage: React.FC = () => {
 
   // <<<=====------ States ------=====>>>
   const [loading, setLoading] = useState(false)
-  const [videos, setVideos] = useState(product?.video ? [...product?.video] : [])
 
   const [showAddStockModal, setShowAddStockModal] = useState(false)
   const [removeAllImageModal, setRemoveAllImagesModal] = useState(false)
@@ -189,15 +189,12 @@ export const EditProductPage: React.FC = () => {
 
   // TODO: complete video remove process
   async function removeProductVideo(media: Media) {
-    const response = await deleteProductVideo(
-      router?.query?.product_id as string,
-      media?.u,
-      Cookies.get(process.env.TOKEN!) ?? '',
-    )
+    const response = await deleteProductVideo(product?.id, media?.u, Cookies.get(process.env.TOKEN!) ?? '')
     if (reqSucceed(response)) {
-      await productRefetch()
+      productRefetch()
       toast.success('ویدیو با موفقیت حذف شد')
     } else {
+      console.log(response)
       toast.error('حذف ویدیو موفقیت آمیز نبود')
     }
     setVideoToRemove(null)
@@ -295,11 +292,82 @@ export const EditProductPage: React.FC = () => {
 
     ;(async () => {
       for await (let response of range) {
-        // (4)
-        console.log(response)
+        if (response?.status == 200) {
+          toast.success('فایل تصویر با موفقیت بارگذاری شد')
+        }
       }
 
-      toast.success('بارگذاری با موفقیت انجام شد')
+      toast.info('بارگذاری تصاویر به اتمام رسید')
+      productRefetch()
+      setLoading(false)
+    })()
+  }
+
+  async function handleVideosUpload(files: File[]) {
+    const imagesToUpload = []
+
+    for (let file of files) {
+      const formData = new FormData()
+      formData?.append('product_video', file)
+      imagesToUpload.push(formData)
+    }
+
+    setLoading(true)
+
+    // VORTEX: why it's not working?
+    // const imagesAsyncIterator = new AsyncIterator(
+    //   imagesToUpload,
+    //   (item: FormData) => {
+    //     await axios.post(
+    //       `${process.env.API}/admin/products/${productId}/image`,
+    //       item,
+    //       {
+    //         headers: {
+    //           Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
+    //           'Content-Type': 'multipart/form-data',
+    //         },
+    //       }
+    //     )
+    //   }
+    // );
+
+    let range = {
+      items: imagesToUpload,
+
+      [Symbol.asyncIterator]() {
+        return {
+          items: this.items,
+
+          async next() {
+            const item = this.items.pop()
+            const response = item
+              ? await axios.post(`${process.env.API}/admin/products/${productId}/video`, item, {
+                  headers: {
+                    Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
+                    'Content-Type': 'multipart/form-data',
+                  },
+                })
+              : null
+
+            if (item) {
+              return { done: false, value: response }
+            } else {
+              return { done: true }
+            }
+          },
+        }
+      },
+    }
+
+    ;(async () => {
+      for await (let response of range) {
+        if (response?.status === 200) {
+          toast.success('ویدیو با موفقیت بارگذاری شد')
+        }
+      }
+
+      toast.info('بارگذاری ویدیو ها به اتمام رسید')
+
       productRefetch()
       setLoading(false)
     })()
@@ -653,22 +721,23 @@ export const EditProductPage: React.FC = () => {
       <Card>
         <CardHeader>
           <h3 style={{ marginBottom: '1rem' }}>ویدیو ها</h3>
-          <InputGroup>
-            <label>تصویر</label>
-            <UploadProductVideo productId={product?.id} callback={productRefetch} />
-          </InputGroup>
+
+          <Group>
+            <Dropzone accept={[MIME_TYPES.mp4]} onDrop={handleVideosUpload} loading={loading}>
+              <Text align="center">بارگذاری فایل تصویری</Text>
+            </Dropzone>
+          </Group>
         </CardHeader>
         <CardBody
           style={{
-            maxHeight: '100vh',
-            overflow: 'scroll',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '1rem',
           }}
         >
-          {/* {product?.main_site_picture && (
-            <ProductImageCard index={0} media={product?.main_site_picture} removalCallback={setItemToRemove} />
-          )} */}
-          {videos?.map((media: Media, index: number) => (
+          {product?.video?.map((media: Media, index: number) => (
             <ProductVideoCard
+              productId={product?.id}
               index={index + 1}
               media={media}
               removalCallback={setVideoToRemove}
@@ -716,7 +785,7 @@ export const EditProductPage: React.FC = () => {
       </Card>
 
       {/* -===>>> Modals <<<===- */}
-      <Modal on={!!imageToRemove} toggle={() => setImageToRemove((current: boolean) => !current)}>
+      <Modal on={!!imageToRemove} toggle={() => setImageToRemove(null)}>
         <Card>
           <CardHeader>آیا از حذف تصویر زیر اطمینان دارید؟</CardHeader>
           <CardBody className="flex">
@@ -733,27 +802,32 @@ export const EditProductPage: React.FC = () => {
         </Card>
       </Modal>
 
-      <Modal on={!!videoToRemove} toggle={() => setVideoToRemove((current: boolean) => !current)}>
+      <Modal on={!!videoToRemove} toggle={() => setVideoToRemove(null)}>
         <Card>
           <CardHeader>آیا از حذف ویدیو زیر اطمینان دارید؟</CardHeader>
-          <CardBody className="flex">
-            <div className="flex col justify-content-between">
-              <Button onClick={() => removeProductVideo(videoToRemove)} status="Danger">
-                بله، حذف شود
-              </Button>
+          <CardBody className="flex col">
+            <video
+              controls
+              className="mb-2 flex center"
+              width="auto"
+              height="auto"
+              style={{
+                objectFit: 'contain',
+                objectPosition: 'center',
+                maxWidth: '75vw',
+                maxHeight: '75vh',
+              }}
+              src={preppend(videoToRemove?.u, 'vid')}
+            />
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
               <Button onClick={() => setVideoToRemove(null)} status="Info">
                 انصراف
               </Button>
+              <Button onClick={() => removeProductVideo(videoToRemove)} status="Danger">
+                بله، حذف شود
+              </Button>
             </div>
-            {
-              <video
-                controls
-                className="mb-2"
-                width="100px"
-                height="100px"
-                src={`${process.env.VID_SRC}/${videoToRemove?.u}`}
-              />
-            }{' '}
           </CardBody>
         </Card>
       </Modal>

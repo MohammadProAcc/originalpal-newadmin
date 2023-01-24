@@ -13,14 +13,12 @@ import {
   TextInput,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { IconTrash } from '@tabler/icons'
-import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 import styled from 'styled-components'
 import { Media } from 'types'
-import { editProductImage, editProductMainImage, useStore } from 'utils'
-import { append } from 'utils/general/append'
+import { editProductImage, editProductMainImage } from 'utils'
+import { preppend } from 'utils/general/preppend'
 
 interface ProductImageCardProps {
   media: Media
@@ -69,86 +67,11 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({
       setLoading(false)
     }
   }
-
-  // return (
-  //   <Card style={{ maxHeight: '40rem' }}>
-  //     <CardHeader style={{ position: 'relative' }}>
-  //       {index === 0 ? (
-  //         media === null ? (
-  //           <Alert status="Danger">تصویر اصلی وجود ندارد</Alert>
-  //         ) : (
-  //           <Alert status="Success">تصویر اصلی</Alert>
-  //         )
-  //       ) : (
-  //         <Alert status="Info">تصویر شماره {index}</Alert>
-  //       )}
-  //     </CardHeader>
-  //     <CardBody style={{ display: 'flex', position: 'relative' }}>
-  //       {media === null ? (
-  //         <></>
-  //       ) : (
-  //         <>
-  //           <Button
-  //             style={{
-  //               padding: '0.125rem',
-  //               position: 'absolute',
-  //               top: '1rem',
-  //               left: '1rem',
-  //               display: index === 0 ? 'none' : '',
-  //             }}
-  //             status="Danger"
-  //             appearance="outline"
-  //             onClick={() => removalCallback(media)}
-  //           >
-  //             <Close />
-  //           </Button>
-  //           <Container>
-  //             <Form onSubmit={handleSubmit(onSubmit)}>
-  //               <InputGroup>
-  //                 <label>وضعیت نمایش</label>
-  //                 <input {...register('s')} placeholder="وضعیت نمایش" />
-  //               </InputGroup>
-
-  //               <InputGroup>
-  //                 <label>اولویت</label>
-  //                 <input {...register('p')} placeholder="اولویت" />
-  //               </InputGroup>
-
-  //               <InputGroup>
-  //                 <label>تگ alt</label>
-  //                 <input {...register('a')} placeholder="تگ alt" />
-  //               </InputGroup>
-
-  //               <InputGroup>
-  //                 <label>تگ title</label>
-  //                 <input {...register('t')} placeholder="تگ title" />
-  //               </InputGroup>
-
-  //               <Button disabled={loading} type="submit" status="Info" appearance="outline">
-  //                 بروزرسانی تصویر
-  //               </Button>
-  //             </Form>
-  //           </Container>
-  //           <InputGroup
-  //             style={{
-  //               width: '100%',
-  //               marginLeft: '3rem',
-  //               display: 'flex',
-  //               justifyContent: 'flex-end',
-  //             }}
-  //           >
-  //             <ProductImage src={`http://api.originalpal.co.uk/images/${media?.u}`} />
-  //           </InputGroup>
-  //         </>
-  //       )}
-  //     </CardBody>
-  //   </Card>
-  // )
   return (
     <Card shadow="sm" p="lg" radius="md" withBorder w="20rem" pos="relative">
       <LoadingOverlay visible={loading} />
       <Card.Section sx={{ figure: { display: 'flex', justifyContent: 'center' }, position: 'relative' }}>
-        <Image src={append(media?.u)} height={160} alt="product main picture" />
+        <Image src={preppend(media?.u)} height={160} alt="product main picture" />
 
         <ActionIcon
           color="red"

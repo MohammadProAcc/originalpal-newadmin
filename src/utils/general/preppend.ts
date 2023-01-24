@@ -1,8 +1,8 @@
-export function append(url: string, mode?: 'src' | 'med' | 'vid') {
-  const prefix = mode
-    ? mode == 'src'
+export function preppend(url: string, by?: 'src' | 'med' | 'vid') {
+  const prefix = by
+    ? by == 'src'
       ? process.env['SRC']
-      : mode === 'med'
+      : by === 'med'
       ? process.env['MED_SRC']
       : process.env['VID_SRC']
     : process.env['SRC']
