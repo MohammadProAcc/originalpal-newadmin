@@ -1,71 +1,68 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { useStore, deleteStock, numeralize, useUserStore, has } from 'utils'
-import Layout from 'Layouts'
-import { Button, Container, Modal } from '@paljs/ui'
-import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { Add } from '@material-ui/icons'
-import { toast } from 'react-toastify'
-import { PermissionEnum } from 'types'
+import React, { useState } from "react";
+import styled from "styled-components";
+import { useStore, deleteStock, numeralize, useUserStore, has, getStocksList } from "utils";
+import Layout from "Layouts";
+import { Button, Container, Modal } from "@paljs/ui";
+import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from "components";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { Add } from "@material-ui/icons";
+import { toast } from "react-toastify";
+import { PermissionEnum } from "types";
+import { useQuery } from "@tanstack/react-query";
 
 export const StockPage = () => {
-  const router = useRouter()
+  const router = useRouter();
 
-  const { stocks, clearList } = useStore((state) => ({
-    stocks: state?.stocks,
-    clearList: state?.clearList,
-  }))
-  const permissions = useUserStore().getPermissions()
+  const stocksQuery = useQuery(["stocks"], () => getStocksList(router.query));
+  const permissions = useUserStore().getPermissions();
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
-  const [itemsToRemove, setItemsToRemove] = useState<any>(null)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const [itemsToRemove, setItemsToRemove] = useState<any>(null);
 
-  const [tableSelections, setTableSelections] = useState<number[] | []>([])
+  const [tableSelections, setTableSelections] = useState<number[] | []>([]);
 
-  const toggleModal = () => setItemToRemove(null)
-  const togglePluralRemoveModal = () => setItemsToRemove(null)
+  const toggleModal = () => setItemToRemove(null);
+  const togglePluralRemoveModal = () => setItemsToRemove(null);
 
   const removeItem = async (item: any) => {
-    setLoading(true)
-    const response = await deleteStock(item?.id)
-    if (response?.status === 'success') {
-      clearList('stocks', item?.id)
-      setItemToRemove(null)
-      toast.success('انبار با موفقیت حذف شد')
+    setLoading(true);
+    const response = await deleteStock(item?.id);
+    if (response?.status === "success") {
+      stocksQuery?.refetch();
+      setItemToRemove(null);
+      toast.success("انبار با موفقیت حذف شد");
     } else {
-      toast.error('حذف انبار موفقیت آمیز نبود')
+      toast.error("حذف انبار موفقیت آمیز نبود");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const pluralRemoveTrigger = async (selections: any[]) => {
-    setLoading(true)
+    setLoading(true);
 
     if (selections?.length > 0) {
       const deletions = await selections?.map(async (id) => {
-        const response = await deleteStock(id)
+        const response = await deleteStock(id);
 
-        if (response?.status === 'success') {
-          clearList('stocks', id)
-
-          toast.success(`مورد با شناسه ${id} حذف شد`)
+        if (response?.status === "success") {
+          stocksQuery.refetch();
+          toast.success(`مورد با شناسه ${id} حذف شد`);
         }
-      })
+      });
 
-      await setTableSelections([])
-      await setItemsToRemove(null)
+      await setTableSelections([]);
+      await setItemsToRemove(null);
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const columns: any[] = ['شناسه انبار', 'شناسه محصول انبار', 'کد', 'سایز', 'تعداد', 'قیمت', 'قیمت با تخفیف', 'فعالیت']
+  const columns: any[] = ["شناسه انبار", "شناسه محصول انبار", "کد", "سایز", "تعداد", "قیمت", "قیمت با تخفیف", "فعالیت"];
 
-  const data = stocks?.data?.data?.map((stock: any) => [
+  const data = stocksQuery?.data?.data?.data?.map((stock: any) => [
     // =====>> Table Columns <<=====
     stock?.id,
     stock?.product_id,
@@ -77,14 +74,14 @@ export const StockPage = () => {
     <Container>
       <Link href={`/stock/${stock?.id}`}>
         <a>
-          <Button style={{ marginLeft: '1rem' }} status="Info">
+          <Button style={{ marginLeft: "1rem" }} status="Info">
             مشاهده
           </Button>
         </a>
       </Link>
       <Link href={`/stock/edit/${stock?.id}`}>
         <a>
-          <Button style={{ marginLeft: '1rem' }} status="Primary">
+          <Button style={{ marginLeft: "1rem" }} status="Primary">
             ویرایش
           </Button>
         </a>
@@ -93,7 +90,7 @@ export const StockPage = () => {
         حذف
       </Button>
     </Container>,
-  ])
+  ]);
 
   return (
     <Layout title="انبار">
@@ -105,8 +102,8 @@ export const StockPage = () => {
             <a>
               <Button
                 style={{
-                  margin: '1rem 0 1rem 1rem',
-                  display: 'flex',
+                  margin: "1rem 0 1rem 1rem",
+                  display: "flex",
                 }}
                 status="Success"
                 appearance="outline"
@@ -127,12 +124,12 @@ export const StockPage = () => {
       {has(permissions, PermissionEnum.browseStock) && (
         <>
           <SearchBar
-            fields={stocks.fields}
+            fields={stocksQuery?.data?.fields}
             entity="stocks"
             params={router.query}
             callback={(form: any) =>
               router.push({
-                pathname: '/stock/search',
+                pathname: "/stock/search",
                 query: form,
               })
             }
@@ -141,7 +138,7 @@ export const StockPage = () => {
           <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
 
           <PaginationBar
-            totalPages={stocks?.data?.last_page}
+            totalPages={stocksQuery?.data?.data?.last_page}
             activePage={router.query.page ? Number(router.query.page) : 1}
             router={router}
           />
@@ -150,10 +147,10 @@ export const StockPage = () => {
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
-          آیا از حذف انبار <span className="text-danger">{`${itemToRemove?.id} `}</span> برای محصول{' '}
+          آیا از حذف انبار <span className="text-danger">{`${itemToRemove?.id} `}</span> برای محصول{" "}
           <span className="text-danger">{`${itemToRemove?.product_id} `}</span> اطمینان دارید؟
           <ButtonGroup>
-            <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>
+            <Button onClick={toggleModal} style={{ marginLeft: "1rem" }}>
               خیر، منصرم شدم
             </Button>
             <Button onClick={() => removeItem(itemToRemove)} disabled={loading} status="Danger">
@@ -166,10 +163,10 @@ export const StockPage = () => {
       <Modal on={itemsToRemove} toggle={togglePluralRemoveModal}>
         <ModalBox fluid>
           آیا از حذف موارد
-          <span className="text-danger mx-1">{itemsToRemove?.join(' , ')}</span>
+          <span className="text-danger mx-1">{itemsToRemove?.join(" , ")}</span>
           اطمینان دارید؟
           <ButtonGroup>
-            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: '1rem' }}>
+            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: "1rem" }}>
               خیر، منصرم شدم
             </Button>
             <Button onClick={() => pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
@@ -179,16 +176,16 @@ export const StockPage = () => {
         </ModalBox>
       </Modal>
     </Layout>
-  )
-}
+  );
+};
 
 const ModalBox = styled(Container)`
   padding: 2rem;
   border-radius: 0.5rem;
   background-color: #fff;
-`
+`;
 
 const ButtonGroup = styled.div`
   margin-top: 1rem;
   display: flex;
-`
+`;

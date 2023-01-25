@@ -1,36 +1,38 @@
-import { StockPage } from 'components'
-import { GetServerSideProps, NextPage } from 'next'
-import { PermissionEnum } from 'types'
-import { asyncHas, getStocksList } from 'utils'
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import { StockPage } from "components";
+import { GetServerSideProps, NextPage } from "next";
+import { PermissionEnum } from "types";
+import { asyncHas, getStocksList } from "utils";
 
-const PageName: NextPage = () => <StockPage />
+const PageName: NextPage = () => <StockPage />;
 
-export default PageName
+export default PageName;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  const token = context?.req?.cookies?.[process.env.TOKEN!];
+  const query = context?.query;
+
   if (token) {
     if (!(await asyncHas(PermissionEnum.browseStock, token)))
       return {
         props: {},
         redirect: {
-          destination: '/dashboard',
+          destination: "/dashboard",
         },
-      }
-    const stocks = await getStocksList(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
+      };
+    const queryClient = new QueryClient();
+    await queryClient.prefetchQuery(["stocks"], () => getStocksList(query, token));
     return {
       props: {
-        initialState: {
-          stocks,
-        },
+        dehydratedState: dehydrate(queryClient),
       },
-    }
+    };
   } else {
     return {
       props: {},
       redirect: {
-        destination: '/auth/login',
+        destination: "/auth/login",
       },
-    }
+    };
   }
-}
+};
