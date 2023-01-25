@@ -1,51 +1,59 @@
-import styled from 'styled-components'
-import { DiscountListCard } from 'components'
-import { FormProvider, useForm } from 'react-hook-form'
-import { Button, InputGroup as _InputGroup } from '@paljs/ui'
-import { pluralEditStock } from 'utils'
-import { toast } from 'react-toastify'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { useStore } from 'utils'
+import { Button, InputGroup as _InputGroup } from "@paljs/ui";
+import { QueryClient, useQuery } from "@tanstack/react-query";
+import { DiscountListCard } from "components";
+import Cookies from "js-cookie";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import styled from "styled-components";
+import { Stock } from "types";
+import { admin, pluralEditStock, useStore } from "utils";
 
 export function DiscountList() {
-  const router = useRouter()
-  const formMethods = useForm()
+  const router = useRouter();
+  const formMethods = useForm();
+  const [loading, setLoading] = useState(false);
 
-  const store = useStore((state) => ({
-    stocks: state.stocks,
-  }))
-
-  const [stocks, setStocks] = useState(store.stocks.filter((_stock: any) => !!_stock.product))
+  const stocksListQuery = useQuery(["stocks-list"], () =>
+    admin(Cookies.get(process.env.TOKEN!))
+      .get("/stock/select")
+      .then((res) => res.data?.data?.filter((stock: Stock) => !!stock?.product_id)),
+  );
+  const [stocks, setStocks] = useState(stocksListQuery.data);
 
   async function onSubmitDiscountForm(form: any) {
-    const stocks = []
+    setLoading(true);
+    const stocks = [];
     for (let item in form) {
-      const [stock, product] = item.split(':')
-      delete form[item].priceAfterDiscount
-      delete form[item].product
-      stocks.push(form[item])
+      delete form[item].priceAfterDiscount;
+      delete form[item].product;
+      stocks.push(form[item]);
     }
-    const response = await pluralEditStock(stocks)
-    toast.success('تغییرات اعمال شدند')
-    router.reload()
+    // FIXME: handle potential error
+    await pluralEditStock(stocks);
+    toast.info("تغییرات اعمال شدند");
+    router.back();
+    setLoading(false);
   }
 
   async function searchCallback(e: any) {
     if (e.target.value.length === 0) {
-      setStocks(store.stocks.filter((_stock: any) => !!_stock.product))
+      setStocks(stocksListQuery.data);
     } else {
       function validate(entry: [any, any], target: string): any {
-        if (!entry || !entry[1]) return false
-        if (typeof entry[1] === 'object') {
-          return Object.entries(entry[1]).some((entries) => validate(entries, target))
+        if (!entry || !entry[1]) return false;
+        if (typeof entry[1] === "object") {
+          return Object.entries(entry[1]).some((entries) => validate(entries, target));
         }
-        return String(entry[1]).includes(target)
+        return String(entry[1]).includes(target);
       }
 
       setStocks(
-        store.stocks.filter((_item: any) => Object.entries(_item).some((entries) => validate(entries, e.target.value))),
-      )
+        stocksListQuery.data?.filter((_item: any) =>
+          Object.entries(_item).some((entries) => validate(entries, e.target.value)),
+        ),
+      );
     }
   }
 
@@ -54,7 +62,9 @@ export function DiscountList() {
       <form onSubmit={formMethods.handleSubmit(onSubmitDiscountForm)}>
         <FlexBox>
           <InputGroup>
-            <Button type="submit">ثبت تخفیفات</Button>
+            <Button type="submit" disabled={loading}>
+              ثبت تخفیفات
+            </Button>
             <input placeholder="جستجو" onChange={searchCallback} />
           </InputGroup>
         </FlexBox>
@@ -67,13 +77,13 @@ export function DiscountList() {
         </Ul>
       </form>
     </FormProvider>
-  )
+  );
 }
 
 const Ul = styled.ul`
   display: flex;
   flex-direction: column;
-`
+`;
 
 const InputGroup = styled(_InputGroup)`
   margin-bottom: 2rem;
@@ -83,8 +93,8 @@ const InputGroup = styled(_InputGroup)`
     width: 100%;
     margin-right: 1rem;
   }
-`
+`;
 
 const FlexBox = styled.div`
   display: flex;
-`
+`;

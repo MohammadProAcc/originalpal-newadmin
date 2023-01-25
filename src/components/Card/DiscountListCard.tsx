@@ -1,83 +1,84 @@
-import { InputGroup as _InputGroup } from '@paljs/ui'
-import _Select from 'react-select'
-import React, { useState } from 'react'
-import { useFormContext } from 'react-hook-form'
-import styled from 'styled-components'
-import { Product, Stock } from 'types'
-import { numeralize, toLocalDate, toLocalTime } from 'utils'
+import { InputGroup as _InputGroup } from "@paljs/ui";
+import { DatePickerButtonLike } from "components/Input";
+import { useState } from "react";
+import { useFormContext } from "react-hook-form";
+import _Select from "react-select";
+import styled from "styled-components";
+import { Product, Stock } from "types";
+import { numeralize, truncateString } from "utils";
 
 const percentageSelectOptions = [
-  { label: 'درصدی', value: 'percent' },
-  { label: 'نقدی', value: 'cash' },
-]
+  { label: "درصدی", value: "percent" },
+  { label: "نقدی", value: "cash" },
+];
 
 export function DiscountListCard(props: DiscountListCardProps) {
-  const [product, setProduct] = useState<Product | null>(props.stock.product)
-  const fieldName = `${props.stock.id}:${props.stock.product_id}`
+  const [product, setProduct] = useState<Product | null>(props.stock.product);
+  const fieldName = `${props.stock.id}:${props.stock.product_id}`;
 
-  const formMethods = useFormContext()
+  const formMethods = useFormContext();
 
-  function discountMutationObserver(e: any) {
-    if (e.target.value == Number(e.target.value)) {
+  function discountMutationObserver(input: Date | number) {
+    if (typeof input === "number") {
       formMethods.setValue(fieldName, {
         ...props.stock,
         ...formMethods.getValues(fieldName),
-        discount_amout: e.target.value,
-      })
+        discount_amout: input,
+      });
     } else {
       formMethods.setValue(fieldName, {
         ...props.stock,
         ...formMethods.getValues(fieldName),
-        discount_end: e.target.value,
-      })
+        discount_end: input,
+      });
     }
   }
 
-  function discountStartMutation(e: any) {
+  function discountStartMutation(input: Date) {
     formMethods.setValue(fieldName, {
       ...props.stock,
       ...formMethods.getValues(fieldName),
-      discount_start: e.target.value,
-    })
+      discount_start: input,
+    });
   }
 
   function discountTypeMutationObserver(e: any) {
-    formMethods.setValue(fieldName, { ...props.stock, ...formMethods.getValues(fieldName), discount_type: e.value })
+    formMethods.setValue(fieldName, { ...props.stock, ...formMethods.getValues(fieldName), discount_type: e.value });
   }
 
   return (
     <Li>
       <div className="col info">
         <strong className="strong">
-          <span className="product-id">شناسه محصول :‌ {props.stock.product_id}</span>
+          <span className="product-id nowrap">شناسه محصول :‌ {props.stock.product_id}</span>
         </strong>
         <span>سایز محصول : {props.stock.size}</span>
-        <span className="product-id">شناسه انبار :‌ {props.stock.id}</span>
+        <span className="product-id nowrap">شناسه انبار :‌ {props.stock.id}</span>
       </div>
 
       <ImageContainer>
         <ProductImage src={`${process.env.SRC}/${product?.site_main_picture?.u}`} />
       </ImageContainer>
-      <span className="product-name">{product?.name}</span>
+      <span className="product-name" style={{ alignSelf: "flex-start" }} title={product?.name}>
+        {truncateString(product?.name ?? "-", 20)}
+      </span>
       <div className="col price date">
-        <FlexBox className="price">قیمت : <strong>{numeralize(props.stock?.price ?? 0)}</strong> تومان</FlexBox>
-        <FlexBox col>
-          تاریخ شروع تخفیف :{' '}
-          {props.stock.discount_start &&
-            toLocalTime(props.stock?.discount_start as any) +
-            ' - ' +
-            toLocalDate(props.stock?.discount_start as any)}
-          <InputGroup>
-            <input type="date" onChange={discountStartMutation} />
-          </InputGroup>
+        <FlexBox className="price">
+          قیمت : <strong>{numeralize(props.stock?.price ?? 0)}</strong> تومان
         </FlexBox>
         <FlexBox col>
-          تاریخ پایان تخفیف :{' '}
-          {props.stock.discount_end &&
-            toLocalTime(props.stock?.discount_end as any) + ' - ' + toLocalDate(props.stock?.discount_end as any)}
-          <InputGroup>
-            <input type="date" onChange={discountMutationObserver} />
-          </InputGroup>
+          <span className="mb-1">تاریخ شروع تخفیف : </span>
+          <DatePickerButtonLike
+            onChange={discountStartMutation}
+            value={formMethods.watch(fieldName)?.discount_start ?? props.stock.discount_start ?? "-"}
+          />
+        </FlexBox>
+        <FlexBox col>
+          <span className="mb-1">تاریخ پایان تخفیف : </span>
+          <DatePickerButtonLike
+            onChange={discountMutationObserver}
+            value={formMethods.watch(fieldName)?.discount_end ?? props.stock.discount_end ?? "-"}
+          />{" "}
         </FlexBox>
       </div>
       <div className="col price discount">
@@ -93,17 +94,20 @@ export function DiscountListCard(props: DiscountListCardProps) {
 
           <InputGroup column>
             <label>مقدار تخفیف :</label>
-            <input defaultValue={props.stock?.discount_amout} type="number" onChange={discountMutationObserver} />
+            <input
+              defaultValue={props.stock?.discount_amout}
+              type="number"
+              onChange={(e) => discountMutationObserver(+e.target.value)}
+            />
           </InputGroup>
         </FlexBox>
       </div>
-
     </Li>
-  )
+  );
 }
 
 interface DiscountListCardProps {
-  stock: Stock
+  stock: Stock;
 }
 
 const Li = styled.li`
@@ -146,6 +150,10 @@ const Li = styled.li`
     text-decoration: underline;
   }
 
+  .nowrap {
+    white-space: nowrap;
+  }
+
   .product-id {
     display: inline-block;
   }
@@ -157,11 +165,11 @@ const Li = styled.li`
     margin-left: auto;
   }
 
-  input[type='number'] {
+  input[type="number"] {
     max-width: 10rem;
   }
 
-  input[type='date'] {
+  input[type="date"] {
     height: 1.5rem;
     padding: 0;
     margin-top: 0.125rem;
@@ -170,7 +178,7 @@ const Li = styled.li`
   > * {
     flex: 1;
   }
-`
+`;
 
 const ImageContainer = styled.div`
   height: 100%;
@@ -178,7 +186,7 @@ const ImageContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 const ProductImage = styled.img`
   width: 6rem;
@@ -186,11 +194,11 @@ const ProductImage = styled.img`
   margin-left: 1rem;
 
   object-fit: cover;
-`
+`;
 
 const Select = styled(_Select)`
   height: 2rem;
-`
+`;
 
 const FlexBox = styled.div<{ col?: boolean }>`
   &.discount {
@@ -207,10 +215,10 @@ const FlexBox = styled.div<{ col?: boolean }>`
   }
 
   display: flex;
-  flex-direction: ${(props) => props.col && 'column'};
-`
+  flex-direction: ${(props) => props.col && "column"};
+`;
 
-const InputGroup = styled(_InputGroup) <{ column?: boolean }>`
+const InputGroup = styled(_InputGroup)<{ column?: boolean }>`
   display: flex;
-  flex-direction: ${(props) => props.column && 'column'};
-`
+  flex-direction: ${(props) => props.column && "column"};
+`;

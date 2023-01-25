@@ -1,11 +1,10 @@
-import { DiscountList } from 'components'
-import Layout from 'Layouts'
+import { DiscountList } from "components";
+import Layout from "Layouts";
 
 export function AggregateDiscountingPage() {
-
-    return (
-      <Layout title="فهرست تخفیفات">
-        <DiscountList />
-      </Layout>
-    )
+  return (
+    <Layout title="فهرست تخفیفات">
+      <DiscountList />
+    </Layout>
+  );
 }
