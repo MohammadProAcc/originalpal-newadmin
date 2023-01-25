@@ -1,61 +1,62 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { useStore, deleteProduct, numeralize, pluralRemove, useUserStore, has } from 'utils'
-import Layout from 'Layouts'
-import { Button, Container, Modal } from '@paljs/ui'
-import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { Add } from '@material-ui/icons'
-import { toast } from 'react-toastify'
-import { Avatar } from '@material-ui/core'
-import axios from 'axios'
-import Cookies from 'js-cookie'
-import { PermissionEnum } from 'types'
+import React, { useState } from "react";
+import styled from "styled-components";
+import { useStore, deleteProduct, numeralize, pluralRemove, useUserStore, has } from "utils";
+import Layout from "Layouts";
+import { Button, Container, Modal } from "@paljs/ui";
+import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from "components";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { Add } from "@material-ui/icons";
+import { toast } from "react-toastify";
+import { Avatar } from "@material-ui/core";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { PermissionEnum } from "types";
+import { Flex } from "@mantine/core";
 
 export const ProductsPage = () => {
-  const router = useRouter()
+  const router = useRouter();
 
   const { products, clearList } = useStore((state) => ({
     products: state?.products,
     clearList: state?.clearList,
-  }))
-  const permissions = useUserStore().getPermissions()
+  }));
+  const permissions = useUserStore().getPermissions();
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
 
-  const [tableSelections, setTableSelections] = useState<number[] | []>([])
+  const [tableSelections, setTableSelections] = useState<number[] | []>([]);
 
-  const toggleModal = () => setItemToRemove(null)
+  const toggleModal = () => setItemToRemove(null);
 
   const removeItem = async (item: any) => {
-    setLoading(true)
+    setLoading(true);
     // const response = await deleteProduct(item?.id)
     const { data: response } = await axios.delete(`${process.env.API}/admin/products/${item?.id})`, {
       headers: {
-        Authorization: `Bearer ${Cookies.get(process.env.TOKEN!) ?? ''}`,
+        Authorization: `Bearer ${Cookies.get(process.env.TOKEN!) ?? ""}`,
       },
-    })
-    if (response?.status === 'success') {
-      clearList('products', item?.id)
-      setItemToRemove(null)
-      toast.success('محصول با موفقیت حذف شد')
+    });
+    if (response?.status === "success") {
+      clearList("products", item?.id);
+      setItemToRemove(null);
+      toast.success("محصول با موفقیت حذف شد");
     } else {
-      toast.error('حذف محصول موفقیت آمیز نبود')
+      toast.error("حذف محصول موفقیت آمیز نبود");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const columns: any[] = ['شناسه', 'تصویر محصول', 'قیمت', 'قیمت با تخفیف', 'نام', 'کد', 'برند', 'وضعیت', 'فعالیت ها']
+  const columns: any[] = ["شناسه", "تصویر محصول", "قیمت", "قیمت با تخفیف", "نام", "کد", "برند", "وضعیت", "فعالیت ها"];
 
   const data = products?.data?.data?.map((product: any) => [
     // =====>> Table Columns <<=====
     product?.id,
     <Avatar
       variant="rounded"
-      style={{ width: '5rem', height: '3rem' }}
+      style={{ width: "5rem", height: "3rem" }}
       src={`${process.env.SRC}/${product?.site_main_picture?.u}`}
     />,
     <span>
@@ -66,19 +67,19 @@ export const ProductsPage = () => {
     </span>,
     product?.name,
     product?.code,
-    product?.brand?.name ? product?.brand?.name : product?.brand ?? '-',
+    product?.brand?.name ? product?.brand?.name : product?.brand ?? "-",
     product?.Enable,
-    <Container>
+    <Flex gap="0.25rem">
       {/* FIXME: fix the url */}
       <a target="_blank" href={`${process.env.WEBSITE_DOMAIN}/products/${product?.id}`}>
-        <Button style={{ marginLeft: '1rem' }} status="Info">
+        <Button style={{ marginLeft: "1rem" }} status="Info">
           مشاهده
         </Button>
       </a>
       {has(permissions, PermissionEnum.editProduct) && (
         <Link href={`/products/edit/${product?.id}`}>
           <a>
-            <Button style={{ marginLeft: '1rem' }} status="Primary">
+            <Button style={{ marginLeft: "1rem" }} status="Primary">
               ویرایش
             </Button>
           </a>
@@ -89,28 +90,28 @@ export const ProductsPage = () => {
           حذف
         </Button>
       )}
-    </Container>,
-  ])
+    </Flex>,
+  ]);
 
-  const [itemsToRemove, setItemsToRemove] = useState<any>(null)
-  const togglePluralRemoveModal = () => setItemsToRemove(null)
+  const [itemsToRemove, setItemsToRemove] = useState<any>(null);
+  const togglePluralRemoveModal = () => setItemsToRemove(null);
 
   const pluralRemoveTrigger = async (selections: any[]) => {
     await pluralRemove(
-      'products',
+      "products",
       selections,
       deleteProduct,
       (entity: string, id: any) => {
-        clearList(entity, id)
-        toast.success(`مورد با شناسه ${id} حذف شد`)
+        clearList(entity, id);
+        toast.success(`مورد با شناسه ${id} حذف شد`);
       },
       async () => {
-        setTableSelections([])
-        setItemsToRemove(null)
+        setTableSelections([]);
+        setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف محصول با شناسه ${id} موفقیت آمیز نبود`),
-    )
-  }
+    );
+  };
 
   return (
     <Layout title="محصولات">
@@ -122,8 +123,8 @@ export const ProductsPage = () => {
             <a>
               <Button
                 style={{
-                  margin: '1rem 0 1rem 1rem',
-                  display: 'flex',
+                  margin: "1rem 0 1rem 1rem",
+                  display: "flex",
                 }}
                 status="Success"
                 appearance="outline"
@@ -149,7 +150,7 @@ export const ProductsPage = () => {
             params={router.query}
             callback={(form: any) =>
               router.push({
-                pathname: '/products/search',
+                pathname: "/products/search",
                 query: form,
               })
             }
@@ -167,10 +168,10 @@ export const ProductsPage = () => {
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
-          آیا از حذف محصول <span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{' '}
+          آیا از حذف محصول <span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{" "}
           <span className="text-danger">{`${itemToRemove?.name}`}</span> اطمینان دارید؟
           <ButtonGroup>
-            <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>
+            <Button onClick={toggleModal} style={{ marginLeft: "1rem" }}>
               خیر، منصرم شدم
             </Button>
             <Button onClick={() => removeItem(itemToRemove)} disabled={loading} status="Danger">
@@ -183,10 +184,10 @@ export const ProductsPage = () => {
       <Modal on={itemsToRemove} toggle={togglePluralRemoveModal}>
         <ModalBox fluid>
           آیا از حذف موارد
-          <span className="text-danger mx-1">{itemsToRemove?.join(' , ')}</span>
+          <span className="text-danger mx-1">{itemsToRemove?.join(" , ")}</span>
           اطمینان دارید؟
           <ButtonGroup>
-            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: '1rem' }}>
+            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: "1rem" }}>
               خیر، منصرم شدم
             </Button>
             <Button onClick={() => pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
@@ -196,16 +197,16 @@ export const ProductsPage = () => {
         </ModalBox>
       </Modal>
     </Layout>
-  )
-}
+  );
+};
 
 const ModalBox = styled(Container)`
   padding: 2rem;
   border-radius: 0.5rem;
   background-color: #fff;
-`
+`;
 
 const ButtonGroup = styled.div`
   margin-top: 1rem;
   display: flex;
-`
+`;

@@ -1,105 +1,106 @@
-import React, { useEffect, useState } from 'react'
-import styled from 'styled-components'
-import { useStore, deleteMenu, pluralRemove, editMenu, translator, has, useUserStore } from 'utils'
-import Layout from 'Layouts'
-import { Button, Container, InputGroup, Modal, Popover } from '@paljs/ui'
-import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { toast } from 'react-toastify'
-import { useForm } from 'react-hook-form'
-import { PermissionEnum } from 'types'
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import { useStore, deleteMenu, pluralRemove, editMenu, translator, has, useUserStore } from "utils";
+import Layout from "Layouts";
+import { Button, Container, InputGroup, Modal, Popover } from "@paljs/ui";
+import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from "components";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { PermissionEnum } from "types";
+import { Flex } from "@mantine/core";
 
 export const MenuPage = () => {
-  const router = useRouter()
+  const router = useRouter();
 
   const { menu, clearList } = useStore((state) => ({
     menu: state?.menu,
     clearList: state?.clearList,
-  }))
+  }));
 
-  const permissions = useUserStore().getPermissions()
+  const permissions = useUserStore().getPermissions();
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
 
-  const toggleModal = () => setItemToRemove(null)
+  const toggleModal = () => setItemToRemove(null);
 
   const removeItem = async (item: any) => {
-    setLoading(true)
-    const response = await deleteMenu(item?.id)
-    if (response?.status === 'success') {
-      clearList('menu', item?.id)
-      setItemToRemove(null)
-      toast.success('منو با موفقیت حذف شد')
+    setLoading(true);
+    const response = await deleteMenu(item?.id);
+    if (response?.status === "success") {
+      clearList("menu", item?.id);
+      setItemToRemove(null);
+      toast.success("منو با موفقیت حذف شد");
     } else {
-      toast.error('حذف منو موفقیت آمیز نبود')
+      toast.error("حذف منو موفقیت آمیز نبود");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const [tableSelections, setTableSelections] = useState<number[] | []>([])
+  const [tableSelections, setTableSelections] = useState<number[] | []>([]);
 
-  const [itemsToRemove, setItemsToRemove] = useState<any>(null)
-  const togglePluralRemoveModal = () => setItemsToRemove(null)
+  const [itemsToRemove, setItemsToRemove] = useState<any>(null);
+  const togglePluralRemoveModal = () => setItemsToRemove(null);
 
   const pluralRemoveTrigger = async (selections: any[]) => {
     await pluralRemove(
-      'menu',
+      "menu",
       selections,
       deleteMenu,
       (entity: string, id: any) => {
-        clearList(entity, id)
-        toast.success(`مورد با شناسه ${id} حذف شد`)
+        clearList(entity, id);
+        toast.success(`مورد با شناسه ${id} حذف شد`);
       },
       async () => {
-        setTableSelections([])
-        setItemsToRemove(null)
+        setTableSelections([]);
+        setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف  سقارش با  شناسه ${id} موفقیت آمیز نبود`),
-    )
-  }
+    );
+  };
 
-  const { register, handleSubmit } = useForm()
+  const { register, handleSubmit } = useForm();
 
-  const [menuToEdit, setMenuToEdit] = useState<any>(null)
-  const [editMenuState, setEditMenuState] = useState<any>(null)
+  const [menuToEdit, setMenuToEdit] = useState<any>(null);
+  const [editMenuState, setEditMenuState] = useState<any>(null);
 
   const updateMenu = async (form: any) => {
-    setLoading(true)
+    setLoading(true);
 
-    const response = await editMenu(menuToEdit?.id, { items: editMenuState })
+    const response = await editMenu(menuToEdit?.id, { items: editMenuState });
 
-    if (response?.status === 'success') {
+    if (response?.status === "success") {
       // if (false) {
-      setMenuToEdit(null)
-      toast.success('منو با موفقیت بروز شد')
+      setMenuToEdit(null);
+      toast.success("منو با موفقیت بروز شد");
     } else {
-      toast.error('برپزرسانی منو موفقیت آمیز نبود')
+      toast.error("برپزرسانی منو موفقیت آمیز نبود");
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const columns: any[] = ['شناسه منو', 'نوع منو', 'فعالیت ها']
+  const columns: any[] = ["شناسه منو", "نوع منو", "فعالیت ها"];
 
   const data = menu?.data?.data?.map((menu: any) => [
     // =====>> Table Columns <<=====
     menu?.id,
     translator(menu?.type),
-    <Container>
+    <Flex gap="0.25rem">
       {has(permissions, PermissionEnum.editMenu) && (
         <Link href={`/menu/edit/${menu?.id}`}>
           <a>
-            <Button style={{ marginLeft: '1rem' }} status="Primary">
+            <Button style={{ marginLeft: "1rem" }} status="Primary">
               ویرایش
             </Button>
           </a>
         </Link>
       )}
-    </Container>,
-  ])
+    </Flex>,
+  ]);
 
   return (
     <Layout title="منو ها">
@@ -121,7 +122,7 @@ export const MenuPage = () => {
             params={router.query}
             callback={(form: any) =>
               router.push({
-                pathname: '/menu/search',
+                pathname: "/menu/search",
                 query: form,
               })
             }
@@ -138,10 +139,10 @@ export const MenuPage = () => {
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
-          آیا از حذف منو <span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{' '}
+          آیا از حذف منو <span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{" "}
           <span className="text-danger">{`${itemToRemove?.title}`}</span> اطمینان دارید؟
           <ButtonGroup>
-            <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>
+            <Button onClick={toggleModal} style={{ marginLeft: "1rem" }}>
               خیر، منصرم شدم
             </Button>
             <Button onClick={() => removeItem(itemToRemove)} disabled={loading} status="Danger">
@@ -162,13 +163,13 @@ export const MenuPage = () => {
                 placement="top"
                 overlay={
                   <p>
-                    منوی ساخته شده توسط{' '}
-                    <a href="https://www.jqueryscript.net/demo/Drag-Drop-Menu-Builder-For-Bootstrap/">ابزار منو ساز</a>{' '}
+                    منوی ساخته شده توسط{" "}
+                    <a href="https://www.jqueryscript.net/demo/Drag-Drop-Menu-Builder-For-Bootstrap/">ابزار منو ساز</a>{" "}
                     را در ورودی کپی کنید
                   </p>
                 }
               >
-                <input {...register('items')} onChange={(e) => setEditMenuState(e.target.value)} placeholder="موارد" />
+                <input {...register("items")} onChange={(e) => setEditMenuState(e.target.value)} placeholder="موارد" />
               </Popover>
             </InputGroup>
             <Button status="Info" type="submit">
@@ -182,16 +183,16 @@ export const MenuPage = () => {
         <ModalBox fluid>برای بروزرسانی منو، منوی جدید را در ورودی زیر کپی کنید</ModalBox>
       </Modal>
     </Layout>
-  )
-}
+  );
+};
 
 const ModalBox = styled(Container)`
   padding: 2rem;
   border-radius: 0.5rem;
   background-color: #fff;
-`
+`;
 
 const ButtonGroup = styled.div`
   margin-top: 1rem;
   display: flex;
-`
+`;

@@ -1,3 +1,4 @@
+import { Flex } from "@mantine/core";
 import { Avatar } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import { Button, Container, Modal } from "@paljs/ui";
@@ -139,7 +140,7 @@ export const SearchBanners = () => {
       {banner?.content_color}
     </div>,
     banner?.active ? "فعال" : "غیر فعال",
-    <Container>
+    <Flex gap="0.25rem">
       {has(permissions, PermissionEnum.readStand) && (
         <Link href={`/banners/${banner?.id}`} passHref>
           <a>
@@ -163,7 +164,7 @@ export const SearchBanners = () => {
           حذف
         </Button>
       )}
-    </Container>,
+    </Flex>,
   ]);
 
   return (

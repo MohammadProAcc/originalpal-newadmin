@@ -1,3 +1,4 @@
+import { Flex } from "@mantine/core";
 import { Add } from "@material-ui/icons";
 import { Button, Container, Modal } from "@paljs/ui";
 import { useQuery } from "@tanstack/react-query";
@@ -85,7 +86,7 @@ export const SearchTagsPage = () => {
     tag?.id,
     tag?.name,
     tag?.type,
-    <Container>
+    <Flex gap="0.25rem">
       {has(permissions, PermissionEnum.readTag) && (
         <Link href={`/tags/${tag?.id}`}>
           <a>
@@ -109,7 +110,7 @@ export const SearchTagsPage = () => {
           حذف
         </Button>
       )}
-    </Container>,
+    </Flex>,
   ]);
 
   return (

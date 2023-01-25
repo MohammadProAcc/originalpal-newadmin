@@ -1,80 +1,81 @@
-import { Add } from '@material-ui/icons'
-import { Button, Container, Modal } from '@paljs/ui'
-import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from 'components'
-import Layout from 'Layouts'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { toast } from 'react-toastify'
-import styled from 'styled-components'
-import { PermissionEnum } from 'types'
-import { deleteUser, has, pluralRemove, translator, useStore, useUserStore } from 'utils'
+import { Flex } from "@mantine/core";
+import { Add } from "@material-ui/icons";
+import { Button, Container, Modal } from "@paljs/ui";
+import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from "components";
+import Layout from "Layouts";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import styled from "styled-components";
+import { PermissionEnum } from "types";
+import { deleteUser, has, pluralRemove, translator, useStore, useUserStore } from "utils";
 
 export const UsersPage = () => {
-  const router = useRouter()
+  const router = useRouter();
 
   const { users, clearList } = useStore((state) => ({
     users: state?.users,
     clearList: state?.clearList,
-  }))
-  const permissions = useUserStore().getPermissions()
+  }));
+  const permissions = useUserStore().getPermissions();
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
 
-  const [tableSelections, setTableSelections] = useState<number[] | []>([])
+  const [tableSelections, setTableSelections] = useState<number[] | []>([]);
 
-  const toggleModal = () => setItemToRemove(null)
+  const toggleModal = () => setItemToRemove(null);
 
   const removeItem = async (item: any) => {
-    setLoading(true)
-    const response = await deleteUser(item?.id)
-    if (response?.status === 'success') {
-      clearList('users', item?.id)
-      setItemToRemove(null)
-      toast.success('کاربر با موفقیت حذف شد')
+    setLoading(true);
+    const response = await deleteUser(item?.id);
+    if (response?.status === "success") {
+      clearList("users", item?.id);
+      setItemToRemove(null);
+      toast.success("کاربر با موفقیت حذف شد");
     } else {
-      toast.error('حذف کاربر موفقیت آمیز نبود')
+      toast.error("حذف کاربر موفقیت آمیز نبود");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const [itemsToRemove, setItemsToRemove] = useState<any>(null)
-  const togglePluralRemoveModal = () => setItemsToRemove(null)
+  const [itemsToRemove, setItemsToRemove] = useState<any>(null);
+  const togglePluralRemoveModal = () => setItemsToRemove(null);
 
   const pluralRemoveTrigger = async (selections: any[]) => {
     await pluralRemove(
-      'users',
+      "users",
       selections,
       deleteUser,
       (entity: string, id: any) => {
-        clearList(entity, id)
-        toast.success(`مورد با شناسه ${id} حذف شد`)
+        clearList(entity, id);
+        toast.success(`مورد با شناسه ${id} حذف شد`);
       },
       async () => {
-        setTableSelections([])
-        setItemsToRemove(null)
+        setTableSelections([]);
+        setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف کاربر با شناسه ${id} موفقیت آمیز نبود`),
-    )
-  }
+    );
+  };
 
-  const columns: any[] = ['شناسه کاربر', 'نام کاربر', 'نام خانوادگی', 'ایمیل', 'شماره تلفن کاربر', 'نقش', 'فعالیت ها']
+  const columns: any[] = ["شناسه کاربر", "نام کاربر", "نام خانوادگی", "ایمیل", "شماره تلفن کاربر", "نقش", "فعالیت ها"];
 
   const data = users?.data?.data?.map((user: any) => [
     // =====>> Table Columns <<=====
     user?.id,
     user?.name,
-    user?.lastname ?? '-',
+    user?.lastname ?? "-",
     user?.email,
     user?.phone,
     translator(user?.role),
-    <Container>
+    <Flex gap="0.25rem">
       {has(permissions, PermissionEnum.readUser) && (
         <Link href={`/users/${user?.id}`}>
           <a>
-            <Button style={{ marginLeft: '1rem' }} status="Info">
+            <Button style={{ marginLeft: "1rem" }} status="Info">
               مشاهده
             </Button>
           </a>
@@ -83,7 +84,7 @@ export const UsersPage = () => {
       {has(permissions, PermissionEnum.editUser) && (
         <Link href={`/users/edit/${user?.id}`}>
           <a>
-            <Button style={{ marginLeft: '1rem' }} status="Primary">
+            <Button style={{ marginLeft: "1rem" }} status="Primary">
               ویرایش
             </Button>
           </a>
@@ -94,8 +95,8 @@ export const UsersPage = () => {
           حذف
         </Button>
       )}
-    </Container>,
-  ])
+    </Flex>,
+  ]);
 
   return (
     <Layout title="کاربران">
@@ -107,8 +108,8 @@ export const UsersPage = () => {
             <a>
               <Button
                 style={{
-                  margin: '1rem 0 1rem 1rem',
-                  display: 'flex',
+                  margin: "1rem 0 1rem 1rem",
+                  display: "flex",
                 }}
                 status="Success"
                 appearance="outline"
@@ -134,7 +135,7 @@ export const UsersPage = () => {
             params={router.query}
             callback={(form: any) =>
               router.push({
-                pathname: '/users/search',
+                pathname: "/users/search",
                 query: form,
               })
             }
@@ -151,10 +152,10 @@ export const UsersPage = () => {
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
-          آیا از حذف کاربر <span className="text-danger">{`${itemToRemove?.id}`}</span> با نام{' '}
-          <span className="text-danger">{`${itemToRemove?.name} ${itemToRemove?.lastname ?? ''}`}</span> اطمینان دارید؟
+          آیا از حذف کاربر <span className="text-danger">{`${itemToRemove?.id}`}</span> با نام{" "}
+          <span className="text-danger">{`${itemToRemove?.name} ${itemToRemove?.lastname ?? ""}`}</span> اطمینان دارید؟
           <ButtonGroup>
-            <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>
+            <Button onClick={toggleModal} style={{ marginLeft: "1rem" }}>
               خیر، منصرم شدم
             </Button>
             <Button onClick={() => removeItem(itemToRemove)} disabled={loading} status="Danger">
@@ -167,10 +168,10 @@ export const UsersPage = () => {
       <Modal on={itemsToRemove} toggle={togglePluralRemoveModal}>
         <ModalBox fluid>
           آیا از حذف موارد
-          <span className="text-danger mx-1">{itemsToRemove?.join(' , ')}</span>
+          <span className="text-danger mx-1">{itemsToRemove?.join(" , ")}</span>
           اطمینان دارید؟
           <ButtonGroup>
-            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: '1rem' }}>
+            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: "1rem" }}>
               خیر، منصرم شدم
             </Button>
             <Button onClick={() => pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
@@ -180,16 +181,16 @@ export const UsersPage = () => {
         </ModalBox>
       </Modal>
     </Layout>
-  )
-}
+  );
+};
 
 const ModalBox = styled(Container)`
   padding: 2rem;
   border-radius: 0.5rem;
   background-color: #fff;
-`
+`;
 
 const ButtonGroup = styled.div`
   margin-top: 1rem;
   display: flex;
-`
+`;

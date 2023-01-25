@@ -1,75 +1,76 @@
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { deletePayment, has, pluralRemove, translator, useStore, useUserStore } from 'utils'
-import Layout from 'Layouts'
-import { Button, Container, Modal } from '@paljs/ui'
-import { BasicTable, HeaderButton, PaginationBar, SearchBar } from 'components'
-import { useRouter } from 'next/router'
-import { toast } from 'react-toastify'
-import { Payment, PermissionEnum } from 'types'
-import Link from 'next/link'
+import React, { useState } from "react";
+import styled from "styled-components";
+import { deletePayment, has, pluralRemove, translator, useStore, useUserStore } from "utils";
+import Layout from "Layouts";
+import { Button, Container, Modal } from "@paljs/ui";
+import { BasicTable, HeaderButton, PaginationBar, SearchBar } from "components";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
+import { Payment, PermissionEnum } from "types";
+import Link from "next/link";
+import { Flex } from "@mantine/core";
 
 export const PaymentsPage = () => {
-  const router = useRouter()
+  const router = useRouter();
 
   const { payments, clearList } = useStore((state) => ({
     payments: state?.payments,
     clearList: state?.clearList,
-  }))
-  const permissions = useUserStore().getPermissions()
+  }));
+  const permissions = useUserStore().getPermissions();
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
 
-  const [itemsToRemove, setItemsToRemove] = useState<any>(null)
-  const togglePluralRemoveModal = () => setItemsToRemove(null)
+  const [itemsToRemove, setItemsToRemove] = useState<any>(null);
+  const togglePluralRemoveModal = () => setItemsToRemove(null);
 
-  const [tableSelections, setTableSelections] = useState<number[] | []>([])
+  const [tableSelections, setTableSelections] = useState<number[] | []>([]);
 
-  const toggleModal = () => setItemToRemove(null)
+  const toggleModal = () => setItemToRemove(null);
 
   const removeItem = async (item: any) => {
-    setLoading(true)
-    const response = await deletePayment(item?.id)
-    if (response?.status === 'success') {
-      clearList('payments', item?.id)
-      toggleModal()
-      toast.success('پرداخت با موفقیت حذف شد')
+    setLoading(true);
+    const response = await deletePayment(item?.id);
+    if (response?.status === "success") {
+      clearList("payments", item?.id);
+      toggleModal();
+      toast.success("پرداخت با موفقیت حذف شد");
     } else {
-      toast.error('عملیات حذف موفقیت آمیز نبود')
+      toast.error("عملیات حذف موفقیت آمیز نبود");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const pluralRemoveTrigger = async (selections: any[]) => {
     await pluralRemove(
-      'payments',
+      "payments",
       selections,
       deletePayment,
       (entity: string, id: any) => {
-        clearList(entity, id)
-        toast.success(`مورد با شناسه ${id} حذف شد`)
+        clearList(entity, id);
+        toast.success(`مورد با شناسه ${id} حذف شد`);
       },
       async () => {
-        setTableSelections([])
-        setItemsToRemove(null)
+        setTableSelections([]);
+        setItemsToRemove(null);
       },
       // TODO: add a proper error callback
       () => {},
-    )
-  }
+    );
+  };
 
   const columns: any[] = [
-    'شماره پرداخت',
-    'وضعیت',
-    'درگاه',
-    'قیمت',
-    'توضیحات',
-    'شماره کارت',
-    'تاریخ پرداخت',
-    'فعالیت ها',
-  ]
+    "شماره پرداخت",
+    "وضعیت",
+    "درگاه",
+    "قیمت",
+    "توضیحات",
+    "شماره کارت",
+    "تاریخ پرداخت",
+    "فعالیت ها",
+  ];
 
   const data = payments?.map((payment: Payment) => [
     payment?.id,
@@ -79,11 +80,11 @@ export const PaymentsPage = () => {
     payment?.description,
     payment?.payment_date,
     payment?.card_number,
-    <Container>
+    <Flex gap="0.25rem">
       {has(permissions, PermissionEnum.readPayment) && (
         <Link href={`/payments/${payment?.id}`}>
           <a>
-            <Button style={{ marginLeft: '1rem' }} status="Info">
+            <Button style={{ marginLeft: "1rem" }} status="Info">
               مشاهده
             </Button>
           </a>
@@ -92,7 +93,7 @@ export const PaymentsPage = () => {
       {has(permissions, PermissionEnum.editPayment) && (
         <Link href={`/payments/edit/${payment?.id}`}>
           <a>
-            <Button style={{ marginLeft: '1rem' }} status="Primary">
+            <Button style={{ marginLeft: "1rem" }} status="Primary">
               ویرایش
             </Button>
           </a>
@@ -103,8 +104,8 @@ export const PaymentsPage = () => {
           حذف
         </Button>
       )}
-    </Container>,
-  ])
+    </Flex>,
+  ]);
 
   return (
     <Layout title="پرداخت ها">
@@ -131,10 +132,10 @@ export const PaymentsPage = () => {
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
-          آیا از حذف بنر مورد <span className="text-danger">{itemToRemove?.id}</span> با عنوان{' '}
-          <span className="text-danger">{itemToRemove?.user?.name ?? '?'}</span> اطمینان دارید؟
+          آیا از حذف بنر مورد <span className="text-danger">{itemToRemove?.id}</span> با عنوان{" "}
+          <span className="text-danger">{itemToRemove?.user?.name ?? "?"}</span> اطمینان دارید؟
           <ButtonGroup>
-            <Button onClick={toggleModal} style={{ marginLeft: '1rem' }}>
+            <Button onClick={toggleModal} style={{ marginLeft: "1rem" }}>
               خیر، منصرم شدم
             </Button>
             <Button onClick={() => removeItem(itemToRemove)} disabled={loading} status="Danger">
@@ -147,10 +148,10 @@ export const PaymentsPage = () => {
       <Modal on={itemsToRemove} toggle={togglePluralRemoveModal}>
         <ModalBox fluid>
           آیا از حذف موارد
-          <span className="text-danger mx-1">{itemsToRemove?.join(' , ')}</span>
+          <span className="text-danger mx-1">{itemsToRemove?.join(" , ")}</span>
           اطمینان دارید؟
           <ButtonGroup>
-            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: '1rem' }}>
+            <Button onClick={togglePluralRemoveModal} style={{ marginLeft: "1rem" }}>
               خیر، منصرم شدم
             </Button>
             <Button onClick={() => pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
@@ -160,16 +161,16 @@ export const PaymentsPage = () => {
         </ModalBox>
       </Modal>
     </Layout>
-  )
-}
+  );
+};
 
 const ModalBox = styled(Container)`
   padding: 2rem;
   border-radius: 0.5rem;
   background-color: #fff;
-`
+`;
 
 const ButtonGroup = styled.div`
   margin-top: 1rem;
   display: flex;
-`
+`;
