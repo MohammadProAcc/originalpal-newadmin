@@ -95,7 +95,7 @@ export const SingleCouponPage: React.FC = () => {
       </Card>
 
       <Card>
-        <CardHeader>deny_off</CardHeader>
+        <CardHeader>به غیر از محصولات فروش ویژه</CardHeader>
         <CardBody>{coupon?.deny_off ?? "-"}</CardBody>
       </Card>
 
