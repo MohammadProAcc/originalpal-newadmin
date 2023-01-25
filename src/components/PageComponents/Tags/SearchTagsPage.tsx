@@ -11,11 +11,31 @@ import styled from "styled-components";
 import { PermissionEnum } from "types";
 import { deleteTag, getTagsList, has, pluralRemove, useUserStore } from "utils";
 
-export const TagsPage = () => {
+export const SearchTagsPage = () => {
   const router = useRouter();
 
-  // FIXME: migrate to react-query
   const tagsQuery = useQuery(["tags", router.query], async () => await getTagsList(router?.query));
+  const tagFields = useQuery(
+    ["tagFields"],
+    () =>
+      new Promise((resolve) =>
+        resolve({
+          fields: [
+            "id",
+            "name",
+            "type",
+            "title",
+            "meta_title",
+            "meta_description",
+            "description",
+            "priority",
+            "updated_at",
+            "created_at",
+          ],
+        }),
+      ),
+  );
+
   const permissions = useUserStore().getPermissions();
 
   const [loading, setLoading] = useState(false);
@@ -124,7 +144,7 @@ export const TagsPage = () => {
       {has(permissions, PermissionEnum.browseTag) && (
         <>
           <SearchBar
-            fields={tagsQuery?.data?.fields}
+            fields={(tagFields?.data as any)?.fields}
             entity="tags"
             params={router.query}
             callback={(form: any) =>
@@ -135,7 +155,8 @@ export const TagsPage = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          {tagsQuery?.data && <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />}
+
           <PaginationBar
             totalPages={tagsQuery?.data?.data?.tags?.data?.last_page}
             activePage={router.query.page ? Number(router.query.page) : 1}

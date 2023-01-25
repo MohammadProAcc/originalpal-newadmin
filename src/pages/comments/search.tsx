@@ -1,63 +1,62 @@
-import { CommentsPage } from 'components'
-import { GetServerSideProps, NextPage } from 'next'
-import { PermissionEnum } from 'types'
-import { asyncHas, getCommentsList, search_in } from 'utils'
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import { SearchCommentsPage } from "components";
+import { GetServerSideProps, NextPage } from "next";
+import { PermissionEnum } from "types";
+import { asyncHas, search_in } from "utils";
 
-const PageName: NextPage = () => <CommentsPage />
-export default PageName
+const PageName: NextPage = () => <SearchCommentsPage />;
+export default PageName;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  const token = context?.req?.cookies?.[process.env.TOKEN!];
+  const query = context?.query;
+
   if (token) {
     if (!(await asyncHas(PermissionEnum.browseComment, token)))
       return {
         props: {},
         redirect: {
-          destination: '/dashboard',
+          destination: "/dashboard",
         },
-      }
-    const response = await search_in('comments', context.query, context.query, context.req.cookies[process.env.TOKEN!])
+      };
 
-    if (!response) {
-      return {
-        props: {},
-        redirect: {
-          destination: '/comments',
-          permanent: false,
-        },
-      }
-    }
+    const queryClient = new QueryClient();
+    await queryClient.prefetchQuery(["comments", query], () => search_in("comments", query, query, token));
+    await queryClient.prefetchQuery(
+      ["commentFields"],
+      () =>
+        new Promise((resolve) =>
+          resolve({
+            fields: [
+              "comfort",
+              "content",
+              "created_at",
+              "id",
+              "product_id",
+              "purchased",
+              "quality",
+              "rating",
+              "size",
+              "title",
+              "updated_at",
+              "user_id",
+              "width",
+            ],
+          }),
+        ),
+    );
 
     return {
       props: {
-        initialState: {
-          comments: {
-            data: response?.data,
-            fields: [
-              'comfort',
-              'content',
-              'created_at',
-              'id',
-              'product_id',
-              'purchased',
-              'quality',
-              'rating',
-              'size',
-              'title',
-              'updated_at',
-              'user_id',
-              'width',
-            ],
-          },
-        },
+        dehydratedState: dehydrate(queryClient),
       },
-    }
+    };
   } else {
     return {
       props: {},
       redirect: {
-        destination: '/auth/login',
+        destination: "/auth/login",
       },
-    }
+    };
   }
-}
+};
