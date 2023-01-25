@@ -142,7 +142,7 @@ export const EditProductPage: React.FC = () => {
     if (response !== null) {
       await productRefetch();
       toast.success("محصول بروز شد");
-      router.back();
+      router.push("/products");
     } else {
       toast.error("بروزرسانی محصول موفقیت آمیز نبود");
     }
