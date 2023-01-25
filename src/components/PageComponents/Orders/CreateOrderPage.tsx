@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Layout from "Layouts"
+import Layout from "Layouts";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { addAddressToOrder, admin, applyCouponOnOrder, createOrder, getOwnAddresses, getOwnOrders } from "utils";
 import { NumberInput, Select, Button, Box, LoadingOverlay, Input, Textarea, Tabs, CSSObject } from "@mantine/core";
@@ -7,31 +7,29 @@ import { IStockForCreation, Stock, Address } from "types";
 import { OrderStockCard } from "./components/OrderStockCard";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { IconWriting, IconCheck } from "@tabler/icons"
+import { IconWriting, IconCheck } from "@tabler/icons";
 import { SelectAddressCard } from "./components/SelectAddressCard";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
 export function CreateOrderPage() {
-
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
 
   const selectProductRef = useRef<HTMLInputElement>(null);
 
-  const { data: { data: stocks } }: any = useQuery(["stocks"], async () => (await admin().get('/stock/select')).data);
+  const {
+    data: { data: stocks },
+  }: any = useQuery(["stocks"], async () => (await admin().get("/stock/select")).data);
 
   const { data: addresses }: any = useQuery(["addresses"], () => getOwnAddresses());
   const stockOptions = stocks.map((_stock: Stock) => ({
     label: `محصول ${_stock.product_id} - سایز ${_stock.size} - شناسه انبار ${_stock.id}`,
-    value: _stock.id
-  }))
+    value: _stock.id,
+  }));
 
-  const [orderStocks, setOrderStocks] =
-    useState
-      <{ stocks: IStockForCreation[] }>
-      ({ stocks: [] });
+  const [orderStocks, setOrderStocks] = useState<{ stocks: IStockForCreation[] }>({ stocks: [] });
 
   const [orderAddress, setOrderAddress] = useState<Address | { address_id: number } | null>(null);
   const [addressFormLock, setAddressFormLock] = useState(false);
@@ -46,43 +44,42 @@ export function CreateOrderPage() {
 
   useEffect(() => {
     if (!!orderAddress) {
-      setAddressFormLock(true)
+      setAddressFormLock(true);
     } else {
-      setAddressFormLock(false)
-    };
-  }, [orderAddress])
+      setAddressFormLock(false);
+    }
+  }, [orderAddress]);
 
   const [selectedStock, setSelectedStock] = useState<string | null>(null);
   const [orderCount, setOrderCount] = useState<number>(0);
 
   function addItemToOrder() {
     if (selectedStock && orderCount) {
-      if (orderStocks.stocks.findIndex(_ => _.id === +selectedStock) >= 0) {
-        setOrderStocks(curr => ({
+      if (orderStocks.stocks.findIndex((_) => _.id === +selectedStock) >= 0) {
+        setOrderStocks((curr) => ({
           stocks: [
-            ...curr.stocks
-              .map(_stock =>
-                _stock.id === +selectedStock
-                  ? {
+            ...curr.stocks.map((_stock) =>
+              _stock.id === +selectedStock
+                ? {
                     id: +selectedStock,
-                    quantity: _stock.quantity + orderCount
+                    quantity: _stock.quantity + orderCount,
                   }
-                  : _stock
-              ),
-          ]
-        }))
+                : _stock,
+            ),
+          ],
+        }));
         setSelectedStock(null);
         setOrderCount(0);
       } else {
-        setOrderStocks(curr => ({
+        setOrderStocks((curr) => ({
           stocks: [
             ...curr.stocks,
             {
               id: +selectedStock,
-              quantity: orderCount
-            }
-          ]
-        }))
+              quantity: orderCount,
+            },
+          ],
+        }));
         setSelectedStock(null);
         setOrderCount(0);
       }
@@ -90,30 +87,24 @@ export function CreateOrderPage() {
   }
 
   function removeOrderStock(stockId: number) {
-    setOrderStocks(_curr => (
-      {
-        stocks: _curr.stocks
-          .filter(__stock =>
-            __stock.id !== stockId
-          )
-      }
-    ))
+    setOrderStocks((_curr) => ({
+      stocks: _curr.stocks.filter((__stock) => __stock.id !== stockId),
+    }));
   }
 
   function reductionCallback(stockId: number) {
-    setOrderStocks(_curr => (
-      {
-        stocks: _curr.stocks.map(
-          __stock =>
-            __stock.id === stockId
-              ? {
+    setOrderStocks((_curr) => ({
+      stocks: _curr.stocks
+        .map((__stock) =>
+          __stock.id === stockId
+            ? {
                 id: stockId,
-                quantity: __stock.quantity - 1
+                quantity: __stock.quantity - 1,
               }
-              : __stock
-        ).filter(_stock => _stock.quantity > 0)
-      }
-    ))
+            : __stock,
+        )
+        .filter((_stock) => _stock.quantity > 0),
+    }));
   }
 
   function navigateToSubmittedOrderEditingPage() {
@@ -134,14 +125,14 @@ export function CreateOrderPage() {
         navigateToSubmittedOrderEditingPage();
       }
       setLoading(false);
-    }
-  })
+    },
+  });
 
   const addAddressToOrderCallback = useMutation({
     mutationFn: addAddressToOrder,
 
     onError() {
-      toast.error("ثبت آدرس موفقیت آمیز نبود")
+      toast.error("ثبت آدرس موفقیت آمیز نبود");
       setLoading(false);
     },
 
@@ -150,15 +141,15 @@ export function CreateOrderPage() {
         if (couponCode) {
           applyCouponCodeToOrder.mutate({
             orderId: submittedOrderId.current!,
-            code: couponCode
-          })
+            code: couponCode,
+          });
         } else {
           setLoading(false);
           navigateToSubmittedOrderEditingPage();
         }
       }
-    }
-  })
+    },
+  });
 
   const orderCreation = useMutation({
     mutationFn: createOrder,
@@ -168,8 +159,9 @@ export function CreateOrderPage() {
       if (errMessage === "User Has open Order") {
         toast.warn(
           <Box>
-            شما یک سفارش باز به شناسه <Link href={`/orders/edit/${openOrderId}`} passHref>{`${openOrderId}`}</Link> دارید
-          </Box>
+            شما یک سفارش باز به شناسه <Link href={`/orders/edit/${openOrderId}`} passHref>{`${openOrderId}`}</Link>{" "}
+            دارید
+          </Box>,
         );
       } else {
         toast.error("ثبت سفارش موفقیت آمیز نبود");
@@ -177,16 +169,15 @@ export function CreateOrderPage() {
       setLoading(false);
     },
     onSuccess() {
-      getOwnOrders()
-        .then(([lastOrder]) => {
-          submittedOrderId.current = lastOrder.id;
-          addAddressToOrderCallback.mutate({
-            address: orderAddress!,
-            orderId: lastOrder.id
-          })
-        })
+      getOwnOrders().then(([lastOrder]) => {
+        submittedOrderId.current = lastOrder.id;
+        addAddressToOrderCallback.mutate({
+          address: orderAddress!,
+          orderId: lastOrder.id,
+        });
+      });
     },
-  })
+  });
 
   async function submitOrder() {
     setLoading(true);
@@ -197,10 +188,7 @@ export function CreateOrderPage() {
     <Layout title="ثبت سفارش">
       <h1>ثبت سفارش</h1>
 
-      <LoadingOverlay
-        visible={loading}
-        sx={{ position: "fixed" }}
-      />
+      <LoadingOverlay visible={loading} sx={{ position: "fixed" }} />
 
       <hr />
 
@@ -213,174 +201,135 @@ export function CreateOrderPage() {
           searchable
           onChange={(e) => setSelectedStock(e)}
         />
-        {
-          selectedStock && (
-            <NumberInput
-              placeholder="تعداد سفارش..."
-              label="تعداد سفارش"
-              onChange={(e) => setOrderCount(e ?? 0)}
-            />
-          )
-        }
-        {
-          orderCount > 0 ? (
-            <Button
-              variant="filled"
-              color="cyan"
-              onClick={addItemToOrder}
-              sx={{
-                marginTop: "1rem"
-              }}
-            >
-              افزودن به سفارش
-            </Button>
-          ) : null
-        }
+        {selectedStock && (
+          <NumberInput placeholder="تعداد سفارش..." label="تعداد سفارش" onChange={(e) => setOrderCount(e ?? 0)} />
+        )}
+        {orderCount > 0 ? (
+          <Button
+            variant="filled"
+            color="cyan"
+            onClick={addItemToOrder}
+            sx={{
+              marginTop: "1rem",
+            }}
+          >
+            افزودن به سفارش
+          </Button>
+        ) : null}
       </Box>
-      {
-        orderStocks.stocks.length ? (
-          <>
-            <hr />
-            <Box sx={{
+      {orderStocks.stocks.length ? (
+        <>
+          <hr />
+          <Box
+            sx={{
               display: "flex",
-              gap: "1rem"
-            }}>
-              {orderStocks?.stocks.map(_stock => (
-                <OrderStockCard
-                  stock={_stock}
-                  removeCallback={removeOrderStock}
-                  reductionCallback={reductionCallback}
-                />
-              ))}
-            </Box>
-            <hr />
-            <div>
-              <Tabs defaultValue="add-address" variant="pills">
-                <Tabs.List>
-                  <Tabs.Tab value="add-address">ثبت نشانی جدید</Tabs.Tab>
-                  <Tabs.Tab value="select-address">انتخاب از بین نشانی های ثبت شده ({addresses.length})</Tabs.Tab>
-                </Tabs.List>
+              gap: "1rem",
+            }}
+          >
+            {orderStocks?.stocks.map((_stock) => (
+              <OrderStockCard stock={_stock} removeCallback={removeOrderStock} reductionCallback={reductionCallback} />
+            ))}
+          </Box>
+          <hr />
+          <div>
+            <Tabs defaultValue="add-address" variant="pills">
+              <Tabs.List>
+                <Tabs.Tab value="add-address">ثبت نشانی جدید</Tabs.Tab>
+                <Tabs.Tab value="select-address">انتخاب از بین نشانی های ثبت شده ({addresses.length})</Tabs.Tab>
+              </Tabs.List>
 
-                <Tabs.Panel value="add-address">
-                  <Box sx={{
+              <Tabs.Panel value="add-address">
+                <Box
+                  sx={{
                     display: "flex",
                     ".address-form": {
                       minWidth: "24rem",
                       marginTop: "1rem",
                       display: "flex",
                       flexDirection: "column",
-                      rowGap: "1rem"
+                      rowGap: "1rem",
                     },
                     ".address-cards": {
-                      flex: "4"
-                    }
-                  }}>
-                    <form
-                      className="address-form"
-                      onSubmit={
-                        addressForm
-                          .handleSubmit(onAddressFormSubmit)
-                      }
-                    >
-                      <Input
-                        placeholder="استان"
-                        disabled={addressFormLock}
-                        {...addressForm
-                          .register("province", { required: true })
-                        }
-                      />
-                      <Input
-                        placeholder="شهر"
-                        disabled={addressFormLock}
-                        {...addressForm
-                          .register("city", { required: true })
-                        }
-                      />
-                      <Textarea
-                        placeholder="نشانی"
-                        disabled={addressFormLock}
-                        {...addressForm
-                          .register("address", { required: true })
-                        }
-                      />
-                      <Input
-                        placeholder="کد پستی"
-                        disabled={addressFormLock}
-                        {...addressForm
-                          .register("postalcode", { required: true })
-                        }
-                      />
-                      {
-                        addressFormLock
-                          ? (
-                            <Button
-                              type="button"
-                              onClick={() => { setOrderAddress(null) }}
-                              color="green"
-                            >
-                              <IconWriting color="#fff" />
-                              ویرایش نشانی
-                            </Button>
-                          ) : (
-                            <Button
-                              type="submit"
-                              color="cyan"
-                            >
-                              <IconCheck color="#fff" />
-                              ثبت نشانی
-                            </Button>
-                          )
-                      }
-                    </form>
-                  </Box>
-                </Tabs.Panel>
-
-                <Tabs.Panel value="select-address">
-                  <Box sx={panelCardsContainerStyles}>
-                    {
-                      addresses
-                        ?.map((_address: Address) =>
-                          <SelectAddressCard
-                            address={_address}
-                            selectionCallback={setOrderAddress}
-                            active={
-                              (
-                                (orderAddress as Address)?.id
-                                ?? (orderAddress as { address_id: number })?.address_id
-                              )
-                              !== _address.id}
-                          />
-                        )
-                    }
-                  </Box>
-                </Tabs.Panel>
-              </Tabs>
-            </div>
-            <hr />
-            {
-              orderAddress ? (
-                <Box>
-                  <Input
-                    placeholder="کد تخفیف..."
-                    sx={{ maxWidth: "24rem" }}
-                    onChange={(e: any) => setCouponCode(e.target.value)}
-                  />
-                  <hr />
-                  <Button
-                    variant="default"
-                    color="green"
-                    onClick={submitOrder}
-                  >
-                    ثبت سفارش
-                  </Button>
+                      flex: "4",
+                    },
+                  }}
+                >
+                  <form className="address-form" onSubmit={addressForm.handleSubmit(onAddressFormSubmit)}>
+                    <Input
+                      placeholder="استان"
+                      disabled={addressFormLock}
+                      {...addressForm.register("province", { required: true })}
+                    />
+                    <Input
+                      placeholder="شهر"
+                      disabled={addressFormLock}
+                      {...addressForm.register("city", { required: true })}
+                    />
+                    <Textarea
+                      placeholder="نشانی"
+                      disabled={addressFormLock}
+                      {...addressForm.register("address", { required: true })}
+                    />
+                    <Input
+                      placeholder="کد پستی"
+                      disabled={addressFormLock}
+                      {...addressForm.register("postalcode", { required: true })}
+                    />
+                    {addressFormLock ? (
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setOrderAddress(null);
+                        }}
+                        color="green"
+                      >
+                        <IconWriting />
+                        ویرایش نشانی
+                      </Button>
+                    ) : (
+                      <Button type="submit" color="cyan">
+                        <IconCheck />
+                        ثبت نشانی
+                      </Button>
+                    )}
+                  </form>
                 </Box>
-              ) : null
-            }
-          </>
-        ) : null
-      }
-    </Layout >
-  )
+              </Tabs.Panel>
+
+              <Tabs.Panel value="select-address">
+                <Box sx={panelCardsContainerStyles}>
+                  {addresses?.map((_address: Address) => (
+                    <SelectAddressCard
+                      address={_address}
+                      selectionCallback={setOrderAddress}
+                      active={
+                        ((orderAddress as Address)?.id ?? (orderAddress as { address_id: number })?.address_id) !==
+                        _address.id
+                      }
+                    />
+                  ))}
+                </Box>
+              </Tabs.Panel>
+            </Tabs>
+          </div>
+          <hr />
+          {orderAddress ? (
+            <Box>
+              <Input
+                placeholder="کد تخفیف..."
+                sx={{ maxWidth: "24rem" }}
+                onChange={(e: any) => setCouponCode(e.target.value)}
+              />
+              <hr />
+              <Button variant="default" color="green" onClick={submitOrder}>
+                ثبت سفارش
+              </Button>
+            </Box>
+          ) : null}
+        </>
+      ) : null}
+    </Layout>
+  );
 }
 
 const panelCardsContainerStyles: CSSObject = {
@@ -388,4 +337,4 @@ const panelCardsContainerStyles: CSSObject = {
   display: "flex",
   flexWrap: "wrap",
   gap: "1rem",
-}
+};
