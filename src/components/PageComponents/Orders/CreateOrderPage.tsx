@@ -318,7 +318,7 @@ export function CreateOrderPage() {
                               onClick={() => { setOrderAddress(null) }}
                               color="green"
                             >
-                              <IconWriting color="#fff" />
+                              <IconWriting />
                               ویرایش نشانی
                             </Button>
                           ) : (
@@ -326,7 +326,7 @@ export function CreateOrderPage() {
                               type="submit"
                               color="cyan"
                             >
-                              <IconCheck color="#fff" />
+                              <IconCheck />
                               ثبت نشانی
                             </Button>
                           )
