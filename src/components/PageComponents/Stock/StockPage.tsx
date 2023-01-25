@@ -10,6 +10,7 @@ import { Add } from "@material-ui/icons";
 import { toast } from "react-toastify";
 import { PermissionEnum } from "types";
 import { useQuery } from "@tanstack/react-query";
+import { Flex } from "@mantine/core";
 
 export const StockPage = () => {
   const router = useRouter();
@@ -71,7 +72,7 @@ export const StockPage = () => {
     stock?.count,
     `${numeralize(stock?.price)} تومان`,
     `${numeralize(stock?.priceAfterDiscount)} تومان`,
-    <Container>
+    <Flex gap=".25rem">
       <Link href={`/stock/${stock?.id}`}>
         <a>
           <Button style={{ marginLeft: "1rem" }} status="Info">
@@ -89,7 +90,7 @@ export const StockPage = () => {
       <Button status="Danger" onClick={() => setItemToRemove(stock)}>
         حذف
       </Button>
-    </Container>,
+    </Flex>,
   ]);
 
   return (
