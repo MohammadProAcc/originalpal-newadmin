@@ -1,18 +1,11 @@
 import { Card, CardBody, CardHeader, InputGroup, Modal } from "@paljs/ui";
-import { Button, FlexContainer, HeaderButton, ModalBox } from "components";
+import { Button, CouponForm, FlexContainer, HeaderButton, ModalBox } from "components";
 import Layout from "Layouts";
 import router from "next/router";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import {
-  deleteCoupon,
-  editCoupon,
-  getSingleCoupon,
-  removeItem,
-  toLocalDate,
-  useStore,
-} from "utils";
+import { deleteCoupon, editCoupon, getSingleCoupon, removeItem, toLocalDate, useStore } from "utils";
 
 export const EditCouponPage: React.FC = () => {
   const { coupon, updateCoupon } = useStore((state: any) => ({
@@ -41,16 +34,10 @@ export const EditCouponPage: React.FC = () => {
   const closeRemovalModal = () => setItemToRemove(false);
 
   const remove = async (removeId: any) => {
-    await removeItem(
-      "coupons",
-      removeId,
-      deleteCoupon,
-      () => router.push("/coupons"),
-      [
-        `کوپن ${removeId} با موفقیت حذف شد`,
-        "حذف کوپن موفقیت آمیز نبود",
-      ],
-    );
+    await removeItem("coupons", removeId, deleteCoupon, () => router.push("/coupons"), [
+      `کوپن ${removeId} با موفقیت حذف شد`,
+      "حذف کوپن موفقیت آمیز نبود",
+    ]);
   };
 
   return (
@@ -82,131 +69,7 @@ export const EditCouponPage: React.FC = () => {
         </ModalBox>
       </Modal>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Card>
-          <CardHeader>کد کوپن</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input {...register("code")} placeholder="کد کوپن" disabled />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>توضیحات</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input
-                {...register("decription", { required: true })}
-                placeholder="توضیحات"
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>نوع</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input
-                {...register("type", { required: true })}
-                placeholder="نوع"
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>مقدار</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input
-                {...register("amount", { required: true })}
-                type="number"
-                placeholder="مقدار"
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>شروع : {toLocalDate(coupon?.start)}</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input
-                type="date"
-                {...register("start", { required: true })}
-                placeholder="شروع"
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>انقضاء : {toLocalDate(coupon?.expiration)}</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input
-                type="date"
-                {...register("expiration", { required: true })}
-                placeholder="انقضاء"
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>حداکثر</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input
-                {...register("max", { required: true })}
-                placeholder="حداکثر"
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>deny_off</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input
-                {...register("deny_off", { required: true })}
-                placeholder="deny_off"
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>محدودیت</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input
-                {...register("limit", { required: true })}
-                placeholder="محدودیت"
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>شناسه کاربر</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input
-                {...register("user_id", { required: true })}
-                placeholder="شناسه کاربر"
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Button status="Info" type="submit" appearance="outline">
-          بروزرسانی کوپن
-        </Button>
-      </form>
+      <CouponForm defaultValues={coupon} />
     </Layout>
   );
 };

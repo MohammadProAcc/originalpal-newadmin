@@ -1,37 +1,40 @@
-import { CouponsPage } from 'components'
-import { GetServerSideProps, NextPage } from 'next'
-import { PermissionEnum } from 'types'
-import { asyncHas, getCouponsList } from 'utils'
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import { CouponsPage } from "components";
+import { GetServerSideProps, NextPage } from "next";
+import { PermissionEnum } from "types";
+import { asyncHas, getCouponsList } from "utils";
 
-const PageName: NextPage = () => <CouponsPage />
+const PageName: NextPage = () => <CouponsPage />;
 
-export default PageName
+export default PageName;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  const token = context?.req?.cookies?.[process.env.TOKEN!];
+  const query = context?.query;
+
   if (token) {
     if (!(await asyncHas(PermissionEnum.browseCoupon, token)))
       return {
         props: {},
         redirect: {
-          destination: '/dashboard',
+          destination: "/dashboard",
         },
-      }
-    const coupons = await getCouponsList(context?.query, context?.req?.cookies?.[process.env.TOKEN!])
+      };
+
+    const queryClient = new QueryClient();
+    await queryClient.prefetchQuery(["coupons", query], () => getCouponsList(query, token));
 
     return {
       props: {
-        initialState: {
-          coupons,
-        },
+        dehydratedState: dehydrate(queryClient),
       },
-    }
+    };
   } else {
     return {
       props: {},
       redirect: {
-        destination: '/auth/login',
+        destination: "/auth/login",
       },
-    }
+    };
   }
-}
+};

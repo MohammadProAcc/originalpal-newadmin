@@ -45,6 +45,7 @@ export const UsersPage = () => {
   const togglePluralRemoveModal = () => setItemsToRemove(null);
 
   const pluralRemoveTrigger = async (selections: any[]) => {
+    setLoading(true);
     await pluralRemove(
       "users",
       selections,
@@ -53,12 +54,12 @@ export const UsersPage = () => {
         clearList(entity, id);
         toast.success(`مورد با شناسه ${id} حذف شد`);
       },
-      async () => {
-        setTableSelections([]);
-        setItemsToRemove(null);
-      },
+      async () => {},
       (id: number) => toast.error(`حذف کاربر با شناسه ${id} موفقیت آمیز نبود`),
     );
+    setLoading(false);
+    setTableSelections([]);
+    setItemsToRemove(null);
   };
 
   const columns: any[] = ["شناسه کاربر", "نام کاربر", "نام خانوادگی", "ایمیل", "شماره تلفن کاربر", "نقش", "فعالیت ها"];
@@ -168,13 +169,13 @@ export const UsersPage = () => {
       <Modal on={itemsToRemove} toggle={togglePluralRemoveModal}>
         <ModalBox fluid>
           آیا از حذف موارد
-          <span className="text-danger mx-1">{itemsToRemove?.join(" , ")}</span>
+          <span className="text-danger mx-1">{tableSelections?.join(" , ")}</span>
           اطمینان دارید؟
           <ButtonGroup>
             <Button onClick={togglePluralRemoveModal} style={{ marginLeft: "1rem" }}>
               خیر، منصرم شدم
             </Button>
-            <Button onClick={() => pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
+            <Button onClick={async () => await pluralRemoveTrigger(tableSelections)} disabled={loading} status="Danger">
               بله، حذف شوند
             </Button>
           </ButtonGroup>

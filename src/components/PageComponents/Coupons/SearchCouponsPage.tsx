@@ -7,13 +7,13 @@ import Cookies from "js-cookie";
 import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { PermissionEnum } from "types";
-import { deleteCoupon, getCouponsList, has, pluralRemove, translator, useStore, useUserStore } from "utils";
+import { deleteCoupon, getCouponsList, has, pluralRemove, search_in, useUserStore } from "utils";
 
-export const CouponsPage = () => {
+export const SearchCouponsPage = () => {
   const router = useRouter();
 
   // FIXME: need to fix after migrating domain
@@ -29,7 +29,31 @@ export const CouponsPage = () => {
   }
 
   const couponsQuery = useQuery(["coupons", router.query], () =>
-    getCouponsList(router.query, Cookies.get(process.env.TOKEN!)),
+    search_in("coupons", router.query, router.query, Cookies.get(process.env["TOKEN"]!)),
+  );
+
+  const couponFields = useQuery(
+    ["couponFields"],
+    () =>
+      new Promise((resolve) =>
+        resolve([
+          "amount",
+          "code",
+          "created_at",
+          "decription",
+          "deleted_at",
+          "deny_off",
+          "expiration",
+          "id",
+          "limit",
+          "max",
+          "min_to_execute",
+          "start",
+          "type",
+          "updated_at",
+          "user_id",
+        ]),
+      ),
   );
 
   const permissions = useUserStore().getPermissions();
@@ -170,7 +194,7 @@ export const CouponsPage = () => {
       {has(permissions, PermissionEnum.browseCoupon) && (
         <>
           <SearchBar
-            fields={couponsQuery?.data?.fields}
+            fields={couponFields?.data as any}
             entity="coupons"
             params={router.query}
             callback={(form: any) =>
