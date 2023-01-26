@@ -1,7 +1,9 @@
 import { Flex } from "@mantine/core";
 import { Add } from "@material-ui/icons";
 import { Button, Container, Modal } from "@paljs/ui";
+import { useQuery } from "@tanstack/react-query";
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from "components";
+import Cookies from "js-cookie";
 import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -9,15 +11,15 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { PermissionEnum } from "types";
-import { deleteUser, has, pluralRemove, translator, useStore, useUserStore } from "utils";
+import { deleteUser, getUsersList, has, pluralRemove, translator, useStore, useUserStore } from "utils";
 
 export const UsersPage = () => {
   const router = useRouter();
 
-  const { users, clearList } = useStore((state) => ({
-    users: state?.users,
-    clearList: state?.clearList,
-  }));
+  const usersQuery = useQuery(["users", router.query], () =>
+    getUsersList(router?.query, Cookies.get(process.env["TOKEN"]!)),
+  );
+
   const permissions = useUserStore().getPermissions();
 
   const [loading, setLoading] = useState(false);
@@ -32,7 +34,7 @@ export const UsersPage = () => {
     setLoading(true);
     const response = await deleteUser(item?.id);
     if (response?.status === "success") {
-      clearList("users", item?.id);
+      usersQuery.refetch();
       setItemToRemove(null);
       toast.success("کاربر با موفقیت حذف شد");
     } else {
@@ -51,7 +53,7 @@ export const UsersPage = () => {
       selections,
       deleteUser,
       (entity: string, id: any) => {
-        clearList(entity, id);
+        usersQuery.refetch();
         toast.success(`مورد با شناسه ${id} حذف شد`);
       },
       async () => {},
@@ -64,7 +66,7 @@ export const UsersPage = () => {
 
   const columns: any[] = ["شناسه کاربر", "نام کاربر", "نام خانوادگی", "ایمیل", "شماره تلفن کاربر", "نقش", "فعالیت ها"];
 
-  const data = users?.data?.data?.map((user: any) => [
+  const data = usersQuery?.data?.table?.data?.map((user: any) => [
     // =====>> Table Columns <<=====
     user?.id,
     user?.name,
@@ -131,7 +133,7 @@ export const UsersPage = () => {
       {has(permissions, PermissionEnum.browseUser) && (
         <>
           <SearchBar
-            fields={users.fields}
+            fields={usersQuery?.data?.fields}
             entity="users"
             params={router.query}
             callback={(form: any) =>
@@ -144,7 +146,7 @@ export const UsersPage = () => {
 
           <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
           <PaginationBar
-            totalPages={users?.data?.last_page}
+            totalPages={usersQuery?.data?.table?.last_page}
             activePage={router.query.page ? Number(router.query.page) : 1}
             router={router}
           />
