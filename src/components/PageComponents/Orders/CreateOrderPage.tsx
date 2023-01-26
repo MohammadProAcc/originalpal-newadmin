@@ -1,16 +1,29 @@
-import React, { useEffect, useRef, useState } from "react";
-import Layout from "Layouts";
+import {
+  Box,
+  Button,
+  CSSObject,
+  Divider,
+  Input,
+  LoadingOverlay,
+  NumberInput,
+  Select,
+  Space,
+  Tabs,
+  Text,
+  Textarea,
+} from "@mantine/core";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { addAddressToOrder, admin, applyCouponOnOrder, createOrder, getOwnAddresses, getOwnOrders } from "utils";
-import { NumberInput, Select, Button, Box, LoadingOverlay, Input, Textarea, Tabs, CSSObject } from "@mantine/core";
-import { IStockForCreation, Stock, Address } from "types";
-import { OrderStockCard } from "./components/OrderStockCard";
-import { toast } from "react-toastify";
-import { useForm } from "react-hook-form";
-import { IconWriting, IconCheck } from "@tabler/icons";
-import { SelectAddressCard } from "./components/SelectAddressCard";
-import { useRouter } from "next/router";
+import Layout from "Layouts";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { FaCheck, FaPen } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { Address, IStockForCreation, Stock } from "types";
+import { addAddressToOrder, admin, applyCouponOnOrder, createOrder, getOwnAddresses, getOwnOrders } from "utils";
+import { OrderStockCard } from "./components/OrderStockCard";
+import { SelectAddressCard } from "./components/SelectAddressCard";
 
 export function CreateOrderPage() {
   const router = useRouter();
@@ -155,12 +168,20 @@ export function CreateOrderPage() {
     mutationFn: createOrder,
     onError(err: any) {
       const errMessage = err.response.data.message;
-      const openOrderId = err.response.data.data.order.id;
+      const openOrderId = err.response.data.data.order?.id;
       if (errMessage === "User Has open Order") {
         toast.warn(
           <Box>
             شما یک سفارش باز به شناسه <Link href={`/orders/edit/${openOrderId}`} passHref>{`${openOrderId}`}</Link>{" "}
             دارید
+          </Box>,
+        );
+      } else if (errMessage === "product is sold") {
+        console.log("err >> ", err.response.data);
+        toast.warn(
+          <Box>
+            <Text>{err.response.data?.data?.stock?.count}</Text> عدد از محصول{" "}
+            <Text>{err.response?.data?.data?.stock?.product_id}</Text> موجود است
           </Box>,
         );
       } else {
@@ -283,12 +304,14 @@ export function CreateOrderPage() {
                         }}
                         color="green"
                       >
-                        <IconWriting />
+                        <FaPen />
+                        <Space mx="xs" />
                         ویرایش نشانی
                       </Button>
                     ) : (
                       <Button type="submit" color="cyan">
-                        <IconCheck />
+                        <FaCheck />
+                        <Space mx="xs" />
                         ثبت نشانی
                       </Button>
                     )}

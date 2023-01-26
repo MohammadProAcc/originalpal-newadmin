@@ -1,40 +1,50 @@
-import { Card, CardBody, CardHeader, Modal } from '@paljs/ui'
-import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
-import { DatesCard } from 'components/Card/DatesCard'
-import Layout from 'Layouts'
-import router from 'next/router'
-import React, { useState } from 'react'
-import { PermissionEnum } from 'types'
-import { deleteOrder, has, numeralize, removeItem, translator, useStore, useUserStore } from 'utils'
+import { Card, CardBody, CardHeader, Modal } from "@paljs/ui";
+import { Button, FlexContainer, HeaderButton, ModalBox } from "components";
+import { DatesCard } from "components/Card/DatesCard";
+import Layout from "Layouts";
+import router from "next/router";
+import React, { useState } from "react";
+import { PermissionEnum } from "types";
+import {
+  deleteOrder,
+  has,
+  numeralize,
+  removeItem,
+  toLocalDate,
+  toLocalTime,
+  translator,
+  useStore,
+  useUserStore,
+} from "utils";
 
 const clacTotalPrice = (orderItems: any[]) => {
   // const priceArr = order['order_items']
-  const priceArr = orderItems?.map((orderItem: any) => orderItem?.price)
+  const priceArr = orderItems?.map((orderItem: any) => +orderItem?.price);
   if (priceArr?.length > 0) {
-    const price = priceArr?.reduce((prev: number, curr: number) => curr + prev)
-    return price
+    const price = priceArr?.reduce((prev: number, curr: number) => curr + prev);
+    return price;
   }
-}
+};
 
 export const SingleOrderPage: React.FC = () => {
   const { order } = useStore((state: any) => ({
     order: state?.order,
-  }))
-  const permissions = useUserStore().getPermissions()
+  }));
+  const permissions = useUserStore().getPermissions();
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
-  const closeRemovalModal = () => setItemToRemove(false)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const closeRemovalModal = () => setItemToRemove(false);
 
   const remove = async (removeId: any) => {
-    await removeItem('orders', removeId, deleteOrder, () => router.push('/orders'), [
+    await removeItem("orders", removeId, deleteOrder, () => router.push("/orders"), [
       `سفارش ${removeId} با موفقیت حذف شد`,
-      'حذف سفارش موفقیت آمیز نبود',
-    ])
-  }
+      "حذف سفارش موفقیت آمیز نبود",
+    ]);
+  };
 
   return (
     <Layout title={`سفارش شماره ${order?.id}`}>
-      <h1 style={{ margin: '0 0 4rem 0' }}>
+      <h1 style={{ margin: "0 0 4rem 0" }}>
         سفارش شماره {order?.id}
         {has(permissions, PermissionEnum.editOrder) && (
           <HeaderButton status="Info" href={`/orders/edit/${order?.id}`}>
@@ -51,7 +61,7 @@ export const SingleOrderPage: React.FC = () => {
       {/* ....:::::: Modals :::::.... */}
       <Modal on={itemToRemove} toggle={closeRemovalModal}>
         <ModalBox>
-          <div style={{ marginBottom: '1rem' }}>
+          <div style={{ marginBottom: "1rem" }}>
             آیا از حذف سفارش
             <span className="mx-1">{itemToRemove?.id}</span>
             اطمینان دارید؟
@@ -85,7 +95,7 @@ export const SingleOrderPage: React.FC = () => {
           {Object.keys(order?.user)?.map((field: any) => (
             <p>
               <span>{translator(field)} :</span>
-              <span>{order['user'][field] ?? ' - '}</span>
+              <span>{order["user"][field] ?? " - "}</span>
             </p>
           ))}
         </CardBody>
@@ -101,10 +111,10 @@ export const SingleOrderPage: React.FC = () => {
       <Card>
         <CardHeader>آدرس</CardHeader>
         <CardBody>
-          {Object.keys(order['address'])?.map((field: any) => (
+          {Object.keys(order["address"])?.map((field: any) => (
             <p>
               <span>{translator(field)} :</span>
-              <span>{order['address'][field] ?? ' - '}</span>
+              <span>{order["address"][field] ?? " - "}</span>
             </p>
           ))}
         </CardBody>
@@ -112,7 +122,7 @@ export const SingleOrderPage: React.FC = () => {
 
       <Card>
         <CardHeader>یادداشت</CardHeader>
-        <CardBody dangerouslySetInnerHTML={{ __html: order['notes'] }} />
+        <CardBody dangerouslySetInnerHTML={{ __html: order["notes"] }} />
       </Card>
 
       <Card>
@@ -120,11 +130,15 @@ export const SingleOrderPage: React.FC = () => {
         <CardBody>
           <Card>
             <CardHeader>ساخته شده در :</CardHeader>
-            <CardBody>{order?.created_at}</CardBody>
+            <CardBody>
+              {toLocalDate(order?.created_at)} - {toLocalTime(order?.created_at)}
+            </CardBody>
           </Card>
           <Card>
             <CardHeader>بروزرسانی شده در :</CardHeader>
-            <CardBody>{order?.updated_at}</CardBody>
+            <CardBody>
+              {toLocalDate(order?.updated_at)} - {toLocalTime(order?.updated_at)}
+            </CardBody>
           </Card>
         </CardBody>
       </Card>
@@ -132,13 +146,13 @@ export const SingleOrderPage: React.FC = () => {
       <Card>
         <CardHeader>سفارشات</CardHeader>
         <CardBody>
-          {order['order_items']?.map((orderItem: any, orderItemIndex: number) => (
+          {order["order_items"]?.map((orderItem: any, orderItemIndex: number) => (
             <Card>
               <CardHeader>
                 <h4>
                   {orderItemIndex + 1}.
                   <img
-                    style={{ width: '10rem', height: '10rem' }}
+                    style={{ width: "10rem", height: "10rem" }}
                     src={`${process.env.SRC}/${orderItem?.product?.site_main_picture?.u}`}
                   />
                 </h4>
@@ -153,7 +167,7 @@ export const SingleOrderPage: React.FC = () => {
             </Card>
           ))}
           <hr />
-          <p>جمع کل : {numeralize(clacTotalPrice(order['order_items']))} تومان</p>
+          <p>جمع کل : {numeralize(clacTotalPrice(order["order_items"]) ?? 0)} تومان</p>
         </CardBody>
       </Card>
 
@@ -164,5 +178,5 @@ export const SingleOrderPage: React.FC = () => {
 
       <DatesCard createdAt={order?.created_at} updatedAt={order?.updated_at} />
     </Layout>
-  )
-}
+  );
+};

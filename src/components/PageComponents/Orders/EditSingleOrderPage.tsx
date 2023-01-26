@@ -1,5 +1,5 @@
-import { Flex, Select as MantineSelect } from '@mantine/core'
-import { Add, Close } from '@material-ui/icons'
+import { Flex, Select as MantineSelect } from "@mantine/core";
+import { Add, Close } from "@material-ui/icons";
 import {
   Alert,
   Button,
@@ -10,20 +10,20 @@ import {
   InputGroup as _InputGroup,
   Modal,
   Select,
-} from '@paljs/ui'
-import { useQuery } from '@tanstack/react-query'
-import { Editor, FlexContainer, HeaderButton, ModalBox } from 'components'
-import { WriteOrderDetailsModal } from 'components/Modal/derived/WriteOrderDetails'
-import { useNonInitialEffect } from 'hooks'
-import Cookies from 'js-cookie'
-import Layout from 'Layouts'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import React, { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
-import styled, { css } from 'styled-components'
-import { Coupon, PermissionEnum } from 'types'
+} from "@paljs/ui";
+import { useQuery } from "@tanstack/react-query";
+import { Editor, FlexContainer, HeaderButton, ModalBox, SendSmsForm } from "components";
+import { WriteOrderDetailsModal } from "components/Modal/derived/WriteOrderDetails";
+import { useNonInitialEffect } from "hooks";
+import Cookies from "js-cookie";
+import Layout from "Layouts";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import styled, { css } from "styled-components";
+import { Coupon, PermissionEnum } from "types";
 import {
   add_stock_option,
   admin,
@@ -41,61 +41,61 @@ import {
   update_order_status,
   useStore,
   useUserStore,
-} from 'utils'
+} from "utils";
 
 const statusOptions = [
-  { label: 'در انتظار پرداخت', value: 'waiting' },
-  { label: 'پرداخت شده', value: 'paid' },
-  { label: 'در حال پردازش', value: 'process' },
-  { label: 'پست شده', value: 'post' },
-  { label: 'تحویل شده', value: 'delivered' },
-]
+  { label: "در انتظار پرداخت", value: "waiting" },
+  { label: "پرداخت شده", value: "paid" },
+  { label: "در حال پردازش", value: "process" },
+  { label: "پست شده", value: "post" },
+  { label: "تحویل شده", value: "delivered" },
+];
 
 export const EditSingleOrderPage: React.FC = () => {
-  const router = useRouter()
-  const orderId = router.query.order_id as string
+  const router = useRouter();
+  const orderId = router.query.order_id as string;
 
   const {
     data: { data: order },
     refetch: refetchOrder,
-  } = useQuery(['order', orderId], () => getSingleOrder(orderId))
+  } = useQuery(["order", orderId], () => getSingleOrder(orderId));
   const {
     data: {
       data: { data: stocks },
     },
     refetch: refetchStocks,
-  }: any = useQuery(['stocks'], () => admin().get('/stock/select'))
-  const { data: coupons } = useQuery(['coupons'], () => getCouponsList({ page: 'total' }))
+  }: any = useQuery(["stocks"], () => admin().get("/stock/select"));
+  const { data: coupons } = useQuery(["coupons"], () => getCouponsList({ page: "total" }));
 
-  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null)
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
   useNonInitialEffect(() => {
     if (order.coupon_id) {
       getSingleCoupon(order.coupon_id).then((res) => {
-        setAppliedCoupon(res.data)
-      })
+        setAppliedCoupon(res.data);
+      });
     }
-  }, [order])
+  }, [order]);
 
   const { updateOrder, clearOrderItems, reload } = useStore((state: any) => ({
     updateOrder: state?.updateOrder,
     clearOrderItems: state?.clearOrderItems,
-  }))
-  const permissions = useUserStore().getPermissions()
+  }));
+  const permissions = useUserStore().getPermissions();
 
   const [stockOptions, setStockOptions] = useState(
     stocks?.map((stock: any) => ({
       label: ` شناسه محصول: ${stock?.product_id} - سایز: ${stock?.size}`,
       value: stock,
     })),
-  )
+  );
 
   const [couponOptions, setCouponOptions] = useState(
     coupons?.data?.data?.map((_coupon: Coupon) => ({
       label: `${_coupon.code} - ${_coupon.decription}`,
       value: _coupon.id,
     })) ?? [],
-  )
+  );
 
   useNonInitialEffect(() => {
     setStockOptions(
@@ -103,8 +103,8 @@ export const EditSingleOrderPage: React.FC = () => {
         label: ` شناسه محصول: ${stock?.product_id} - سایز: ${stock?.size}`,
         value: stock,
       })),
-    )
-  }, [stocks])
+    );
+  }, [stocks]);
 
   useNonInitialEffect(() => {
     setCouponOptions(
@@ -112,56 +112,56 @@ export const EditSingleOrderPage: React.FC = () => {
         label: `${_coupon.code} - ${_coupon.decription}`,
         value: _coupon.id,
       })),
-    )
-  }, [coupons])
+    );
+  }, [coupons]);
 
-  const [status, setStatus] = useState<any>()
-  const [sms, setSms] = useState<any>(false)
+  const [status, setStatus] = useState<any>();
+  const [sms, setSms] = useState<any>(false);
 
   const changeStatus = async () => {
-    setLoading(true)
+    setLoading(true);
     const response = await update_order_status(
       router.query.order_id as string,
       { status, sms },
-      Cookies.get(process.env.TOKEN!) ?? '',
-    )
-    if (response?.status === 'success') {
-      toast.success(`وضعیت با موفقیت تغییر کرد به ${translator(status)}`)
+      Cookies.get(process.env.TOKEN!) ?? "",
+    );
+    if (response?.status === "success") {
+      toast.success(`وضعیت با موفقیت تغییر کرد به ${translator(status)}`);
     } else {
-      toast.error('تغییر وضعیت موفقیت آمیز نبود')
+      toast.error("تغییر وضعیت موفقیت آمیز نبود");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const [selectedStock, setSelectedStock] = useState()
+  const [selectedStock, setSelectedStock] = useState();
 
-  const [stockToRemove, setStockToRemove] = useState<any>(null)
+  const [stockToRemove, setStockToRemove] = useState<any>(null);
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
-  const [showOrderDetailsFormModal, setShowOrderDetailsFormModal] = useState(false)
+  const [showOrderDetailsFormModal, setShowOrderDetailsFormModal] = useState(false);
 
-  const { register: addStockRegister, handleSubmit: addStockHandleSubmit, control: addStockControl } = useForm()
+  const { register: addStockRegister, handleSubmit: addStockHandleSubmit, control: addStockControl } = useForm();
 
   const addStock = async (form: any) => {
     const finalForm = {
       quantity: Number(form?.quantity),
       stock_id: form?.stock?.id.toString(),
-    }
+    };
     const response = await add_stock_option(
       router?.query?.order_id as string,
       finalForm,
-      Cookies.get(process.env.TOKEN!) ?? '',
-    )
-    if (response?.status === 'success') {
-      const updatedOrder = await getSingleOrder(order?.id)
-      updateOrder(updatedOrder.data)
-      refetchOrder({})
-      toast.success('محصول با موفقیت اضافه شد')
+      Cookies.get(process.env.TOKEN!) ?? "",
+    );
+    if (response?.status === "success") {
+      const updatedOrder = await getSingleOrder(order?.id);
+      updateOrder(updatedOrder.data);
+      refetchOrder({});
+      toast.success("محصول با موفقیت اضافه شد");
     } else {
-      toast.error('افزودن محصول موفقیت آمیز نبود')
+      toast.error("افزودن محصول موفقیت آمیز نبود");
     }
-  }
+  };
 
   const { register, handleSubmit, control } = useForm({
     defaultValues: {
@@ -170,7 +170,7 @@ export const EditSingleOrderPage: React.FC = () => {
       payment_id: order?.payment_id,
       coupon_id: order?.coupon_id,
     },
-  })
+  });
 
   const { register: userRegister, handleSubmit: userHandleSubmit } = useForm({
     defaultValues: {
@@ -178,16 +178,20 @@ export const EditSingleOrderPage: React.FC = () => {
       name: order.user.name,
       lastname: order.user.lastname,
       email: order.user.email,
+      user_id: order.user_id,
     },
-  })
+  });
 
   async function onUserFormSubmit(form: any) {
-    const response = await editOrder(order.id, { user: form })
-    if (response?.status === 'success') {
-      toast.success('تغییرات کاربر اعمال شد')
-      router.back()
+    const userForm = {
+      user_id: form.user_id,
+    };
+    const response = await editOrder(order.id, userForm);
+    if (response?.status === "success") {
+      toast.success("کاربر با تغییر کرد");
+      router.back();
     } else {
-      toast.error('اعمال تغییرات کاربر موفقیت آمیز نبود')
+      toast.error("تغییر کاربر موفقیت آمیز نبود");
     }
   }
 
@@ -195,61 +199,61 @@ export const EditSingleOrderPage: React.FC = () => {
     defaultValues: {
       ...order?.address,
     },
-  })
+  });
 
   const addressOnSubmit = async (form: any) => {
-    const response = await editOrderAddress(order?.id, order?.address?.id, form)
-    if (response?.status === 'success') {
-      toast.success('آدرس با موفقیت بروز شد')
-      router.back()
+    const response = await editOrderAddress(order?.id, order?.address?.id, form);
+    if (response?.status === "success") {
+      toast.success("آدرس با موفقیت بروز شد");
+      router.back();
     } else {
-      toast.error('بروزرسانی آدرس موفقیت آمیز نبود')
+      toast.error("بروزرسانی آدرس موفقیت آمیز نبود");
     }
-  }
+  };
 
   const onSubmit = async (form: any) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const { data: response } = await admin().put(`/orders/${router?.query?.order_id}`, form)
-      if (response?.status === 'success') {
-        toast.success('سفارش با موفقیت بروز شد')
-        router.back()
+      const { data: response } = await admin().put(`/orders/${router?.query?.order_id}`, form);
+      if (response?.status === "success") {
+        toast.success("سفارش با موفقیت بروز شد");
+        router.back();
       }
     } catch (err) {
-      toast.error('بروزرسانی سفارش موفقیت آمیز نبود')
+      toast.error("بروزرسانی سفارش موفقیت آمیز نبود");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const removeStock = async (stock: any) => {
-    setLoading(true)
-    const response = await removeOrderItem(stock?.id)
-    if (response?.status === 'success') {
-      clearOrderItems(stock?.id)
-      setStockToRemove(null)
-      refetchOrder({})
-      toast.success('محصول با موفقیت از سبد خرید شما حذف شد')
+    setLoading(true);
+    const response = await removeOrderItem(stock?.id);
+    if (response?.status === "success") {
+      clearOrderItems(stock?.id);
+      setStockToRemove(null);
+      refetchOrder({});
+      toast.success("محصول با موفقیت از سبد خرید شما حذف شد");
     } else {
-      toast.error('حذف محصول با موفقیت انجام شد')
+      toast.error("حذف محصول با موفقیت انجام شد");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
-  const closeRemovalModal = () => setItemToRemove(false)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const closeRemovalModal = () => setItemToRemove(false);
 
   const remove = async (removeId: any) => {
-    await removeItem('orders', removeId, deleteOrder, () => router.push('/orders'), [
+    await removeItem("orders", removeId, deleteOrder, () => router.push("/orders"), [
       `سفارش ${removeId} با موفقیت حذف شد`,
-      'حذف سفارش موفقیت آمیز نبود',
-    ])
-  }
+      "حذف سفارش موفقیت آمیز نبود",
+    ]);
+  };
 
   return (
     <Layout title={`سفارش شماره ${order?.id}`}>
-      <h1 style={{ margin: '0 0 4rem 0' }}>
+      <h1 style={{ margin: "0 0 4rem 0" }}>
         ویرایش سفارش شماره {order?.id}
-        <FlexContainer style={{ display: 'inline-flex' }}>
+        <FlexContainer style={{ display: "inline-flex" }}>
           {has(permissions, PermissionEnum.readOrder) && (
             <HeaderButton status="Info" href={`/orders/${order?.id}`}>
               مشاهده
@@ -280,30 +284,34 @@ export const EditSingleOrderPage: React.FC = () => {
       <form onSubmit={userHandleSubmit(onUserFormSubmit)}>
         <InputGroup fullWidth className="user">
           <label htmlFor="user-name">نام کاربر : </label>
-          <input id="user-name" {...userRegister('name')} />
+          <input id="user-name" {...userRegister("name")} disabled />
         </InputGroup>
 
         <InputGroup fullWidth className="user">
           <label htmlFor="user-lastname">نام خانوادگی کاربر : </label>
-          <input {...userRegister('lastname')} />
+          <input {...userRegister("lastname")} disabled />
         </InputGroup>
         <InputGroup fullWidth className="user">
           <label htmlFor="user-phone">شماره همراه کاربر : </label>
-          <input id="user-phone" {...userRegister('phone')} />
+          <input id="user-phone" {...userRegister("phone")} disabled />
         </InputGroup>
         <InputGroup fullWidth className="user">
           <label htmlFor="user-email">ایمیل </label>
-          <input id="user-email" {...userRegister('email')} />
+          <input id="user-email" {...userRegister("email")} disabled />
+        </InputGroup>
+        <InputGroup fullWidth className="user">
+          <label htmlFor="user-id">شناسه کاربر</label>
+          <input id="user-id" {...userRegister("user_id")} />
         </InputGroup>
 
-        <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline">
+        <Button style={{ margin: "1rem 0" }} status="Info" appearance="outline">
           اعمال تغییرات کاربر
         </Button>
       </form>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card>
-          <CardHeader style={{ display: 'flex', alignItems: 'center' }}>
-            وضعیت : {translator(order?.status)}{' '}
+          <CardHeader style={{ display: "flex", alignItems: "center" }}>
+            وضعیت : {translator(order?.status)}{" "}
             {status && (
               <Button
                 status="Warning"
@@ -314,12 +322,12 @@ export const EditSingleOrderPage: React.FC = () => {
               >
                 تغییر وضعیت به {translator(status)}
               </Button>
-            )}{' '}
+            )}{" "}
             {status && status !== order?.status && (
               // <Checkbox style={{ color: 'transparent', marginRight: '2rem' }} checked={sms} onChange={setSms}>
               //   پیامک تغییر وضعیت ارسال شود؟
               // </Checkbox>
-              <Button status="Info">ارسال پیامک</Button>
+              <Button status="Info">تغییر دادن وضعیت + ارسال پیامک تغییر وضعیت</Button>
             )}
           </CardHeader>
           <Select
@@ -333,7 +341,7 @@ export const EditSingleOrderPage: React.FC = () => {
           <CardHeader>شماره پرداخت</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('payment_id')} disabled />
+              <input {...register("payment_id")} disabled />
             </InputGroup>
           </CardBody>
         </Card>
@@ -342,7 +350,7 @@ export const EditSingleOrderPage: React.FC = () => {
           <CardHeader>نوع ارسال</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('delivery')} />
+              <input {...register("delivery")} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -365,7 +373,7 @@ export const EditSingleOrderPage: React.FC = () => {
           control={control}
           render={({ field }) => <Editor callback={field.onChange} content={order?.notes} title="یادداشت ها" />}
         />
-        <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline">
+        <Button style={{ margin: "1rem 0" }} status="Info" appearance="outline">
           اعمال تغییرات
         </Button>
       </form>
@@ -378,37 +386,37 @@ export const EditSingleOrderPage: React.FC = () => {
           <CardBody>
             <AddressInputGroup>
               <label>استان</label>
-              <input {...addressRegister('province')} />
+              <input {...addressRegister("province")} />
             </AddressInputGroup>
 
             <AddressInputGroup>
               <label>شهر</label>
-              <input {...addressRegister('city')} />
+              <input {...addressRegister("city")} />
             </AddressInputGroup>
 
             <AddressInputGroup>
               <label>آدرس</label>
-              <textarea {...addressRegister('address')} />
+              <textarea {...addressRegister("address")} />
             </AddressInputGroup>
 
             <AddressInputGroup>
               <label>کد پستی</label>
-              <input {...addressRegister('postalcode')} />
+              <input {...addressRegister("postalcode")} />
             </AddressInputGroup>
           </CardBody>
         </Card>
 
-        <Button style={{ margin: '1rem 0' }} status="Info" appearance="outline">
+        <Button style={{ margin: "1rem 0" }} status="Info" appearance="outline">
           اعمال تغییرات آدرس
         </Button>
       </AddressForm>
 
       <hr />
 
-      <div style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: "1rem" }}>
         <Form onSubmit={addStockHandleSubmit(addStock)}>
-          <span style={{ display: 'flex', alignItems: 'center', margin: '1rem' }}>افزودن محصول به سفارش</span>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span style={{ display: "flex", alignItems: "center", margin: "1rem" }}>افزودن محصول به سفارش</span>
+          <div style={{ display: "flex", alignItems: "center" }}>
             <Controller
               name="stock"
               rules={{
@@ -420,8 +428,8 @@ export const EditSingleOrderPage: React.FC = () => {
                   options={stockOptions}
                   // onChange={(e: any) => setSelectedStock(e.value)}
                   onChange={(e: any) => {
-                    setSelectedStock(e.value)
-                    field.onChange(e.value)
+                    setSelectedStock(e.value);
+                    field.onChange(e.value);
                   }}
                   placeholder="افزودن سفارش"
                 />
@@ -431,11 +439,11 @@ export const EditSingleOrderPage: React.FC = () => {
             {selectedStock && (
               <>
                 <InputGroup>
-                  <input {...addStockRegister('quantity', { required: true })} placeholder="تعداد" />
+                  <input {...addStockRegister("quantity", { required: true })} placeholder="تعداد" />
                 </InputGroup>
                 <Button
                   type="submit"
-                  style={{ padding: '0.125rem', marginRight: '1rem' }}
+                  style={{ padding: "0.125rem", marginRight: "1rem" }}
                   status="Success"
                   appearance="outline"
                 >
@@ -449,18 +457,18 @@ export const EditSingleOrderPage: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <span style={{ display: 'flex', marginBottom: '1rem' }}>سفارشات</span>{' '}
+          <span style={{ display: "flex", marginBottom: "1rem" }}>سفارشات</span>{" "}
         </CardHeader>
         <CardBody>
-          {order['order_items']?.length > 0 ? (
-            order['order_items']?.map((orderItem: any, orderItemIndex: number) => (
-              <Card style={{ position: 'relative' }}>
+          {order["order_items"]?.length > 0 ? (
+            order["order_items"]?.map((orderItem: any, orderItemIndex: number) => (
+              <Card style={{ position: "relative" }}>
                 <Button
                   style={{
-                    padding: '0.125rem',
-                    position: 'absolute',
-                    top: '1rem',
-                    left: '1rem',
+                    padding: "0.125rem",
+                    position: "absolute",
+                    top: "1rem",
+                    left: "1rem",
                   }}
                   status="Danger"
                   appearance="outline"
@@ -472,7 +480,7 @@ export const EditSingleOrderPage: React.FC = () => {
                   <h4>
                     {orderItemIndex + 1}.
                     <img
-                      style={{ width: '10rem', height: '10rem' }}
+                      style={{ width: "10rem", height: "10rem" }}
                       src={`${process.env.SRC}/${orderItem?.product?.site_main_picture?.u}`}
                     />
                   </h4>
@@ -491,14 +499,14 @@ export const EditSingleOrderPage: React.FC = () => {
           )}
           <hr />
           <p>
-            جمع کل :{' '}
+            جمع کل :{" "}
             {numeralize(
-              order['order_items'] &&
-                order['order_items'].length > 0 &&
-                order['order_items']
+              order["order_items"] &&
+                order["order_items"].length > 0 &&
+                order["order_items"]
                   ?.map((orderItem: any) => Number(orderItem?.price))
                   ?.reduce((prev: number, curr: number) => curr + prev),
-            )}{' '}
+            )}{" "}
             تومان
           </p>
         </CardBody>
@@ -615,6 +623,13 @@ export const EditSingleOrderPage: React.FC = () => {
         </CardBody>
       </Card>
 
+      <Card>
+        <CardHeader>ارسال پیامک</CardHeader>
+        <CardBody>
+          <SendSmsForm />
+        </CardBody>
+      </Card>
+
       {/* -==>>> Modals <<<==- */}
 
       <WriteOrderDetailsModal on={showOrderDetailsFormModal} toggle={() => setShowOrderDetailsFormModal(false)} />
@@ -623,8 +638,8 @@ export const EditSingleOrderPage: React.FC = () => {
         <Card>
           <CardHeader>
             آیا از حذف محصول {stockToRemove?.product?.name} از سبد خرید اطمینان دارید؟
-            <InputGroup style={{ marginTop: '1rem' }}>
-              <Button status="Danger" style={{ marginLeft: '1rem' }} onClick={() => setStockToRemove(null)}>
+            <InputGroup style={{ marginTop: "1rem" }}>
+              <Button status="Danger" style={{ marginLeft: "1rem" }} onClick={() => setStockToRemove(null)}>
                 خیر
               </Button>
               <Button disabled={loading} status="Success" onClick={() => removeStock(stockToRemove)}>
@@ -635,16 +650,16 @@ export const EditSingleOrderPage: React.FC = () => {
         </Card>
       </Modal>
     </Layout>
-  )
-}
+  );
+};
 
 const AddStockSelect = styled(Select)`
   width: 20rem;
   margin: 0 1rem;
-`
+`;
 
 interface IFormProps {
-  smsForm?: boolean
+  smsForm?: boolean;
 }
 const Form = styled.form<IFormProps>`
   display: flex;
@@ -656,13 +671,13 @@ const Form = styled.form<IFormProps>`
       flex-direction: column;
       align-items: flex-start;
     `}
-`
+`;
 
 const AddressForm = styled.form`
   label {
     min-width: 5rem;
   }
-`
+`;
 
 const AddressInputGroup = styled(_InputGroup)`
   margin-bottom: 1rem;
@@ -674,7 +689,7 @@ const AddressInputGroup = styled(_InputGroup)`
   textarea {
     width: 100%;
   }
-`
+`;
 
 const InputGroup = styled(_InputGroup)`
   &.user {
@@ -682,8 +697,8 @@ const InputGroup = styled(_InputGroup)`
       min-width: 8rem;
     }
   }
-`
+`;
 
 const CouponsSelect = styled(MantineSelect)`
   margin-top: 1rem;
-`
+`;

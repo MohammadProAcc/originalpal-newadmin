@@ -1,17 +1,16 @@
 import { Card, Text, Button, Divider } from "@mantine/core";
-import { IconCheck } from "@tabler/icons";
 import React from "react";
+import { FaCheck } from "react-icons/fa";
 import { Address } from "types";
 
 interface ISelectAddressCardProps {
-  address: Address
-  selectionCallback: (addr: Address | { address_id: number }) => void
-  active: boolean
+  address: Address;
+  selectionCallback: (addr: Address | { address_id: number }) => void;
+  active: boolean;
 }
 export function SelectAddressCard(props: ISelectAddressCardProps) {
   return (
     <Card shadow="sm" p="lg" radius="md" withBorder sx={{ width: "24rem" }}>
-
       <Text>
         <strong>استان: </strong>
         {props.address.province}
@@ -39,19 +38,18 @@ export function SelectAddressCard(props: ISelectAddressCardProps) {
       <Button
         variant={props.active ? "light" : "outline"}
         color="blue"
-        fullWidth mt="md"
+        fullWidth
+        mt="md"
         radius="md"
         disabled={!props.active}
-        onClick={() => props.selectionCallback({
-          address_id: props.address.id
-        })}
-      >
-        {
-          props.active
-            ? "انتخاب نشانی"
-            : <IconCheck />
+        onClick={() =>
+          props.selectionCallback({
+            address_id: props.address.id,
+          })
         }
+      >
+        {props.active ? "انتخاب نشانی" : <FaCheck />}
       </Button>
     </Card>
-  )
+  );
 }
