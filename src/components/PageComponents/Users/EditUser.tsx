@@ -63,7 +63,7 @@ export const EditUserPage: React.FC = () => {
 
   const onSubmit = async (form: UserForm) => {
     setLoading(true);
-    
+
     delete form.phone;
     delete form.email;
 
@@ -77,7 +77,7 @@ export const EditUserPage: React.FC = () => {
     } else {
       toast.error("بروزرسانی کاربر موفقیت آمیز نبود");
     }
-  
+
     setLoading(false);
   };
 
@@ -128,7 +128,7 @@ export const EditUserPage: React.FC = () => {
         <Card>
           <CardHeader>نام کاربر</CardHeader>
           <CardBody>
-            <InputGroup>
+            <InputGroup fullWidth>
               <input {...register("name", { required: true })} />
             </InputGroup>
           </CardBody>
@@ -137,7 +137,7 @@ export const EditUserPage: React.FC = () => {
         <Card>
           <CardHeader>نام خانوادگی</CardHeader>
           <CardBody>
-            <InputGroup>
+            <InputGroup fullWidth>
               <input {...register("lastname")} />
             </InputGroup>
           </CardBody>
@@ -146,7 +146,7 @@ export const EditUserPage: React.FC = () => {
         <Card>
           <CardHeader>ایمیل</CardHeader>
           <CardBody>
-            <InputGroup>
+            <InputGroup fullWidth>
               <input {...register("email", { required: true })} />
             </InputGroup>
           </CardBody>
@@ -155,7 +155,7 @@ export const EditUserPage: React.FC = () => {
         <Card>
           <CardHeader>رمز عبور </CardHeader>
           <CardBody>
-            <InputGroup>
+            <InputGroup fullWidth>
               <input placeholder="تغییر رمز عبور" {...register("password")} />
             </InputGroup>
           </CardBody>

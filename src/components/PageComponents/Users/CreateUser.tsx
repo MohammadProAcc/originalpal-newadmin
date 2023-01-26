@@ -42,22 +42,22 @@ export function CreateUser() {
       <Form onSubmit={handleSubmit(onSubmit)}>
         <h1>افزودن کاربر</h1>
 
-        <InputGroup className="col">
+        <InputGroup className="col" fullWidth>
           <label>نام کاربر</label>
           <input {...register("name", { required: true })} placeholder="نام" />
         </InputGroup>
 
-        <InputGroup className="col">
+        <InputGroup className="col" fullWidth>
           <label>نام خانوادگی</label>
           <input {...register("lastname", { required: true })} placeholder="نام خانوادگی" />
         </InputGroup>
 
-        <InputGroup className="col">
+        <InputGroup className="col" fullWidth>
           <label>ایمیل</label>
           <input type="email" {...register("email", { required: true })} placeholder="ایمیل" />
         </InputGroup>
 
-        <InputGroup className="col">
+        <InputGroup className="col" fullWidth>
           <label>رمز عبور</label>
           <input type="password" {...register("password", { required: true })} placeholder="رمز عبور" />
         </InputGroup>

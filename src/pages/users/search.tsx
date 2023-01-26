@@ -1,60 +1,57 @@
-import { UsersPage } from 'components'
-import { GetServerSideProps, NextPage } from 'next'
-import { PermissionEnum } from 'types'
-import { asyncHas, getUsersList, search_in } from 'utils'
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import { SearchUsersPage } from "components";
+import { GetServerSideProps, NextPage } from "next";
+import { PermissionEnum } from "types";
+import { asyncHas, search_in } from "utils";
 
-const PageName: NextPage = () => <UsersPage />
-export default PageName
+const PageName: NextPage = () => <SearchUsersPage />;
+export default PageName;
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  const token = context?.req?.cookies?.[process.env.TOKEN!];
+  const query = context?.query;
+
   if (token) {
     if (!(await asyncHas(PermissionEnum.browseUser, token)))
       return {
         props: {},
         redirect: {
-          destination: '/dashboard',
+          destination: "/dashboard",
         },
-      }
-    const response = await search_in('users', context.query, context.query, context.req.cookies[process.env.TOKEN!])
+      };
 
-    if (!response) {
-      return {
-        props: {},
-        redirect: {
-          destination: '/users',
-          permanent: false,
-        },
-      }
-    }
+    const queryClient = new QueryClient();
+    await queryClient.prefetchQuery(["users", query], () => search_in("users", query, query, token));
+    await queryClient.prefetchQuery(
+      ["userFields"],
+      () =>
+        new Promise((resolve) =>
+          resolve([
+            "id",
+            "name",
+            "lastname",
+            "email",
+            "password",
+            "phone",
+            "points",
+            "role",
+            "status",
+            "created_at",
+            "updated_at",
+          ]),
+        ),
+    );
 
     return {
       props: {
-        initialState: {
-          users: {
-            data: response?.data,
-            fields: [
-              'created_at',
-              'email',
-              'id',
-              'lastname',
-              'name',
-              'password',
-              'phone',
-              'points',
-              'role',
-              'status',
-              'updated_at',
-            ],
-          },
-        },
+        dehydratedState: dehydrate(queryClient),
       },
-    }
+    };
   } else {
     return {
       props: {},
       redirect: {
-        destination: '/auth/login',
+        destination: "/auth/login",
       },
-    }
+    };
   }
-}
+};
