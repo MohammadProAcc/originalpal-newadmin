@@ -1,49 +1,53 @@
-import { Card, CardBody, CardHeader, InputGroup, Modal } from '@paljs/ui'
-import { Button, FlexContainer, HeaderButton, ModalBox } from 'components'
-import Layout from 'Layouts'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
-import { PermissionEnum } from 'types'
-import { deleteAddress, editAddress, has, removeItem, useStore, useUserStore } from 'utils'
+import { Card, CardBody, CardHeader, InputGroup, Modal } from "@paljs/ui";
+import { Button, FlexContainer, HeaderButton, ModalBox } from "components";
+import Layout from "Layouts";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { PermissionEnum } from "types";
+import { deleteAddress, editAddress, has, removeItem, useStore, useUserStore } from "utils";
 
 export const EditAddressPage: React.FC = () => {
-  const router = useRouter()
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
   const { address } = useStore((state: any) => ({
     address: state?.address,
-  }))
-  const permissions = useUserStore().getPermissions()
+  }));
+  const permissions = useUserStore().getPermissions();
 
   const { register, handleSubmit } = useForm({
     defaultValues: address,
-  })
+  });
 
   const onSubmit = async (form: any) => {
-    const response = await editAddress(address?.id, form)
+    setLoading(true);
+    const response = await editAddress(address?.id, form);
     if (response === null) {
-      toast.success('آدرس بروز شد')
-      router.back()
+      toast.success("آدرس بروز شد");
+      router.back();
     } else {
-      toast.error('بروزرسانی آدرس موفقیت آمیز نبود')
+      toast.error("بروزرسانی آدرس موفقیت آمیز نبود");
     }
-  }
+    setLoading(false);
+  };
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
-  const closeRemovalModal = () => setItemToRemove(false)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const closeRemovalModal = () => setItemToRemove(false);
 
   const remove = async (removeId: any) => {
-    await removeItem('address', removeId, deleteAddress, () => router.push('/address'), [
+    await removeItem("address", removeId, deleteAddress, () => router.push("/address"), [
       `آدرس ${removeId} با موفقیت حذف شد`,
-      'حذف آدرس موفقیت آمیز نبود',
-    ])
-  }
+      "حذف آدرس موفقیت آمیز نبود",
+    ]);
+  };
 
   return (
     <Layout title={`${address?.id}`}>
-      <h1 style={{ marginBottom: '4rem' }}>
+      <h1 style={{ marginBottom: "4rem" }}>
         ویرایش آدرس {address?.name}
-        <FlexContainer style={{ display: 'inline-flex' }}>
+        <FlexContainer style={{ display: "inline-flex" }}>
           {has(permissions, PermissionEnum.readAddress) && (
             <HeaderButton status="Info" href={`/address/${address?.id}`}>
               مشاهده
@@ -80,7 +84,7 @@ export const EditAddressPage: React.FC = () => {
           <CardHeader>استان</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('province', { required: true })} />
+              <input {...register("province", { required: true })} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -89,7 +93,16 @@ export const EditAddressPage: React.FC = () => {
           <CardHeader>شهر</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('city', { required: true })} />
+              <input {...register("city", { required: true })} />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>نشانی</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input {...register("address", { required: true })} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -98,13 +111,13 @@ export const EditAddressPage: React.FC = () => {
           <CardHeader>کد پستی</CardHeader>
           <CardBody>
             <InputGroup>
-              <input {...register('postalcode', { required: true })} />
+              <input {...register("postalcode", { required: true })} />
             </InputGroup>
           </CardBody>
         </Card>
 
-        <Button>ویرایش آدرس</Button>
+        <Button disabled={loading}>ویرایش آدرس</Button>
       </form>
     </Layout>
-  )
-}
+  );
+};

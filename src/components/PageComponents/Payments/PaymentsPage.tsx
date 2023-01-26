@@ -90,7 +90,7 @@ export const PaymentsPage = () => {
           </a>
         </Link>
       )}
-      {has(permissions, PermissionEnum.editPayment) && (
+      {/* {has(permissions, PermissionEnum.editPayment) && (
         <Link href={`/payments/edit/${payment?.id}`}>
           <a>
             <Button style={{ marginLeft: "1rem" }} status="Primary">
@@ -103,7 +103,7 @@ export const PaymentsPage = () => {
         <Button status="Danger" onClick={() => setItemToRemove(payment)}>
           حذف
         </Button>
-      )}
+      )} */}
     </Flex>,
   ]);
 
