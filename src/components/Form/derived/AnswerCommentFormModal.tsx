@@ -4,14 +4,13 @@ import React, { useState } from "react";
 import { Comment } from "types";
 
 export function AnswerCommentFormModal(props: AnswerCommentFormModalProps) {
-
   return (
     <Modal on={props.show} toggle={props.toggle}>
-      <ModalBox style={{minWidth: "70vw"}}>
+      <ModalBox style={{ minWidth: "70vw", maxHeight: "75vh", overflowY: "scroll" }}>
         {props.comment && <AnswerCommentForm comment={props.comment} callback={props.callback} />}
       </ModalBox>
     </Modal>
-  )
+  );
 }
 
 interface AnswerCommentFormModalProps {
