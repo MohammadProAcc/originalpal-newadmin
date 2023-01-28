@@ -8,3 +8,4 @@ export * from "./has";
 export * from "./mediaCoersion";
 export * from "./preppend";
 export * from "./truncateString";
+export * from "./coerce";

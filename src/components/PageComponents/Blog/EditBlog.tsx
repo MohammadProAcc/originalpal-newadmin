@@ -1,43 +1,44 @@
-import { Badge } from '@mantine/core'
-import { Card, CardBody, CardHeader, Checkbox, InputGroup, Modal } from '@paljs/ui'
-import { Button, Editor, FlexContainer, handlePostLink, HeaderButton, ModalBox, postLinkOptions } from 'components'
-import { MediaCard } from 'components/Card'
-import Layout from 'Layouts'
-import router from 'next/router'
-import React, { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import Select from 'react-select'
-import { toast } from 'react-toastify'
-import styled from 'styled-components'
-import { PostLink } from 'types'
+import { Alert, Divider, Flex, LoadingOverlay, Text } from "@mantine/core";
+import { Card, CardBody, CardHeader, Checkbox, InputGroup, Modal } from "@paljs/ui";
+import { useQuery } from "@tanstack/react-query";
+import { Button, Editor, FlexContainer, handlePostLink, HeaderButton, ModalBox, postLinkOptions } from "components";
+import { MediaCard } from "components/Card";
+import Cookies from "js-cookie";
+import Layout from "Layouts";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import Select from "react-select";
+import { toast } from "react-toastify";
+import styled from "styled-components";
+import { PostLink } from "types";
 import {
   $_remove_blog_video,
+  coerce,
   deleteBlog,
   editBlog,
+  editBlogVideo,
   getSingleBlog,
   removeItem,
   uploadBlogImage,
   uploadBlogVideo,
-  useStore,
-} from 'utils'
+} from "utils";
 
 export const EditBlogPage: React.FC = () => {
-  const { blog, reload } = useStore((state: any) => ({
-    blog: state?.blog,
-    reload: state?.reload,
-  }))
+  const router = useRouter();
 
-  const [postLinkToAddName, setPostLinkToAddName] = useState<string | null>(null)
-  const [postLinkToAddHref, setPostLinkToAddHref] = useState<string | null>(null)
+  const blogQuery = useQuery(["blog", router.query], () =>
+    getSingleBlog(router.query?.blog_id as string, Cookies.get(process.env["TOKEN"]!)),
+  );
 
-  const endimage = blog.endimage?.includes('{') ? JSON.parse(blog.endimage) : blog.endimage
+  const [postLinkToAddName, setPostLinkToAddName] = useState<string | null>(null);
+  const [postLinkToAddHref, setPostLinkToAddHref] = useState<string | null>(null);
 
   const reloadBlog = async () => {
-    const reloadedBlog = await getSingleBlog(blog?.id)
-    reload('blog', reloadedBlog?.data)
-  }
+    blogQuery.refetch();
+  };
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -46,112 +47,143 @@ export const EditBlogPage: React.FC = () => {
     formState: { dirtyFields },
     getValues,
     setValue,
+    watch,
   } = useForm({
-    defaultValues: blog,
-  })
+    defaultValues: blogQuery?.data?.data,
+  });
 
   const onSubmit = async (form: any) => {
-    setLoading(true)
+    setLoading(true);
 
     for (let key in form) {
-      if (!dirtyFields[key]) delete form[key]
+      if (!dirtyFields[key]) delete form[key];
     }
 
     if (form?.length < 1) {
-      toast.info('ابتدا تغییرات را اعمال کنید')
-      return
+      toast.info("ابتدا تغییرات را اعمال کنید");
+      return;
     }
 
     const finalForm = {
       ...form,
       post_links: getValues().post_links,
-    }
+    };
 
-    const response = await editBlog(blog?.id, finalForm)
+    const response = await editBlog(blogQuery?.data?.data?.id, finalForm);
 
-    if (response?.status === 'success') {
-      toast.success('وبلاگ  بروز شد')
-      router.back()
+    if (response?.status === "success") {
+      toast.success("وبلاگ  بروز شد");
+      router.back();
     } else {
-      toast.error('بروزرسانی وبلاگ موفقیت آمیز نبود')
+      toast.error("بروزرسانی وبلاگ موفقیت آمیز نبود");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const updateBlogMedia = async (form: any, source: 'endimage' | 'thumb' | 'video') => {
-    setLoading(true)
+  const updateBlogMedia = async (form: any, source: "endimage" | "thumb") => {
+    setLoading(true);
 
-    const response = await editBlog(blog?.id, {
+    let appendix: any = {};
+    if (source == "endimage") {
+      appendix.endtitle = getValues("endtitle");
+      appendix.endalt = getValues("endalt");
+      appendix.endtext = getValues("endtext");
+    }
+    const response = await editBlog(blogQuery?.data?.data?.id, {
       [source]: form,
-    })
+      ...appendix,
+    });
 
-    if (response?.status === 'success') {
-      await reloadBlog()
-      toast.success('وبلاگ  بروز شد')
-      router.back()
+    if (response?.status === "success") {
+      await reloadBlog();
+      toast.success("وبلاگ  بروز شد");
     } else {
-      toast.error('بروزرسانی وبلاگ موفقیت آمیز نبود')
+      toast.error("بروزرسانی وبلاگ موفقیت آمیز نبود");
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
-  const closeRemovalModal = () => setItemToRemove(false)
+  const updateBlogVideo = async (form: any) => {
+    setLoading(true);
 
-  const [videoToRemove, setVideoToRemove] = useState<any>(null)
-  const closeVideoRemovalModal = () => setVideoToRemove(null)
+    const response = await editBlogVideo(blogQuery?.data?.data?.id, form);
+
+    if (response?.status === "success") {
+      await reloadBlog();
+      toast.success("ویدیو وبلاگ  بروز شد");
+    } else {
+      toast.error("بروزرسانی ویدیو وبلاگ موفقیت آمیز نبود");
+    }
+
+    setLoading(false);
+  };
+
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const closeRemovalModal = () => setItemToRemove(false);
+
+  const [videoToRemove, setVideoToRemove] = useState<any>(null);
+  const closeVideoRemovalModal = () => setVideoToRemove(null);
 
   const remove = async (removeId: any) => {
-    await removeItem('blog', removeId, deleteBlog, () => router.push('/blog'), [
+    await removeItem("blog", removeId, deleteBlog, () => router.push("/blog"), [
       `وبلاگ ${removeId} با موفقیت حذف شد`,
-      'حذف وبلاگ موفقیت آمیز نبود',
-    ])
-  }
+      "حذف وبلاگ موفقیت آمیز نبود",
+    ]);
+  };
 
   const removeVideo = async (videoToRemove: any) => {
-    const response = await $_remove_blog_video(blog.id, videoToRemove.u)
-  }
+    setLoading(true);
+    try {
+      await $_remove_blog_video(blogQuery?.data?.data?.id, videoToRemove.u);
+      blogQuery.refetch();
+      setVideoToRemove(null);
+      toast.success("ویدیو با موفقیت حذف شد");
+    } catch (err) {
+      toast.error("حذف ویدیو موفقیت آمیز نبود");
+    }
+    setLoading(false);
+  };
 
-  const replaceMedia = async (source: 'thumb' | 'endimage' | 'video', file: File) => {
-    setLoading(true)
-    let response
-    if (source === 'video') {
-      response = await uploadBlogVideo(blog?.id, file)
+  const replaceMedia = async (source: "thumb" | "endimage" | "video", file: File) => {
+    setLoading(true);
+    let response;
+    if (source === "video") {
+      response = await uploadBlogVideo(blogQuery?.data?.data?.id, file);
     } else {
-      response = await uploadBlogImage(blog?.id, source, file)
+      response = await uploadBlogImage(blogQuery?.data?.data?.id, source, file);
     }
-    if (response?.status === 'success') {
-      await reloadBlog()
-      toast.success('وبلاگ با موفقیت بروز شد')
-      router.back()
+    if (response?.status === "success") {
+      await reloadBlog();
+      toast.success("وبلاگ با موفقیت بروز شد");
     } else {
-      toast.error('بروزرسانی وبلاگ موفقیت آمیز نبود')
+      toast.error("بروزرسانی وبلاگ موفقیت آمیز نبود");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   return (
-    <Layout title={`${blog?.id}`}>
-      <h1 style={{ marginBottom: '4rem' }}>
-        ویرایش وبلاگ شماره {blog?.id}
-        <HeaderButton status="Info" href={`/blog/${blog?.id}`}>
+    <Layout title={`${blogQuery?.data?.data?.id}`}>
+      <h1 style={{ marginBottom: "4rem" }}>
+        ویرایش وبلاگ شماره {blogQuery?.data?.data?.id}
+        <HeaderButton status="Info" href={`/blog/${blogQuery?.data?.data?.id}`}>
           مشاهده
         </HeaderButton>
-        <HeaderButton status="Danger" onClick={() => setItemToRemove(blog)}>
+        <HeaderButton status="Danger" onClick={() => setItemToRemove(blogQuery?.data?.data)}>
           حذف
         </HeaderButton>
       </h1>
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(onSubmit)} style={{ position: "relative" }}>
+        <LoadingOverlay visible={loading} />
         <h2>
-          <span style={{ margin: '0 0 0 1rem' }}>ساخت وبلاگ</span>
+          <span style={{ margin: "0 0 0 1rem" }}>ساخت وبلاگ</span>
           <Controller
             name="is_news"
             control={control}
             render={({ field }) => (
-              <span style={{ color: 'transparent', fontSize: '0' }}>
+              <span style={{ color: "transparent", fontSize: "0" }}>
                 <Checkbox
-                  style={{ color: 'transparent' }}
+                  style={{ color: "transparent" }}
                   checked={field.value}
                   onChange={(e: any) => field.onChange(e ? 1 : 0)}
                 >
@@ -165,7 +197,7 @@ export const EditBlogPage: React.FC = () => {
         {/* ....:::::: Remove Modals :::::.... */}
         <Modal on={itemToRemove} toggle={closeRemovalModal}>
           <ModalBox>
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: "1rem" }}>
               آیا از حذف برچسب
               <span className="mx-1">{itemToRemove?.id}</span>
               اطمینان دارید؟
@@ -181,11 +213,11 @@ export const EditBlogPage: React.FC = () => {
 
         <Modal on={videoToRemove} toggle={closeVideoRemovalModal}>
           <ModalBox>
-            <div style={{ marginBottom: '1rem' }}>آیا از حذف ویدیو زیر اطمینان دارید؟</div>
-            <video src={`${process.env.VID_SRC}/${videoToRemove?.u}`} controls style={{ maxHeight: '75vh' }} />
+            <div style={{ marginBottom: "1rem" }}>آیا از حذف ویدیو زیر اطمینان دارید؟</div>
+            <video src={`${process.env.VID_SRC}/${videoToRemove?.u}`} controls style={{ maxHeight: "75vh" }} />
             <FlexContainer jc="space-between">
               <Button onClick={closeVideoRemovalModal}>انصراف</Button>
-              <Button onClick={() => removeVideo(videoToRemove)} status="Danger">
+              <Button onClick={() => removeVideo(videoToRemove)} status="Danger" disabled={loading}>
                 حذف
               </Button>
             </FlexContainer>
@@ -194,7 +226,7 @@ export const EditBlogPage: React.FC = () => {
 
         <InputGroup className="col mb-4" fullWidth>
           <label>عنوان</label>
-          <input {...register('title', { required: true })} placeholder="عنوان" />
+          <input {...register("title", { required: true })} placeholder="عنوان" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
@@ -204,28 +236,30 @@ export const EditBlogPage: React.FC = () => {
             rules={{
               required: true,
             }}
-            render={({ field }) => <Editor content={blog?.desc} callback={field?.onChange} title="محتوا" />}
+            render={({ field }) => (
+              <Editor content={blogQuery?.data?.data?.desc} callback={field?.onChange} title="محتوا" />
+            )}
           />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>اسلاگ</label>
-          <input {...register('slug', { required: true })} placeholder="اسلاگ" />
+          <input {...register("slug", { required: true })} placeholder="اسلاگ" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>نویسنده</label>
-          <input {...register('writer')} placeholder="نویسنده" />
+          <input {...register("writer")} placeholder="نویسنده" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>برچسب ها</label>
-          <input {...register('labels')} placeholder="برچسب ها" />
+          <input {...register("labels")} placeholder="برچسب ها" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
           <label>دسته بندی ها</label>
-          <input {...register('show_categories')} placeholder="دسته بندی ها" />
+          <input {...register("show_categories")} placeholder="دسته بندی ها" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>
@@ -233,7 +267,9 @@ export const EditBlogPage: React.FC = () => {
           <Controller
             control={control}
             name="summary"
-            render={({ field }) => <Editor content={blog?.summary} callback={field?.onChange} title="خلاصه" />}
+            render={({ field }) => (
+              <Editor content={blogQuery?.data?.data?.summary} callback={field?.onChange} title="خلاصه" />
+            )}
           />
         </InputGroup>
 
@@ -242,22 +278,22 @@ export const EditBlogPage: React.FC = () => {
           <CardBody>
             <InputGroup className="col" fullWidth>
               <label>کلمات مترادف (meta_keywords)</label>
-              <input {...register('meta_keywords')} placeholder="کلمات مترادف" />
+              <input {...register("meta_keywords")} placeholder="کلمات مترادف" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>عنوان متا</label>
-              <input {...register('meta_title')} placeholder="عنوان متا" />
+              <input {...register("meta_title")} placeholder="عنوان متا" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>توضیحات متا</label>
-              <input {...register('meta_description')} placeholder="توضیحات متا" />
+              <input {...register("meta_description")} placeholder="توضیحات متا" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>عنوان صفحه</label>
-              <input {...register('title_page')} placeholder="عنوان" />
+              <input {...register("title_page")} placeholder="عنوان" />
             </InputGroup>
           </CardBody>
         </Card>
@@ -353,14 +389,40 @@ export const EditBlogPage: React.FC = () => {
             <label>پیوند های پست در شبکه های اجتماعی: </label>
 
             <InputGroup fullWidth className="col post-links">
-              <div>
-                {blog['post_links']?.map((_post: PostLink) => (
-                  <div>
-                    <Badge color="blue">{_post.name} : </Badge>
-                    {_post.href}
-                  </div>
-                ))}
-              </div>
+              {watch("post_links")?.length > 0 ? (
+                <>
+                  <Divider variant="dashed" my="md" />
+                  <Flex direction="column" gap="0.25rem">
+                    {watch("post_links")?.map((_post: PostLink, index: number) => {
+                      return (
+                        <Flex gap="1rem" align="center">
+                          <Text color="blue" fw="bolder">
+                            {_post.name}
+                          </Text>
+                          <input {...register(`post_links[${index}].href`)} />
+                          <Button
+                            status="Danger"
+                            type="button"
+                            onClick={() =>
+                              setValue(
+                                "post_links",
+                                getValues("post_links").filter((link: PostLink) => link.name !== _post.name),
+                              )
+                            }
+                          >
+                            حذف
+                          </Button>
+                        </Flex>
+                      );
+                    })}
+                  </Flex>
+                  <Divider variant="dashed" my="md" />
+                </>
+              ) : (
+                <Alert color="red" variant="outline" my="md">
+                  پیوندی وجود ندارد
+                </Alert>
+              )}
               <Select options={postLinkOptions} onChange={({ value }: any) => setPostLinkToAddName(value)} />
               <input
                 placeholder="پیوند پست"
@@ -376,11 +438,11 @@ export const EditBlogPage: React.FC = () => {
                   handlePostLink(
                     { name: postLinkToAddName, href: postLinkToAddHref },
                     getValues,
-                    (value: PostLink[]) => setValue('post_links', value),
+                    (value: PostLink[]) => setValue("post_links", value),
                     () => {
-                      setPostLinkToAddName('')
-                      setPostLinkToAddHref('')
-                      ;(document.getElementById('post-link-name')! as any).value = ''
+                      setPostLinkToAddName("");
+                      setPostLinkToAddHref("");
+                      (document.getElementById("post-link-name")! as any).value = "";
                     },
                   )
                 }
@@ -391,49 +453,51 @@ export const EditBlogPage: React.FC = () => {
           </InputGroup>
         </Styler>
 
-        <Button disabled={loading} style={{ width: 'auto', margin: '3rem 0' }} status="Info" appearance="outline">
-          {loading ? '...' : 'بروزرسانی وبلاگ'}
+        <Button disabled={loading} style={{ width: "auto", margin: "3rem 0" }} status="Info" appearance="outline">
+          {loading ? "..." : "بروزرسانی وبلاگ"}
         </Button>
       </Form>
 
       <h3 className="mb-4">رسانه</h3>
 
-      <Card>
+      <Card style={{ position: "relative" }}>
+        <LoadingOverlay visible={loading} />
         <CardHeader>تصویر پایانی</CardHeader>
         <CardBody>
           <InputGroup className="col" fullWidth>
             <label>تصویر پایانی ( برای جایگزینی تصویر، تصویر موردنظر خود را از طریق ورودی زیر بارگزاری کنید)</label>
             <input
               type="file"
-              onChange={(e: any) => replaceMedia('endimage', e?.target?.files[0])}
+              onChange={(e: any) => replaceMedia("endimage", e?.target?.files[0])}
               placeholder="تصویر پایانی"
             />
             <MediaCard
-              media={endimage}
+              media={coerce.media(watch("endimage"))}
               removalCallback={console.log}
-              updateCallback={(form: any) => updateBlogMedia(form, 'endimage')}
+              updateCallback={(form: any) => updateBlogMedia(form, "endimage")}
               index={0}
             />
           </InputGroup>
 
           <InputGroup className="col" fullWidth>
             <label>عنوان پایانی</label>
-            <input {...register('endtitle')} placeholder="عنوان پایانی" />
+            <input {...register("endtitle")} placeholder="عنوان پایانی" />
           </InputGroup>
 
           <InputGroup className="col" fullWidth>
             <label>تگ آلت تصویر پایانی</label>
-            <input {...register('endtitle')} placeholder="تگ آلت تصویر پایانی" />
+            <input {...register("endalt")} placeholder="تگ آلت تصویر پایانی" />
           </InputGroup>
 
           <InputGroup className="col" fullWidth>
             <label>متن تصویر پایانی</label>
-            <input {...register('endtext')} placeholder="متن تصویر پایانی" />
+            <input {...register("endtext")} placeholder="متن تصویر پایانی" />
           </InputGroup>
         </CardBody>
       </Card>
 
-      <Card>
+      <Card style={{ position: "relative" }}>
+        <LoadingOverlay visible={loading} />
         <CardHeader>
           <label>تصویر بنر ( برای جایگزینی تصویر، تصویر موردنظر خود را از طریق ورودی زیر بارگزاری کنید)</label>
         </CardHeader>
@@ -441,21 +505,22 @@ export const EditBlogPage: React.FC = () => {
           <InputGroup className="col" fullWidth>
             <input
               type="file"
-              onChange={(e: any) => replaceMedia('thumb', e?.target?.files[0])}
+              onChange={(e: any) => replaceMedia("thumb", e?.target?.files[0])}
               placeholder="تصویر بنر"
             />
 
             <MediaCard
-              media={endimage}
+              media={coerce.media(watch("thumb"))}
               removalCallback={console.log}
-              updateCallback={(form: any) => updateBlogMedia(form, 'thumb')}
+              updateCallback={(form: any) => updateBlogMedia(form, "thumb")}
               index={0}
             />
           </InputGroup>
         </CardBody>
       </Card>
 
-      <Card>
+      <Card style={{ position: "relative" }}>
+        <LoadingOverlay visible={loading} />
         <CardHeader>
           <label>ویدیوی بنر</label>
         </CardHeader>
@@ -463,17 +528,17 @@ export const EditBlogPage: React.FC = () => {
           <InputGroup className="col" fullWidth>
             <input
               type="file"
-              onChange={(e: any) => replaceMedia('video', e?.target?.files[0])}
+              onChange={(e: any) => replaceMedia("video", e?.target?.files[0])}
               placeholder="ویدیوی بنر"
             />
 
-            {blog?.video?.length > 0 && (
+            {blogQuery?.data?.data?.video?.length > 0 && (
               <>
-                {blog?.video.map((video: any, index: number) => (
+                {blogQuery?.data?.data?.video.map((video: any, index: number) => (
                   <MediaCard
                     media={video}
                     removalCallback={setVideoToRemove}
-                    updateCallback={(form: any) => updateBlogMedia(form, 'video')}
+                    updateCallback={updateBlogVideo}
                     index={index}
                     isVideo
                   />
@@ -484,13 +549,13 @@ export const EditBlogPage: React.FC = () => {
         </CardBody>
       </Card>
     </Layout>
-  )
-}
+  );
+};
 
 const CheckBoxWrapper = styled.div`
   color: transparent;
   font-size: 0;
-`
+`;
 
 const Styler = styled.div`
   .col {
@@ -500,7 +565,7 @@ const Styler = styled.div`
       gap: 1rem;
     }
   }
-`
+`;
 
 const Form = styled.form`
   width: 100%;
@@ -514,4 +579,4 @@ const Form = styled.form`
   label {
     margin-bottom: 1rem;
   }
-`
+`;

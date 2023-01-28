@@ -1,23 +1,57 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { useStore, deleteBlog, pluralRemove, useUserStore, has, getBlogList } from "utils";
-import Layout from "Layouts";
+import { Flex } from "@mantine/core";
+import { Add } from "@material-ui/icons";
 import { Button, Container, Modal } from "@paljs/ui";
+import { useQuery } from "@tanstack/react-query";
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from "components";
+import Cookies from "js-cookie";
+import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Add } from "@material-ui/icons";
+import { useState } from "react";
 import { toast } from "react-toastify";
+import styled from "styled-components";
 import { PermissionEnum } from "types";
-import { Flex } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import Cookies from "js-cookie";
+import { deleteBlog, has, pluralRemove, search_in, useUserStore } from "utils";
 
-export const BlogsPage = () => {
+export const SearchBlogsPage = () => {
   const router = useRouter();
 
   const blogsQuery = useQuery(["blogs", router.query], () =>
-    getBlogList(router.query, Cookies.get(process.env["TOKEN"]!)),
+    search_in("blog", router.query, { page: router.query.page }, Cookies.get(process.env["TOKEN"]!)).then((res) => ({
+      ...res,
+      fields: [
+        "comments",
+        "created_at",
+        "deleted_at",
+        "desc",
+        "endalt",
+        "endimage",
+        "endtext",
+        "endtitle",
+        "headers",
+        "id",
+        "is_news",
+        "isboard",
+        "iscast",
+        "ishighlight",
+        "istop",
+        "isvideo",
+        "labels",
+        "meta_description",
+        "meta_keywords",
+        "meta_title",
+        "show_categories",
+        "slug",
+        "srcvideo",
+        "summary",
+        "thumb",
+        "title",
+        "title_page",
+        "trend",
+        "updated_at",
+        "writer",
+      ],
+    })),
   );
 
   const permissions = useUserStore().getPermissions();

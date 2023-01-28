@@ -1,3 +1,4 @@
+import { dehydrate, QueryClient } from "@tanstack/react-query";
 import { EditBlogPage } from "components";
 import { useFetchAll } from "hooks";
 import { GetServerSideProps, NextPage } from "next";
@@ -8,12 +9,11 @@ export default SingleBlog;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const token = context?.req?.cookies?.[process.env.TOKEN!];
+  const query = context.query;
 
   if (token) {
-    const blog = await getSingleBlog(
-      context?.query?.blog_id as string,
-      context?.req?.cookies?.[process.env.TOKEN!],
-    );
+    const queryClient = new QueryClient();
+    await queryClient.prefetchQuery(["blog", query], () => getSingleBlog(query?.blog_id as string, token));
 
     // TODO: implement it
     // const lastPage = (await $_get_categories({ token })).data.data.last_page;
@@ -25,10 +25,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     return {
       props: {
-        initialState: {
-          blog: blog?.data,
-          categories: [],
-        },
+        dehydratedState: dehydrate(queryClient),
       },
     };
   } else {
