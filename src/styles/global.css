@@ -79,6 +79,10 @@ strong {
   font-family: IRANSansBold;
 }
 
+a {
+  text-decoration: none !important;
+}
+
 .flex {
   display: flex;
 }

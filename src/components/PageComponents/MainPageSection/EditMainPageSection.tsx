@@ -1,49 +1,78 @@
+import { Divider, Input, LoadingOverlay, MultiSelect } from "@mantine/core";
+import { Button, Checkbox, InputGroup as _InputGroup, Modal, Popover, Select as _Select } from "@paljs/ui";
+import { useQuery } from "@tanstack/react-query";
+import { HeaderButton, ModalBox } from "components";
+import { FlexContainer } from "components/Container/FlexContainer";
+import Cookies from "js-cookie";
+import Layout from "Layouts";
+import router from "next/router";
+import React, { useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import styled, { css } from "styled-components";
+import { IBanner, PermissionEnum, ProductBrand, Tag } from "types";
 import {
-  createMainPageSection,
   deleteMainPageSection,
   editMainPageSection,
+  getAllBrands,
+  getSingleMainPageSection,
+  getTagsList,
   has,
   removeItem,
-  useStore,
+  search_in,
   useUserStore,
-} from 'utils'
-import Layout from 'Layouts'
-import React, { useEffect, useRef, useState } from 'react'
-import { HeaderButton, ModalBox } from 'components'
-import { FlexContainer } from 'components/Container/FlexContainer'
-import { Button, Checkbox, Modal, Select as _Select, InputGroup as _InputGroup, Popover } from '@paljs/ui'
-import router from 'next/router'
-import { Controller, useForm } from 'react-hook-form'
-import Cookies from 'js-cookie'
-import { toast } from 'react-toastify'
-import styled, { css } from 'styled-components'
-import { PermissionEnum } from 'types'
+} from "utils";
 
 const sectionTypeOptions = [
-  { label: 'محصول', value: 'product' },
-  { label: 'لینک', value: 'link' },
-  { label: 'بنر', value: 'banner' },
-]
+  { label: "محصول", value: "product" },
+  { label: "لینک", value: "link" },
+  { label: "بنر", value: "banner" },
+];
 
 export const EditMainPageSectionPage: React.FC = () => {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
-  const { mainPageSection } = useStore((state: any) => ({
-    mainPageSection: state?.mainPageSection,
-  }))
-  const permissions = useUserStore().getPermissions()
+  const brandsQuery = useQuery(["brands"], () => getAllBrands());
+  const tagsQuery = useQuery(["tags"], () => getTagsList({ page: "total" }));
+  const bannersQuery = useQuery(["banners"], () =>
+    search_in("banners", { key: "type", type: "=", value: "stand" }, router.query, Cookies.get(process.env.TOKEN!)),
+  );
 
-  const [insertedLinks, setInsertedLinks] = useState<any>(mainPageSection?.parameter)
+  const tagsOptions: {
+    label: string;
+    value: string;
+  }[] = tagsQuery?.data?.data?.data?.map((tag: Tag) => ({
+    label: tag?.name,
+    value: tag?.id?.toString(),
+  }));
+
+  const brandsOptions = brandsQuery?.data?.data?.map((brand: ProductBrand) => ({
+    label: brand?.name,
+    value: brand?.id,
+  }));
+
+  const bannersOptions = bannersQuery?.data?.data?.data?.map((banner: IBanner) => ({
+    label: banner?.title,
+    value: banner?.id,
+  }));
+
+  const mainPageSectionQuery = useQuery(["main-page-section"], () =>
+    getSingleMainPageSection(router.query?.main_page_section_id as string, Cookies.get(process.env["TOKEN"]!)!),
+  );
+
+  const permissions = useUserStore().getPermissions();
+
+  const [insertedLinks, setInsertedLinks] = useState<any>(mainPageSectionQuery?.data?.parameter);
 
   useEffect(() => {
-    if (mainPageSection?.type === 'link') {
-      linkTitleRef.current.value = ''
-      linkLinkRef.current.value = ''
+    if (mainPageSectionQuery?.data?.type === "link") {
+      linkTitleRef.current.value = "";
+      linkLinkRef.current.value = "";
     }
-  }, [insertedLinks])
+  }, [insertedLinks]);
 
-  const linkTitleRef = useRef<any>(null)
-  const linkLinkRef = useRef<any>(null)
+  const linkTitleRef = useRef<any>(null);
+  const linkLinkRef = useRef<any>(null);
 
   const addLink = () => {
     setInsertedLinks((current: any) =>
@@ -61,89 +90,64 @@ export const EditMainPageSectionPage: React.FC = () => {
               link: linkLinkRef?.current?.value,
             },
           ],
-    )
-  }
+    );
+  };
 
   const removeLink = (linkTitle: string) => {
-    setInsertedLinks((current: any) => current?.filter((item: any) => item?.title !== linkTitle))
-  }
+    setInsertedLinks((current: any) => current?.filter((item: any) => item?.title !== linkTitle));
+  };
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
-  const closeRemovalModal = () => setItemToRemove(false)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const closeRemovalModal = () => setItemToRemove(false);
 
   const remove = async (removeId: any) => {
-    await removeItem('mainPageSection', removeId, deleteMainPageSection, () => router.push('/mainPageSection'), [
+    await removeItem("mainPageSection", removeId, deleteMainPageSection, () => router.back(), [
       `بخش صقحه اصلی ${removeId} با موفقیت حذف شد`,
-      'حذف mainPageر موفقیت آمیز نبود',
-    ])
-  }
+      "حذف mainPageر موفقیت آمیز نبود",
+    ]);
+  };
 
-  const [selectedType, setSelectedType] = useState<any>(mainPageSection?.type)
+  const [selectedType, setSelectedType] = useState<any>(mainPageSectionQuery?.data?.type);
 
-  const { register, handleSubmit, control, reset } = useForm({
-    defaultValues:
-      mainPageSection?.type === 'product'
-        ? {
-            type: mainPageSection?.type,
-            title: mainPageSection?.title,
-            priority: mainPageSection?.priority,
-            active: mainPageSection?.active,
-            brands: mainPageSection?.parameter?.brand?.join(' '),
-            tags: mainPageSection?.parameter?.tags?.join(' '),
-            inStock: mainPageSection?.parameter?.inStock,
-          }
-        : mainPageSection?.type === 'banner'
-        ? {
-            type: mainPageSection?.type,
-            title: mainPageSection?.title,
-            priority: mainPageSection?.priority,
-            active: mainPageSection?.active,
-            banners: mainPageSection?.banners,
-          }
-        : {
-            type: mainPageSection?.type,
-            title: mainPageSection?.title,
-            priority: mainPageSection?.priority,
-            active: mainPageSection?.active,
-            links: mainPageSection?.links,
-          },
-  })
+  const { register, handleSubmit, control, reset, getValues } = useForm({
+    defaultValues: mainPageSectionQuery?.data,
+  });
 
   const onSubmit = async (form: any) => {
+    setLoading(true);
     const final = {
       ...form,
-      tags: form?.tags ? form?.tags?.split(' ')?.map((tag: string) => Number(tag)) : [],
-      brands: form?.brands?.split(' ')?.map((brand: string) => Number(brand)),
-      banners: form?.banners?.split(' ')?.map((banner: string) => Number(banner)),
+      tags: form?.tags ? form?.tags?.split(" ")?.map((tag: string) => Number(tag)) : [],
+      brands: form?.brands?.split(" ")?.map((brand: string) => Number(brand)),
+      banners: form?.banners?.split(" ")?.map((banner: string) => Number(banner)),
       links: insertedLinks,
       inStock: form?.inStock ? 1 : 0,
-    }
+    };
 
-    setLoading(true)
-    const response = await editMainPageSection(mainPageSection?.id, final, Cookies.get(process.env.TOKEN!))
-    if (response?.status === 'success') {
-      toast.success('بخش صفحه اصلی  با موفقیت بروز شد')
-      router.back()
-      reset()
+    const response = await editMainPageSection(mainPageSectionQuery?.data?.id, final, Cookies.get(process.env.TOKEN!));
+    if (response?.status === "success") {
+      toast.success("بخش صفحه اصلی  با موفقیت بروز شد");
+      router.back();
+      reset();
     } else {
-      toast.error('بروزرسانی بخش صفحه اصلی  موفقیت آمیز نبود')
+      toast.error("بروزرسانی بخش صفحه اصلی  موفقیت آمیز نبود");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   return (
-    <Layout title={`ویرایش بخش صفحه اصلی - ${mainPageSection?.id}`}>
-      <h1 style={{ marginBottom: '4rem' }}>
-        ویرایش بخش صفحه اصلی - {mainPageSection?.id}
-        <FlexContainer style={{ display: 'inline-flex' }}>
+    <Layout title={`ویرایش بخش صفحه اصلی - ${mainPageSectionQuery?.data?.id}`}>
+      <h1 style={{ marginBottom: "4rem" }}>
+        ویرایش بخش صفحه اصلی - {mainPageSectionQuery?.data?.id}
+        <FlexContainer style={{ display: "inline-flex" }}>
           {has(permissions, PermissionEnum.readMainPageSection) && (
-            <HeaderButton status="Info" href={`/mainPageSection/${mainPageSection?.id}`}>
+            <HeaderButton status="Info" href={`/mainPageSection/${mainPageSectionQuery?.data?.id}`}>
               مشاهده
             </HeaderButton>
           )}
 
           {has(permissions, PermissionEnum.deleteMainPageSection) && (
-            <HeaderButton status="Danger" onClick={() => setItemToRemove(mainPageSection)}>
+            <HeaderButton status="Danger" onClick={() => setItemToRemove(mainPageSectionQuery?.data)}>
               حذف
             </HeaderButton>
           )}
@@ -164,6 +168,7 @@ export const EditMainPageSectionPage: React.FC = () => {
       </Modal>
 
       <Form onSubmit={handleSubmit(onSubmit)}>
+        <LoadingOverlay visible={loading} />
         <InputGroup>
           <label>نوع</label>
           <Controller
@@ -173,10 +178,11 @@ export const EditMainPageSectionPage: React.FC = () => {
               <Select
                 options={sectionTypeOptions}
                 onChange={(e: any) => {
-                  setSelectedType(e?.value)
-                  field.onChange(e?.value)
+                  setSelectedType(e?.value);
+                  field.onChange(e?.value);
                 }}
                 placeholder="محصول، لینک، بنر..."
+                value={sectionTypeOptions.find((option) => option.value === field.value)}
               />
             )}
           />
@@ -184,12 +190,12 @@ export const EditMainPageSectionPage: React.FC = () => {
 
         <InputGroup>
           <label>عنوان</label>
-          <input {...register('title')} placeholder="عنوان" />
+          <input {...register("title")} placeholder="عنوان" />
         </InputGroup>
 
         <InputGroup>
           <label>اولویت</label>
-          <input {...register('priority')} type="number" placeholder="اولویت" />{' '}
+          <input {...register("priority")} type="number" placeholder="اولویت" />{" "}
         </InputGroup>
         <InputGroup>
           <label>فعال</label>
@@ -197,28 +203,44 @@ export const EditMainPageSectionPage: React.FC = () => {
             name="active"
             control={control}
             render={({ field }) => (
-              <Checkbox style={{ color: 'transparent' }} checked={field?.value} onChange={field?.onChange}></Checkbox>
+              <Checkbox style={{ color: "transparent" }} checked={field?.value} onChange={field?.onChange}></Checkbox>
             )}
           />
         </InputGroup>
 
-        {selectedType === 'product' ? (
+        {selectedType === "product" ? (
           <>
             <H3>جزییات بخش محصول</H3>
 
-            <InputGroup>
-              <label>برند ها</label>
-              <Popover trigger="focus" placement="top" overlay="شناسه برند های مورد نظر را با فاصله (space) وارد کنید">
-                <input {...register('brands')} />
-              </Popover>
-            </InputGroup>
+            <Input {...register("product_count")} placeholder="تعداد محصولات" title="تعداد محصولات" />
 
-            <InputGroup>
-              <label>برچسب ها</label>
-              <Popover trigger="focus" placement="top" overlay="شناسه برچسب های مورد نظر را با فاصله (space) وارد کنید">
-                <input {...register('tags')} />
-              </Popover>
-            </InputGroup>
+            <Controller
+              name="parameter.brand"
+              control={control}
+              render={({ field }) => (
+                <MultiSelect
+                  selectOnBlur
+                  title="برچسب ها"
+                  data={brandsOptions as any}
+                  placeholder="برند های مورد نظر را انتخاب کنید"
+                  {...field}
+                />
+              )}
+            />
+
+            <Controller
+              name="parameter.tag"
+              control={control}
+              render={({ field }) => (
+                <MultiSelect
+                  selectOnBlur
+                  title="برچسب ها"
+                  data={tagsOptions as any}
+                  placeholder="برچسب های مورد نظر را انتخاب کنید"
+                  {...field}
+                />
+              )}
+            />
 
             <InputGroup>
               <label>فقط محصولات موجود</label>
@@ -229,22 +251,31 @@ export const EditMainPageSectionPage: React.FC = () => {
                   <Checkbox
                     checked={field?.value}
                     onChange={field?.onChange}
-                    style={{ color: 'transparent' }}
+                    style={{ color: "transparent" }}
                   ></Checkbox>
                 )}
               />
             </InputGroup>
           </>
-        ) : selectedType === 'banner' ? (
+        ) : selectedType === "banner" ? (
           <>
             <H3>جزییات بخش بنر</H3>
 
-            <InputGroup>
-              <label>بنر ها</label>
-              <Popover trigger="focus" placement="top" overlay="شناسه بنر های مورد نظر را با فاصله (space) وارد کنید">
-                <input {...register('banners')} />
-              </Popover>
-            </InputGroup>
+            <Controller
+              name="parameter"
+              control={control}
+              render={({ field }) => (
+                <MultiSelect
+                  selectOnBlur
+                  title="بنر ها"
+                  data={bannersOptions as any}
+                  placeholder="بنر های مورد نظر را انتخاب کنید"
+                  // {...field}
+                  value={field.value}
+                />
+              )}
+            />
+            <Divider my="md" />
           </>
         ) : (
           <>
@@ -253,13 +284,13 @@ export const EditMainPageSectionPage: React.FC = () => {
             <InputGroup col>
               <label>لینک ها</label>
 
-              <input placeholder="عنوان لینک" ref={linkTitleRef} style={{ marginBottom: '0.5rem' }} />
+              <input placeholder="عنوان لینک" ref={linkTitleRef} style={{ marginBottom: "0.5rem" }} />
 
               <input ref={linkLinkRef} placeholder="مسیر لینک" />
 
               <AddLinkButton
                 onClick={() => {
-                  addLink()
+                  addLink();
                 }}
               >
                 افزودن لینک
@@ -287,8 +318,8 @@ export const EditMainPageSectionPage: React.FC = () => {
         </Button>
       </Form>
     </Layout>
-  )
-}
+  );
+};
 
 const Form = styled.form`
   width: 100%;
@@ -298,10 +329,10 @@ const Form = styled.form`
   label {
     min-width: 4rem;
   }
-`
+`;
 
 interface IInputGroupProps {
-  col?: boolean
+  col?: boolean;
 }
 const InputGroup = styled(_InputGroup)<IInputGroupProps>`
   margin: 0 0 1rem 0;
@@ -311,19 +342,19 @@ const InputGroup = styled(_InputGroup)<IInputGroupProps>`
       display: flex;
       flex-direction: column;
     `}
-`
+`;
 
 const Select = styled(_Select)`
   width: 100%;
-`
+`;
 
 const H3 = styled.h3`
   margin: 0 0 2rem 0;
-`
+`;
 
 const LinksContainer = styled.div`
   display: flex;
-`
+`;
 
 const AddLinkButton = styled.a`
   max-width: 10rem;
@@ -340,7 +371,7 @@ const AddLinkButton = styled.a`
     cursor: pointer;
     background-color: rgba(0, 214, 143, 0.5);
   }
-`
+`;
 
 const LinkEx = styled.a`
   max-width: 10rem;
@@ -358,4 +389,4 @@ const LinkEx = styled.a`
     background-color: rgba(255, 0, 0, 0.25);
     border-color: transparent;
   }
-`
+`;
