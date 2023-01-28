@@ -1,1 +1,2 @@
-export * from "./BlogCategoriesPage"
+export * from "./BlogCategoriesPage";
+export * from "./SearchBlogCategoriesPage";

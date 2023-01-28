@@ -10,16 +10,18 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { BlogCategory, PermissionEnum } from "types";
-import { $_get_categories, $_delete_category, has, pluralRemove, useStore, useUserStore } from "utils";
+import { $_delete_category, has, pluralRemove, search_in, useUserStore } from "utils";
 
-export const BlogCategoriesPage = () => {
+export const SearchBlogCategoriesPage = () => {
   const router = useRouter();
 
-  const blogCategoriesQuery = useQuery(["blog-categories"], () =>
-    $_get_categories({
-      token: Cookies.get(process.env["TOKEN"]!),
-      params: router.query,
-    }),
+  const blogCategoriesQuery = useQuery(["blog-categories", router.query], () =>
+    search_in("categories", router.query, { page: router.query.page }, Cookies.get(process.env["TOKEN"]!)).then(
+      (res) => ({
+        ...res,
+        fields: ["id", "slug", "title", "content", "priority", "created_at", "updated_at"],
+      }),
+    ),
   );
 
   const permissions = useUserStore().getPermissions();
@@ -81,7 +83,7 @@ export const BlogCategoriesPage = () => {
 
   const columns: any[] = ["شناسه دسته‌بندی", "عنوان", "اسلاگ", "محتوا", "تعداد مقالات", "فعالیت ها"];
 
-  const data = blogCategoriesQuery?.data?.data?.data?.data?.map((blogCategory: BlogCategory) => [
+  const data = blogCategoriesQuery?.data?.data?.data?.map((blogCategory: BlogCategory) => [
     // =====>> Table Columns <<=====
     blogCategory?.id,
     blogCategory?.title,
@@ -135,7 +137,7 @@ export const BlogCategoriesPage = () => {
       {has(permissions, PermissionEnum.browseBlog) && (
         <>
           <SearchBar
-            fields={blogCategoriesQuery?.data?.data?.fields}
+            fields={blogCategoriesQuery?.data?.fields}
             entity="categories"
             params={router.query}
             callback={(form: any) =>
@@ -146,9 +148,10 @@ export const BlogCategoriesPage = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          {blogCategoriesQuery.data && <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />}
+
           <PaginationBar
-            totalPages={blogCategoriesQuery?.data?.data?.data?.last_page}
+            totalPages={blogCategoriesQuery?.data?.data?.last_page}
             activePage={router.query.page ? Number(router.query.page) : 1}
             router={router}
           />

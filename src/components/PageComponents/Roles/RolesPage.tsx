@@ -1,27 +1,20 @@
-import React, { useEffect, useState } from "react";
-import styled, { css } from "styled-components";
-import {
-  useStore,
-  deleteUser,
-  pluralRemove,
-  $_delete_role,
-  reqSucceed,
-  useUserStore,
-  has,
-  $_get_roles_list,
-} from "utils";
-import Layout from "Layouts";
-import { Button, Container, Modal } from "@paljs/ui";
-import { BasicTable, FlexContainer, HeaderButton, InputGroup } from "components";
-import { Add } from "@material-ui/icons";
-import { toast } from "react-toastify";
-import { CreateRoleModal, EditRoleModal } from "components";
-import { PermissionEnum } from "types";
-import { useQuery } from "@tanstack/react-query";
 import { Flex } from "@mantine/core";
+import { Add } from "@material-ui/icons";
+import { Button, Container, Modal } from "@paljs/ui";
+import { useQuery } from "@tanstack/react-query";
+import { BasicTable, CreateRoleModal, EditRoleModal, FlexContainer, HeaderButton } from "components";
+import Layout from "Layouts";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { toast } from "react-toastify";
+import styled, { css } from "styled-components";
+import { PermissionEnum } from "types";
+import { $_delete_role, $_get_roles_list, has, reqSucceed, useUserStore } from "utils";
 
 export const RolesPage = () => {
-  const { data: roles, refetch: refetchRoles } = useQuery(["roles"], () => $_get_roles_list());
+  const router = useRouter();
+
+  const { data: roles, refetch: refetchRoles } = useQuery(["roles"], () => $_get_roles_list(router.query));
 
   const permissions = useUserStore().getPermissions();
 
@@ -71,7 +64,7 @@ export const RolesPage = () => {
 
   const columns: any[] = ["شناسه نقش", "نام نقش", "فعالیت ها"];
 
-  const data = roles?.map((role: any) => [
+  const data = roles?.data?.map((role: any) => [
     // =====>> Table Columns <<=====
     role?.id,
     role?.name,
@@ -88,6 +81,16 @@ export const RolesPage = () => {
       )}
     </Flex>,
   ]);
+
+  function creationCallback() {
+    refetchRoles();
+    setShowCreationModal(false);
+  }
+
+  function updateCallback() {
+    refetchRoles();
+    toggleRoleEditModal();
+  }
 
   return (
     <Layout title="نقش ها">
@@ -139,7 +142,7 @@ export const RolesPage = () => {
           آیا از حذف نقش های
           <span className="text-danger mx-1">
             {itemsToRemove
-              ?.map((roleId: number) => roles?.find((_role: any) => _role.id === roleId)?.name)
+              ?.map((roleId: number) => roles?.data?.find((_role: any) => _role.id === roleId)?.name)
               ?.join(" , ")}
           </span>
           اطمینان دارید؟
@@ -154,9 +157,14 @@ export const RolesPage = () => {
         </ModalBox>
       </Modal>
 
-      <CreateRoleModal onClose={toggleCreationModal} opened={showCreationModal} callback={refetchRoles} />
+      <CreateRoleModal onClose={toggleCreationModal} opened={showCreationModal} callback={creationCallback} />
 
-      <EditRoleModal onClose={toggleRoleEditModal} opened={roleToEdit} defaultValues={roleToEdit} />
+      <EditRoleModal
+        onClose={toggleRoleEditModal}
+        opened={roleToEdit}
+        defaultValues={roleToEdit}
+        callback={updateCallback}
+      />
     </Layout>
   );
 };
