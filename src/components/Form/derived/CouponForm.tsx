@@ -78,7 +78,6 @@ export function CouponForm(props: ICouponFormProps) {
         </CardBody>
       </Card>
 
-      {console.log()}
       <Controller
         name="type"
         control={control}

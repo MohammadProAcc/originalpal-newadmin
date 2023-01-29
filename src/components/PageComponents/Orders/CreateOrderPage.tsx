@@ -177,7 +177,6 @@ export function CreateOrderPage() {
           </Box>,
         );
       } else if (errMessage === "product is sold") {
-        console.log("err >> ", err.response.data);
         toast.warn(
           <Box>
             <Text>{err.response.data?.data?.stock?.count}</Text> عدد از محصول{" "}

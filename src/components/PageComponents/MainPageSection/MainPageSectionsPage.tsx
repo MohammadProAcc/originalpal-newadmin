@@ -14,7 +14,7 @@ import { Flex } from "@mantine/core";
 export const MainPageSectionPage = () => {
   const router = useRouter();
 
-  const { mainPageSections, clearList } = useStore((state) => ({
+  const { mainPageSections, fields, clearList } = useStore((state) => ({
     mainPageSections: state?.mainPageSections,
     clearList: state?.clearMainPageSectionsList,
   }));
@@ -132,8 +132,7 @@ export const MainPageSectionPage = () => {
       {has(permissions, PermissionEnum.browseMainPageSection) && (
         <>
           <SearchBar
-            // fields={mainPageSections.fields}
-            fields={[]}
+            fields={["id", "type", "title"]}
             entity="mainPageSections"
             params={router.query}
             callback={(form: any) =>

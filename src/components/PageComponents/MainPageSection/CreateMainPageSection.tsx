@@ -1,9 +1,9 @@
-import { Divider, Input, LoadingOverlay, MultiSelect } from "@mantine/core";
-import { Button, Checkbox, InputGroup as _InputGroup, Popover, Select as _Select } from "@paljs/ui";
+import { Divider, Flex, Input, LoadingOverlay, MultiSelect } from "@mantine/core";
+import { Button, Checkbox, InputGroup as _InputGroup, Select as _Select } from "@paljs/ui";
 import { useQuery } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import Layout from "Layouts";
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -121,32 +121,22 @@ export function CreateMainPageSection() {
             )}
           />
         </InputGroup>
-
         <InputGroup>
           <label>عنوان</label>
           <input {...register("title")} placeholder="عنوان" />
         </InputGroup>
-
         <InputGroup>
           <label>اولویت</label>
           <input {...register("priority")} type="number" placeholder="اولویت" />{" "}
         </InputGroup>
-        <InputGroup>
-          <label>فعال</label>
-          <Controller
-            name="active"
-            control={control}
-            render={({ field }) => (
-              <Checkbox style={{ color: "transparent" }} checked={field?.value} onChange={field?.onChange}></Checkbox>
-            )}
-          />
-        </InputGroup>
-
+        <label>
+          <input type="checkbox" style={{ color: "transparent" }} {...register("active")} /> فعال
+        </label>
         {selectedType === "product" ? (
           <>
             <H3>جزییات بخش محصول</H3>
 
-            <Input {...register("product_count")} placeholder="تعداد محصولات" title="تعداد محصولات" />
+            <Input {...register("parameter.product_count")} placeholder="تعداد محصولات" title="تعداد محصولات" />
 
             <Controller
               name="brands"
@@ -245,7 +235,6 @@ export function CreateMainPageSection() {
             </InputGroup>
           </>
         )}
-
         <Button type="submit" status="Success">
           ساخت بخش
         </Button>

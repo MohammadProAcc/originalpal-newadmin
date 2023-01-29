@@ -1,13 +1,16 @@
 import { Alert, Divider, Flex, Text } from "@mantine/core";
 import { Button, Card, CardBody, CardHeader, InputGroup } from "@paljs/ui";
 import { Editor } from "components";
+import Cookies from "js-cookie";
 import Layout from "Layouts";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
+import { toast } from "react-toastify";
 import styled from "styled-components";
 import { PostLink } from "types";
+import { search_in, uploadBlogImage, uploadBlogVideo } from "utils";
 import { handlePostLink, postLinkOptions } from "./handlePostLink";
 
 export function CreateBlog() {
@@ -18,63 +21,62 @@ export function CreateBlog() {
   const { register, handleSubmit, control, getValues, setValue, watch } = useForm();
 
   const onSubmit = async (form: any) => {
-    console.log(form);
-    // setLoading(true);
+    setLoading(true);
 
-    // const video = form.video;
-    // delete form.video;
+    const video = form.video;
+    delete form.video;
 
-    // // FIXME: temporary
-    // const srcvideo = form?.srcvideo;
-    // delete form?.srcvideo;
+    // FIXME: temporary
+    const srcvideo = form?.srcvideo;
+    delete form?.srcvideo;
 
-    // const thumb = form?.thumb[0];
-    // delete form?.thumb;
+    const thumb = form?.thumb[0];
+    delete form?.thumb;
 
-    // const endImage = form?.endimage[0];
-    // delete form?.endimage;
+    const endImage = form?.endimage[0];
+    delete form?.endimage;
 
-    // const response = await createBlog(form, Cookies.get(process.env.TOKEN!));
-    // if (response !== null) {
-    //   const { data: blogs } = await search_in(
-    //     "blog",
-    //     {
-    //       key: "title",
-    //       type: "=",
-    //       value: form?.title,
-    //     },
-    //     router?.query,
-    //   );
-    //   const blogId = blogs?.data[blogs?.total - 1]?.id;
+    const response = await createBlog(form, Cookies.get(process.env.TOKEN!));
+    if (response !== null) {
+      const { data: blogs } = await search_in(
+        "blog",
+        {
+          key: "title",
+          type: "=",
+          value: form?.title,
+        },
+        router?.query,
+      );
+      const blogId = blogs?.data[blogs?.total - 1]?.id;
 
-    //   if (thumb) {
-    //     const thumbUploadResponse = await uploadBlogImage(blogId, "thumb", thumb);
-    //     if (thumbUploadResponse?.status === "success") {
-    //       toast.success("تصویر بنر وبلاگ آپلود شد");
-    //     }
-    //   }
+      if (thumb) {
+        const thumbUploadResponse = await uploadBlogImage(blogId, "thumb", thumb);
+        if (thumbUploadResponse?.status === "success") {
+          toast.success("تصویر بنر وبلاگ آپلود شد");
+        }
+      }
 
-    //   if (endImage) {
-    //     const endimageUploadResponse = await uploadBlogImage(blogId, "endimage", endImage);
-    //     if (endimageUploadResponse?.status === "success") {
-    //       toast.success("تصویر پایانی وبلاگ آپلود شد");
-    //     }
-    //   }
+      if (endImage) {
+        const endimageUploadResponse = await uploadBlogImage(blogId, "endimage", endImage);
+        if (endimageUploadResponse?.status === "success") {
+          toast.success("تصویر پایانی وبلاگ آپلود شد");
+        }
+      }
 
-    //   if (video[0]) {
-    //     const videoUploadResponse = await uploadBlogVideo(blogId, video[0]);
-    //     if (videoUploadResponse?.status === "success") {
-    //       toast.success("ویدیو وبلاگ آپلود شد");
-    //     }
-    //   }
+      if (video[0]) {
+        const videoUploadResponse = await uploadBlogVideo(blogId, video[0]);
+        if (videoUploadResponse?.status === "success") {
+          toast.success("ویدیو وبلاگ آپلود شد");
+        }
+      }
 
-    //   toast.success("وبلاگ با موفقیت ساخته شد");
-    //   router.push(`/blog/edit/${blogId}`);
-    // } else {
-    //   toast.error("ساخت وبلاگ موفقیت آمیز نبود");
-    // }
+      toast.success("وبلاگ با موفقیت ساخته شد");
+      router.push(`/blog/edit/${blogId}`);
+    } else {
+      toast.error("ساخت وبلاگ موفقیت آمیز نبود");
+    }
 
-    // setLoading(false);
+    setLoading(false);
   };
 
   return (
@@ -369,3 +371,6 @@ const Form = styled.form`
     margin-bottom: 1rem;
   }
 `;
+function createBlog(form: any, arg1: string | undefined) {
+  throw new Error("Function not implemented.");
+}

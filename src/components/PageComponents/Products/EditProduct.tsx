@@ -194,7 +194,6 @@ export const EditProductPage: React.FC = () => {
       productRefetch();
       toast.success("ویدیو با موفقیت حذف شد");
     } else {
-      console.log(response);
       toast.error("حذف ویدیو موفقیت آمیز نبود");
     }
     setVideoToRemove(null);

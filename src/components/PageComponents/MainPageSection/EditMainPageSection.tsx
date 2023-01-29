@@ -1,10 +1,11 @@
-import { Divider, Input, LoadingOverlay, MultiSelect } from "@mantine/core";
-import { Button, Checkbox, InputGroup as _InputGroup, Modal, Popover, Select as _Select } from "@paljs/ui";
+import { Divider, Flex, Input, LoadingOverlay, MultiSelect, Text } from "@mantine/core";
+import { Button, InputGroup as _InputGroup, Modal, Select as _Select } from "@paljs/ui";
 import { useQuery } from "@tanstack/react-query";
 import { HeaderButton, ModalBox } from "components";
 import { FlexContainer } from "components/Container/FlexContainer";
 import Cookies from "js-cookie";
 import Layout from "Layouts";
+import { isNumber } from "lodash";
 import router from "next/router";
 import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -20,6 +21,7 @@ import {
   has,
   removeItem,
   search_in,
+  translator,
   useUserStore,
 } from "utils";
 
@@ -109,20 +111,44 @@ export const EditMainPageSectionPage: React.FC = () => {
 
   const [selectedType, setSelectedType] = useState<any>(mainPageSectionQuery?.data?.type);
 
-  const { register, handleSubmit, control, reset, getValues } = useForm({
-    defaultValues: mainPageSectionQuery?.data,
+  const { register, handleSubmit, control, reset, getValues, watch } = useForm({
+    defaultValues: {
+      ...mainPageSectionQuery?.data,
+      active: mainPageSectionQuery?.data?.active == 0 ? false : true,
+      parameter: {
+        ...mainPageSectionQuery?.data?.parameter,
+        inStock: mainPageSectionQuery?.data?.parameter?.inStock == 0 ? false : true,
+      },
+    },
   });
 
   const onSubmit = async (form: any) => {
     setLoading(true);
-    const final = {
-      ...form,
-      tags: form?.tags ? form?.tags?.split(" ")?.map((tag: string) => Number(tag)) : [],
-      brands: form?.brands?.split(" ")?.map((brand: string) => Number(brand)),
-      banners: form?.banners?.split(" ")?.map((banner: string) => Number(banner)),
-      links: insertedLinks,
-      inStock: form?.inStock ? 1 : 0,
-    };
+    let final;
+    if (form.type === "link") {
+      final = {
+        ...form,
+        links: insertedLinks,
+      };
+    }
+    if (form.type === "banner") {
+      const { links, parameter, ...rest } = form;
+      let banners: any = [];
+      for (let key in parameter) {
+        if (!isNaN(Number(key))) {
+          banners.push(parameter[key]);
+        }
+      }
+      final = { ...rest, banners };
+    } else {
+      let { parameter, ...rest } = form;
+      final = {
+        ...rest,
+        brands: parameter.brand,
+        tags: parameter.tag,
+        product_count: parameter.product_count,
+      };
+    }
 
     const response = await editMainPageSection(mainPageSectionQuery?.data?.id, final, Cookies.get(process.env.TOKEN!));
     if (response?.status === "success") {
@@ -171,7 +197,10 @@ export const EditMainPageSectionPage: React.FC = () => {
         <LoadingOverlay visible={loading} />
         <InputGroup>
           <label>نوع</label>
-          <Controller
+          <Text display="flex" style={{ alignItems: "center" }}>
+            {translator(getValues("type"))}
+          </Text>
+          {/* <Controller
             name="type"
             control={control}
             render={({ field }) => (
@@ -185,7 +214,7 @@ export const EditMainPageSectionPage: React.FC = () => {
                 value={sectionTypeOptions.find((option) => option.value === field.value)}
               />
             )}
-          />
+          /> */}
         </InputGroup>
 
         <InputGroup>
@@ -197,22 +226,18 @@ export const EditMainPageSectionPage: React.FC = () => {
           <label>اولویت</label>
           <input {...register("priority")} type="number" placeholder="اولویت" />{" "}
         </InputGroup>
-        <InputGroup>
-          <label>فعال</label>
-          <Controller
-            name="active"
-            control={control}
-            render={({ field }) => (
-              <Checkbox style={{ color: "transparent" }} checked={field?.value} onChange={field?.onChange}></Checkbox>
-            )}
-          />
-        </InputGroup>
+
+        <Flex>
+          <label>
+            <input type="checkbox" {...register("active")} /> فعال
+          </label>
+        </Flex>
 
         {selectedType === "product" ? (
           <>
             <H3>جزییات بخش محصول</H3>
 
-            <Input {...register("product_count")} placeholder="تعداد محصولات" title="تعداد محصولات" />
+            <Input {...register("parameter.product_count")} placeholder="تعداد محصولات" title="تعداد محصولات" />
 
             <Controller
               name="parameter.brand"
@@ -242,20 +267,9 @@ export const EditMainPageSectionPage: React.FC = () => {
               )}
             />
 
-            <InputGroup>
-              <label>فقط محصولات موجود</label>
-              <Controller
-                name="inStock"
-                control={control}
-                render={({ field }) => (
-                  <Checkbox
-                    checked={field?.value}
-                    onChange={field?.onChange}
-                    style={{ color: "transparent" }}
-                  ></Checkbox>
-                )}
-              />
-            </InputGroup>
+            <Flex>
+              <input type="checkbox" {...register("parameter.inStock")} /> <label>فقط محصولات موجود</label>
+            </Flex>
           </>
         ) : selectedType === "banner" ? (
           <>
@@ -270,8 +284,17 @@ export const EditMainPageSectionPage: React.FC = () => {
                   title="بنر ها"
                   data={bannersOptions as any}
                   placeholder="بنر های مورد نظر را انتخاب کنید"
-                  // {...field}
-                  value={field.value}
+                  {...field}
+                  value={(() => {
+                    let parameters = watch("parameter");
+                    let values: string[] = [];
+                    for (let key in parameters) {
+                      if (!isNaN(Number(key))) {
+                        values.push(parameters[key]);
+                      }
+                    }
+                    return values;
+                  })()}
                 />
               )}
             />
