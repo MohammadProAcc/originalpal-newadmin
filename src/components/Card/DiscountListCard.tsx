@@ -1,3 +1,4 @@
+import { Flex, Text } from "@mantine/core";
 import { InputGroup as _InputGroup } from "@paljs/ui";
 import { DatePickerButtonLike } from "components/Input";
 import { useState } from "react";
@@ -47,34 +48,41 @@ export function DiscountListCard(props: DiscountListCardProps) {
   }
 
   return (
-    <Li>
-      <div className="col info">
+    <Li title={props.stock.product?.name}>
+      <Flex direction="column" gap="md">
         <strong className="strong">
-          <span className="product-id nowrap">شناسه محصول :‌ {props.stock.product_id}</span>
+          <span className="product-id nowrap">محصول :‌ {props.stock.product_id}</span>
         </strong>
-        <span>سایز محصول : {props.stock.size}</span>
-        <span className="product-id nowrap">شناسه انبار :‌ {props.stock.id}</span>
-      </div>
+        <span className="product-id nowrap">انبار :‌ {props.stock.id}</span>
+      </Flex>
 
       <ImageContainer>
         <ProductImage src={`${process.env.SRC}/${product?.site_main_picture?.u}`} />
       </ImageContainer>
-      <span className="product-name" style={{ alignSelf: "flex-start" }} title={product?.name}>
-        {truncateString(product?.name ?? "-", 20)}
-      </span>
+      <Flex
+        style={{ width: "8rem", height: "100%", alignSelf: "flex-start" }}
+        title={product?.name}
+        align="center"
+        // justify="center"
+      >
+        <strong style={{ fontSize: "1.5rem" }}>{props.stock.size}</strong>
+      </Flex>
       <div className="col price date">
-        <FlexBox className="price">
-          قیمت : <strong>{numeralize(props.stock?.price ?? 0)}</strong> تومان
-        </FlexBox>
+        <Flex direction="column" style={{ width: "9rem" }} gap="xs">
+          <Text>قیمت :</Text>{" "}
+          <span>
+            <strong>{numeralize(props.stock?.price ?? 0)}</strong> تومان
+          </span>
+        </Flex>
         <FlexBox col>
-          <span className="mb-1">تاریخ شروع تخفیف : </span>
+          <span className="mb-1">شروع : </span>
           <DatePickerButtonLike
             onChange={discountStartMutation}
             value={formMethods.watch(fieldName)?.discount_start ?? props.stock.discount_start ?? "-"}
           />
         </FlexBox>
         <FlexBox col>
-          <span className="mb-1">تاریخ پایان تخفیف : </span>
+          <span className="mb-1">پایان : </span>
           <DatePickerButtonLike
             onChange={discountMutationObserver}
             value={formMethods.watch(fieldName)?.discount_end ?? props.stock.discount_end ?? "-"}
@@ -84,7 +92,7 @@ export function DiscountListCard(props: DiscountListCardProps) {
       <div className="col price discount">
         <FlexBox className="discount">
           <InputGroup column>
-            <label>نوع تخفیف :</label>
+            <label>نوع :</label>
             <Select
               options={percentageSelectOptions}
               onChange={discountTypeMutationObserver}
@@ -93,7 +101,7 @@ export function DiscountListCard(props: DiscountListCardProps) {
           </InputGroup>
 
           <InputGroup column>
-            <label>مقدار تخفیف :</label>
+            <label>مقدار :</label>
             <input
               defaultValue={props.stock?.discount_amout}
               type="number"

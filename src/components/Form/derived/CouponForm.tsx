@@ -96,7 +96,7 @@ export function CouponForm(props: ICouponFormProps) {
       <br />
 
       <Card>
-        <CardHeader>مقدار تخفیف</CardHeader>
+        <CardHeader>مقدار تخفیف (تومان یا درصد - با توجه به نوع)</CardHeader>
         <CardBody>
           <InputGroup fullWidth>
             <input {...register("amount", { required: true })} type="number" placeholder="مقدار" />

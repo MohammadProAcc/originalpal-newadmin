@@ -38,7 +38,12 @@ export function DatePickerButtonLike(props: IDatePickerButtonLikeProps) {
       </Button>
 
       <CalendarContainer data-active={showCalendar}>
-        <PersianDatePicker value={props.value ?? ""} onSelect={props.onChange} zIndex={+ZIndex.max - 1} />
+        <PersianDatePicker
+          onClickOutSide={() => setShowCalendar(false)}
+          value={props.value ?? ""}
+          onSelect={props.onChange}
+          zIndex={+ZIndex.max - 1}
+        />
       </CalendarContainer>
     </$>
   );

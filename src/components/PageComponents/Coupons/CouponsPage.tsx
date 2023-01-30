@@ -179,6 +179,8 @@ export const CouponsPage = () => {
                   return `نوع: cash یا percent`;
                 } else if (field === "deny_off") {
                   return `فقط محصولات فروش ویژه: 0 یا 1`;
+                } else if (field === "limit") {
+                  return `محدودیت استفاده از کد`;
                 }
                 return field;
               })}

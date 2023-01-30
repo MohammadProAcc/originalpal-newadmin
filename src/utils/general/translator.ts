@@ -89,7 +89,7 @@ const dictionary = {
   password: "رمز عبور",
   points: "امتیاز ها",
   decription: "توضیحات",
-  amount: "تعداد",
+  amount: "مقدار",
   start: "شروع",
   expiration: "انقضاء",
   min_to_execute: "حداقل برای شروع",
