@@ -170,7 +170,16 @@ export const CouponsPage = () => {
       {has(permissions, PermissionEnum.browseCoupon) && (
         <>
           <SearchBar
-            fields={couponsQuery?.data?.fields}
+            fields={couponsQuery?.data?.fields
+              .filter((f: string) => !["created_at", "updated_at", "deleted_at", "start", "expiration"].includes(f))
+              .map((field: string) => {
+                if (field === "type") {
+                  return `نوع: cash یا percent`;
+                } else if (field === "deny_off") {
+                  return `فقط محصولات فروش ویژه: 0 یا 1`;
+                }
+                return field;
+              })}
             entity="coupons"
             params={router.query}
             callback={(form: any) =>
