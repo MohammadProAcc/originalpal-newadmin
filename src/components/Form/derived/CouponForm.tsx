@@ -40,6 +40,8 @@ export function CouponForm(props: ICouponFormProps) {
 
   const onSubmit = async (form: any) => {
     setLoading(true);
+    form.type = form.type.value;
+
     let response;
     if (props.defaultValues) {
       response = await editCoupon(props.defaultValues?.id, form);
