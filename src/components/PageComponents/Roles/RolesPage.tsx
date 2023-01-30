@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BasicTable, CreateRoleModal, EditRoleModal, FlexContainer, HeaderButton } from "components";
 import Layout from "Layouts";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import styled, { css } from "styled-components";
 import { PermissionEnum } from "types";
@@ -27,6 +27,7 @@ export const RolesPage = () => {
   const [showCreationModal, setShowCreationModal] = useState(false);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
   const toggleRoleEditModal = () => setRoleToEdit(null);
@@ -56,6 +57,7 @@ export const RolesPage = () => {
       await $_delete_role({ role_id: item });
     }
     setTableSelections([]);
+    clearSelectionsRef.current?.();
     setItemsToRemove(null);
     await refetchRoles();
     toast.success("نقش های مورد نظر با موفقیت حذف شدند");
@@ -119,7 +121,12 @@ export const RolesPage = () => {
       </FlexContainer>
 
       {has(permissions, PermissionEnum.browseRole) && (
-        <BasicTable getSelections={setTableSelections} columns={columns} rows={data ?? []} />
+        <BasicTable
+          getSelections={setTableSelections}
+          columns={columns}
+          rows={data ?? []}
+          clearSelectionTriggerRef={clearSelectionsRef}
+        />
       )}
 
       <Modal on={itemToRemove} toggle={toggleModal}>

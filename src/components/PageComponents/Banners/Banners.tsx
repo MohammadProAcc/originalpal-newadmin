@@ -6,7 +6,7 @@ import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } fro
 import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { PermissionEnum } from "types";
@@ -31,6 +31,7 @@ export const Banners = () => {
   const [itemsToRemove, setItemsToRemove] = useState<any>(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
 
@@ -60,6 +61,7 @@ export const Banners = () => {
       },
       async () => {
         setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف  بنر با  شناسه ${id} موفقیت آمیز نبود`),
@@ -185,7 +187,12 @@ export const Banners = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable
+            getSelections={setTableSelections}
+            columns={columns}
+            rows={data}
+            clearSelectionTriggerRef={clearSelectionsRef}
+          />
           <PaginationBar
             totalPages={banners?.data?.last_page}
             activePage={router.query.page ? Number(router.query.page) : 1}

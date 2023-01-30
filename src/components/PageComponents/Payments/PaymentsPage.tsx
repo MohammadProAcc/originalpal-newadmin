@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { deletePayment, has, pluralRemove, translator, useStore, useUserStore } from "utils";
-import Layout from "Layouts";
-import { Button, Container, Modal } from "@paljs/ui";
-import { BasicTable, HeaderButton, PaginationBar, SearchBar } from "components";
-import { useRouter } from "next/router";
-import { toast } from "react-toastify";
-import { Payment, PermissionEnum } from "types";
-import Link from "next/link";
 import { Flex } from "@mantine/core";
+import { Button, Container, Modal } from "@paljs/ui";
+import { BasicTable, HeaderButton, PaginationBar } from "components";
+import Layout from "Layouts";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useRef, useState } from "react";
+import { toast } from "react-toastify";
+import styled from "styled-components";
+import { Payment, PermissionEnum } from "types";
+import { deletePayment, has, pluralRemove, translator, useStore, useUserStore } from "utils";
 
 export const PaymentsPage = () => {
   const router = useRouter();
@@ -27,6 +27,7 @@ export const PaymentsPage = () => {
   const togglePluralRemoveModal = () => setItemsToRemove(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
 
@@ -54,6 +55,7 @@ export const PaymentsPage = () => {
       },
       async () => {
         setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       // TODO: add a proper error callback
@@ -120,7 +122,12 @@ export const PaymentsPage = () => {
 
       {has(permissions, PermissionEnum.browsePayment) && (
         <>
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable
+            getSelections={setTableSelections}
+            columns={columns}
+            rows={data}
+            clearSelectionTriggerRef={clearSelectionsRef}
+          />
 
           <PaginationBar
             totalPages={payments?.data?.last_page}

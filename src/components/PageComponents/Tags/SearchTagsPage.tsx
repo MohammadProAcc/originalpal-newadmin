@@ -6,7 +6,7 @@ import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } fro
 import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { PermissionEnum } from "types";
@@ -45,6 +45,7 @@ export const SearchTagsPage = () => {
   const [itemsToRemove, setItemsToRemove] = useState<any>(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
   const togglePluralRemoveModal = () => setItemsToRemove(null);
@@ -73,6 +74,7 @@ export const SearchTagsPage = () => {
       },
       async () => {
         await setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف برچسب با شناسه ${id} موفقیت آمیز نبود`),
@@ -156,7 +158,14 @@ export const SearchTagsPage = () => {
             }
           />
 
-          {tagsQuery?.data && <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />}
+          {tagsQuery?.data && (
+            <BasicTable
+              getSelections={setTableSelections}
+              columns={columns}
+              rows={data}
+              clearSelectionTriggerRef={clearSelectionsRef}
+            />
+          )}
 
           <PaginationBar
             totalPages={tagsQuery?.data?.data?.tags?.data?.last_page}

@@ -4,7 +4,7 @@ import { BasicTable, HeaderButton, PaginationBar, SearchBar } from "components";
 import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { PermissionEnum } from "types";
@@ -28,6 +28,7 @@ export const OrdersPage = () => {
   const togglePluralRemoveModal = () => setItemsToRemove(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
 
@@ -55,6 +56,7 @@ export const OrdersPage = () => {
       },
       async () => {
         setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف  سقارش با  شناسه ${id} موفقیت آمیز نبود`),
@@ -139,7 +141,13 @@ export const OrdersPage = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} isOrder columns={columns} rows={data} />
+          <BasicTable
+            getSelections={setTableSelections}
+            isOrder
+            columns={columns}
+            rows={data}
+            clearSelectionTriggerRef={clearSelectionsRef}
+          />
 
           <PaginationBar
             totalPages={orders?.data?.last_page}

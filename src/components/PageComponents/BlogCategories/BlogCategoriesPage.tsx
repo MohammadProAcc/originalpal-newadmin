@@ -6,7 +6,7 @@ import { BasicTable, BlogCategoryModal, FlexContainer, HeaderButton, PaginationB
 import Cookies from "js-cookie";
 import Layout from "Layouts";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { BlogCategory, PermissionEnum } from "types";
@@ -56,6 +56,7 @@ export const BlogCategoriesPage = () => {
   };
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const [itemsToRemove, setItemsToRemove] = useState<any>(null);
   const togglePluralRemoveModal = () => setItemsToRemove(null);
@@ -72,6 +73,7 @@ export const BlogCategoriesPage = () => {
       },
       async () => {
         setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف  دسته‌بندی مقاله با  شناسه ${id} موفقیت آمیز نبود`),
@@ -146,7 +148,12 @@ export const BlogCategoriesPage = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable
+            getSelections={setTableSelections}
+            columns={columns}
+            rows={data}
+            clearSelectionTriggerRef={clearSelectionsRef}
+          />
           <PaginationBar
             totalPages={blogCategoriesQuery?.data?.data?.data?.last_page}
             activePage={router.query.page ? Number(router.query.page) : 1}

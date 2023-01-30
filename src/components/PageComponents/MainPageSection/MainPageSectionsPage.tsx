@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { useStore, deleteMainPageSection, translator, useUserStore, has } from "utils";
-import Layout from "Layouts";
+import { Flex } from "@mantine/core";
+import { Add } from "@material-ui/icons";
 import { Button, Container, Modal } from "@paljs/ui";
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from "components";
+import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Add } from "@material-ui/icons";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
+import styled from "styled-components";
 import { PermissionEnum } from "types";
-import { Flex } from "@mantine/core";
+import { deleteMainPageSection, has, translator, useStore, useUserStore } from "utils";
 
 export const MainPageSectionPage = () => {
   const router = useRouter();
@@ -27,6 +27,7 @@ export const MainPageSectionPage = () => {
   const [itemsToRemove, setItemsToRemove] = useState<any>(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
   const togglePluralRemoveModal = () => setItemsToRemove(null);
@@ -59,6 +60,7 @@ export const MainPageSectionPage = () => {
       });
 
       setTableSelections([]);
+      clearSelectionsRef.current?.();
       setItemsToRemove(null);
     }
 
@@ -143,7 +145,12 @@ export const MainPageSectionPage = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable
+            getSelections={setTableSelections}
+            columns={columns}
+            rows={data}
+            clearSelectionTriggerRef={clearSelectionsRef}
+          />
 
           <PaginationBar
             totalPages={mainPageSections?.data?.last_page}

@@ -7,11 +7,11 @@ import Cookies from "js-cookie";
 import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { PermissionEnum } from "types";
-import { deleteCoupon, getCouponsList, has, pluralRemove, translator, useStore, useUserStore } from "utils";
+import { deleteCoupon, getCouponsList, has, pluralRemove, useUserStore } from "utils";
 
 export const CouponsPage = () => {
   const router = useRouter();
@@ -40,6 +40,7 @@ export const CouponsPage = () => {
   const [itemsToRemove, setItemsToRemove] = useState<any>(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
 
@@ -69,6 +70,7 @@ export const CouponsPage = () => {
       },
       () => {
         setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف  کوپن با  شناسه ${id} موفقیت آمیز نبود`),
@@ -190,7 +192,12 @@ export const CouponsPage = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable
+            getSelections={setTableSelections}
+            columns={columns}
+            rows={data}
+            clearSelectionTriggerRef={clearSelectionsRef}
+          />
           <PaginationBar
             totalPages={couponsQuery?.data?.data?.last_page}
             activePage={router.query.page ? Number(router.query.page) : 1}

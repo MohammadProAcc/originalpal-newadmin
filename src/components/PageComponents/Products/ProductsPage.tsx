@@ -1,18 +1,18 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { useStore, deleteProduct, numeralize, pluralRemove, useUserStore, has } from "utils";
-import Layout from "Layouts";
+import { Badge, Flex } from "@mantine/core";
+import { Avatar } from "@material-ui/core";
+import { Add } from "@material-ui/icons";
 import { Button, Container, Modal } from "@paljs/ui";
+import axios from "axios";
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from "components";
+import Cookies from "js-cookie";
+import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Add } from "@material-ui/icons";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { Avatar } from "@material-ui/core";
-import axios from "axios";
-import Cookies from "js-cookie";
+import styled from "styled-components";
 import { PermissionEnum } from "types";
-import { Badge, Flex } from "@mantine/core";
+import { deleteProduct, has, numeralize, pluralRemove, useStore, useUserStore } from "utils";
 
 export const ProductsPage = () => {
   const router = useRouter();
@@ -28,6 +28,7 @@ export const ProductsPage = () => {
   const [itemToRemove, setItemToRemove] = useState<any>(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
 
@@ -107,6 +108,7 @@ export const ProductsPage = () => {
       },
       async () => {
         setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف محصول با شناسه ${id} موفقیت آمیز نبود`),
@@ -156,7 +158,12 @@ export const ProductsPage = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable
+            getSelections={setTableSelections}
+            columns={columns}
+            rows={data}
+            clearSelectionTriggerRef={clearSelectionsRef}
+          />
 
           <PaginationBar
             totalPages={products?.data?.last_page}
