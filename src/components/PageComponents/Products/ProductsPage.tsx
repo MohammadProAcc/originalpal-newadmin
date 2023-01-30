@@ -12,7 +12,7 @@ import { Avatar } from "@material-ui/core";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { PermissionEnum } from "types";
-import { Flex } from "@mantine/core";
+import { Badge, Flex } from "@mantine/core";
 
 export const ProductsPage = () => {
   const router = useRouter();
@@ -68,7 +68,7 @@ export const ProductsPage = () => {
     product?.name,
     product?.code,
     product?.brand?.name ? product?.brand?.name : product?.brand ?? "-",
-    product?.Enable,
+    product?.Enable == 1 ? <Badge color="green">فعال</Badge> : <Badge color="red">غیرفعال</Badge>,
     <Flex gap="0.25rem">
       {/* FIXME: fix the url */}
       <a target="_blank" href={`${process.env.WEBSITE_DOMAIN}/products/${product?.id}`}>

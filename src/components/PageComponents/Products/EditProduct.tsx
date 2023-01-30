@@ -1,4 +1,14 @@
-import { Badge, Button as MantineButton, Collapse, Divider, Flex, Group, MultiSelect, Text } from "@mantine/core";
+import {
+  Badge,
+  Button as MantineButton,
+  Collapse,
+  Divider,
+  Flex,
+  Group,
+  MultiSelect,
+  Space,
+  Text,
+} from "@mantine/core";
 import { Dropzone, IMAGE_MIME_TYPE, MIME_TYPES } from "@mantine/dropzone";
 import {
   Alert,
@@ -91,7 +101,7 @@ export const EditProductPage: React.FC = () => {
   const { register, handleSubmit, control, watch } = useForm({
     defaultValues: {
       slug: product?.slug,
-      Enable: product?.Enable,
+      Enable: product?.Enable == 0 ? false : true,
       brand_id: product?.brand_id,
       code: product?.code,
       description: product?.description,
@@ -136,6 +146,7 @@ export const EditProductPage: React.FC = () => {
 
     delete form?.url;
     delete form?.color;
+    form.Enable = form.Enable ? "1" : "0";
 
     const response = await editProduct(product?.id, form);
 
@@ -377,6 +388,13 @@ export const EditProductPage: React.FC = () => {
     <Layout title={`ویرایش محصول ${product?.id}`}>
       <h1 style={{ marginBottom: "4rem" }}>محصول "{product?.name}"</h1>
       <Form onSubmit={handleSubmit(onSubmit)}>
+        <Flex>
+          <label>
+            <input type="checkbox" {...register("Enable")} />
+            فعال
+          </label>
+        </Flex>
+
         <Card>
           <CardHeader>َUrl منحصر به فرد</CardHeader>
           <CardBody>
@@ -404,24 +422,24 @@ export const EditProductPage: React.FC = () => {
           </CardBody>
         </Card>
 
-        <Card>
-          <CardHeader>برند : {product?.brand?.name ?? "-"}</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <Controller
-                name="brand_id"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    options={brandsOptions}
-                    onChange={(e: any) => field.onChange(e?.value)}
-                    placeholder="برای تغییر دادن برند ضربه بزنید"
-                  />
-                )}
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
+        <Space mt="sm" />
+        <Text>
+          <strong>برند</strong>
+        </Text>
+        <Space mt="xs" />
+        <Controller
+          name="brand_id"
+          control={control}
+          render={({ field }) => (
+            <Select
+              options={brandsOptions}
+              onChange={(e: any) => field.onChange(e?.value)}
+              value={brandsOptions.find((b: any) => b.value == field.value)}
+              placeholder="برای تغییر دادن برند ضربه بزنید"
+            />
+          )}
+        />
+        <Space mt="sm" />
 
         <Flex direction="column">
           <Text mb="sm">
@@ -471,21 +489,6 @@ export const EditProductPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>فعال یا غیرفعال کردن محصول : {product?.Enable ? "فعال" : "غیر فعال"}</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <Controller
-                control={control}
-                name="Enable"
-                render={({ field }) => (
-                  <Select options={activationOptions} onChange={(e: any) => field?.onChange(e?.value)} />
-                )}
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
           <CardHeader>وضعیت</CardHeader>
           <CardBody>
             <InputGroup>
@@ -498,7 +501,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>SEO</CardHeader>
           <CardBody>
             <Card>
-              <CardHeader>عنوان صفحه (tag title)</CardHeader>
+              <CardHeader>تگ (title)</CardHeader>
               <CardBody>
                 <InputGroup>
                   <input {...register("title_page")} />
@@ -507,7 +510,7 @@ export const EditProductPage: React.FC = () => {
             </Card>
 
             <Card>
-              <CardHeader>عنوان سئو (meta title)</CardHeader>
+              <CardHeader>تگ (meta title)</CardHeader>
               <CardBody>
                 <InputGroup>
                   <input {...register("meta_title")} placeholder="عنوان سئو (tag title)" />
@@ -516,7 +519,7 @@ export const EditProductPage: React.FC = () => {
             </Card>
 
             <Card>
-              <CardHeader>مترادف ها (meta_keywords)</CardHeader>
+              <CardHeader>تگ (meta_keywords)</CardHeader>
               <CardBody>
                 <InputGroup>
                   <textarea style={{ minWidth: "100%", height: "8rem" }} {...register("meta_keywords")} />
@@ -525,7 +528,7 @@ export const EditProductPage: React.FC = () => {
             </Card>
 
             <Card>
-              <CardHeader>توضیح متا (meta_description)</CardHeader>
+              <CardHeader>تگ (meta_description)</CardHeader>
               <CardBody>
                 <InputGroup>
                   <textarea style={{ minWidth: "100%", height: "8rem" }} {...register("meta_description")} />
@@ -836,7 +839,7 @@ export const EditProductPage: React.FC = () => {
       </Modal>
 
       <Modal on={showAddStockModal} toggle={() => setShowAddStockModal(false)}>
-        <ModalBox style={{ width: "50vw", height: "90vh" }}>
+        <ModalBox style={{ width: "50vw", height: "90vh", overflowY: "scroll" }}>
           <StockForm callback={afterStockCreation} />
         </ModalBox>
       </Modal>

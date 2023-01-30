@@ -1,17 +1,17 @@
-import { ActionIcon, Badge, Button, Card, Group, LoadingOverlay, NumberInput, Text, TextInput } from '@mantine/core'
-import { useForm } from '@mantine/form'
-import React, { useState } from 'react'
-import { toast } from 'react-toastify'
-import styled from 'styled-components'
-import { Media } from 'types'
-import { preppend, editProductVideo, useStore } from 'utils'
+import { ActionIcon, Badge, Button, Card, Group, LoadingOverlay, NumberInput, Text, TextInput } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import styled from "styled-components";
+import { Media } from "types";
+import { preppend, editProductVideo, useStore } from "utils";
 
 interface ProductVideoCardProps {
-  media: Media
-  removalCallback: Function
-  index: number
-  updateCallback: () => Promise<any>
-  productId: number
+  media: Media;
+  removalCallback: Function;
+  index: number;
+  updateCallback: () => Promise<any>;
+  productId: number;
 }
 export const ProductVideoCard: React.FC<ProductVideoCardProps> = ({
   media,
@@ -20,7 +20,7 @@ export const ProductVideoCard: React.FC<ProductVideoCardProps> = ({
   index,
   productId,
 }) => {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const videoForm = useForm({
     initialValues: {
@@ -30,25 +30,25 @@ export const ProductVideoCard: React.FC<ProductVideoCardProps> = ({
       s: media?.s,
       u: media?.u,
     },
-  })
+  });
 
   const onSubmit = async (form: any) => {
-    setLoading(true)
+    setLoading(true);
 
-    let response: any
+    let response: any;
 
-    response = await editProductVideo(productId, form)
+    response = await editProductVideo(productId, form);
 
-    if (response.status === 'success') {
+    if (response.status === "success") {
       updateCallback().then(() => {
-        toast.success('اطلاعات ویدیو با موفقیت بروز شد')
-        setLoading(false)
-      })
+        toast.success("اطلاعات ویدیو با موفقیت بروز شد");
+        setLoading(false);
+      });
     } else {
-      toast.error('بروزرسانی اطلاعات ویدیو موفقیت آمیز نبود')
-      setLoading(false)
+      toast.error("بروزرسانی اطلاعات ویدیو موفقیت آمیز نبود");
+      setLoading(false);
     }
-  }
+  };
 
   return (
     // <Card style={{ maxHeight: '40rem' }}>
@@ -116,8 +116,8 @@ export const ProductVideoCard: React.FC<ProductVideoCardProps> = ({
     // </Card>
     <Card shadow="sm" p="lg" pt="0" radius="md" withBorder w="20rem" pos="relative">
       <LoadingOverlay visible={loading} />
-      <Card.Section sx={{ figure: { display: 'flex', justifyContent: 'center' }, position: 'relative' }}>
-        <ProductVideo controls src={preppend(media?.u, 'vid')} />
+      <Card.Section sx={{ figure: { display: "flex", justifyContent: "center" }, position: "relative" }}>
+        <ProductVideo controls src={preppend(media?.u, "vid")} />
 
         <ActionIcon
           color="red"
@@ -125,7 +125,7 @@ export const ProductVideoCard: React.FC<ProductVideoCardProps> = ({
           pos="absolute"
           top="0.5rem"
           left="0.75rem"
-          sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
           onClick={() => removalCallback(media)}
         >
           ❌
@@ -145,9 +145,9 @@ export const ProductVideoCard: React.FC<ProductVideoCardProps> = ({
       <hr />
 
       <form onSubmit={videoForm.onSubmit(onSubmit)}>
-        <TextInput defaultValue={media?.a} label="برچسب alt" {...videoForm.getInputProps('a')} />
-        <TextInput defaultValue={media?.t} label="برچسب title" {...videoForm.getInputProps('t')} />
-        <NumberInput defaultValue={media?.p} label="ترتیب" {...videoForm.getInputProps('p')} />
+        <TextInput defaultValue={media?.a} label="alt ویدیو" {...videoForm.getInputProps("a")} />
+        <TextInput defaultValue={media?.t} label="title ویدیو" {...videoForm.getInputProps("t")} />
+        <NumberInput defaultValue={media?.p} label="ترتیب" {...videoForm.getInputProps("p")} />
 
         <Button
           variant="light"
@@ -156,14 +156,14 @@ export const ProductVideoCard: React.FC<ProductVideoCardProps> = ({
           mt="md"
           radius="md"
           type="submit"
-          disabled={!(videoForm.isDirty('a') || videoForm.isDirty('t') || videoForm.isDirty('p'))}
+          disabled={!(videoForm.isDirty("a") || videoForm.isDirty("t") || videoForm.isDirty("p"))}
         >
           بروزرسانی اطلاعات ویدیو
         </Button>
       </form>
     </Card>
-  )
-}
+  );
+};
 
 const ProductVideo = styled.video`
   width: 20rem;
@@ -172,4 +172,4 @@ const ProductVideo = styled.video`
   object-fit: contain;
 
   object-fit: cover;
-`
+`;

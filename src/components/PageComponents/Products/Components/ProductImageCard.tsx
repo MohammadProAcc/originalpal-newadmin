@@ -11,21 +11,21 @@ import {
   NumberInput,
   Text,
   TextInput,
-} from '@mantine/core'
-import { useForm } from '@mantine/form'
-import React, { useState } from 'react'
-import { toast } from 'react-toastify'
-import styled from 'styled-components'
-import { Media } from 'types'
-import { editProductImage, editProductMainImage } from 'utils'
-import { preppend } from 'utils/general/preppend'
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import styled from "styled-components";
+import { Media } from "types";
+import { editProductImage, editProductMainImage } from "utils";
+import { preppend } from "utils/general/preppend";
 
 interface ProductImageCardProps {
-  media: Media
-  index: number
-  removalCallback: Function
-  updateCallback: () => Promise<any>
-  productId: number
+  media: Media;
+  index: number;
+  removalCallback: Function;
+  updateCallback: () => Promise<any>;
+  productId: number;
 }
 export const ProductImageCard: React.FC<ProductImageCardProps> = ({
   media,
@@ -34,7 +34,7 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({
   updateCallback,
   productId,
 }) => {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const imageForm = useForm({
     initialValues: {
@@ -44,33 +44,33 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({
       s: media?.s,
       u: media?.u,
     },
-  })
+  });
 
   const onSubmit = async (form: any) => {
-    setLoading(true)
+    setLoading(true);
 
-    let response: any
+    let response: any;
 
     if (index === 0) {
-      response = await editProductMainImage(productId, form)
+      response = await editProductMainImage(productId, form);
     } else {
-      response = await editProductImage(productId, form)
+      response = await editProductImage(productId, form);
     }
 
-    if (response.status === 'success') {
+    if (response.status === "success") {
       updateCallback().then(() => {
-        toast.success('اطلاعات تصویر با موفقیت بروز شد')
-        setLoading(false)
-      })
+        toast.success("اطلاعات تصویر با موفقیت بروز شد");
+        setLoading(false);
+      });
     } else {
-      toast.error('بروزرسانی اطلاعات تصویر موفقیت آمیز نبود')
-      setLoading(false)
+      toast.error("بروزرسانی اطلاعات تصویر موفقیت آمیز نبود");
+      setLoading(false);
     }
-  }
+  };
   return (
     <Card shadow="sm" p="lg" radius="md" withBorder w="20rem" pos="relative">
       <LoadingOverlay visible={loading} />
-      <Card.Section sx={{ figure: { display: 'flex', justifyContent: 'center' }, position: 'relative' }}>
+      <Card.Section sx={{ figure: { display: "flex", justifyContent: "center" }, position: "relative" }}>
         <Image src={preppend(media?.u)} height={160} alt="product main picture" />
 
         <ActionIcon
@@ -79,7 +79,7 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({
           pos="absolute"
           top="-0.5rem"
           left="0.75rem"
-          sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
           onClick={() => removalCallback(media)}
         >
           ❌
@@ -99,9 +99,9 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({
       <hr />
 
       <form onSubmit={imageForm.onSubmit(onSubmit)}>
-        <TextInput defaultValue={media?.a} label="برچسب alt" {...imageForm.getInputProps('a')} />
-        <TextInput defaultValue={media?.t} label="برچسب title" {...imageForm.getInputProps('t')} />
-        <NumberInput defaultValue={media?.p} label="ترتیب" {...imageForm.getInputProps('p')} />
+        <TextInput defaultValue={media?.a} label="alt تصویر" {...imageForm.getInputProps("a")} />
+        <TextInput defaultValue={media?.t} label="title تصویر" {...imageForm.getInputProps("t")} />
+        <NumberInput defaultValue={media?.p} label="ترتیب" {...imageForm.getInputProps("p")} />
 
         <Button
           variant="light"
@@ -110,14 +110,14 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({
           mt="md"
           radius="md"
           type="submit"
-          disabled={!(imageForm.isDirty('a') || imageForm.isDirty('t') || imageForm.isDirty('p'))}
+          disabled={!(imageForm.isDirty("a") || imageForm.isDirty("t") || imageForm.isDirty("p"))}
         >
           بروزرسانی اطلاعات تصویر
         </Button>
       </form>
     </Card>
-  )
-}
+  );
+};
 
 // const InputGroup = styled(_InputGroup)`
 //   margin-bottom: 1rem;
@@ -128,11 +128,11 @@ export const ProductImageCard: React.FC<ProductImageCardProps> = ({
 //   }
 // `
 
-const Form = styled.form``
+const Form = styled.form``;
 
 const ProductImage = styled.img`
   width: 16rem;
   height: 16rem;
 
   object-fit: cover;
-`
+`;
