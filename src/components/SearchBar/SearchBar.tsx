@@ -2,11 +2,10 @@ import { InputGroup, Select } from "@paljs/ui";
 import { Button } from "components";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import styled from "styled-components";
 import { ZIndex } from "styles";
-import { search_in, translator } from "utils";
+import { translator } from "utils";
 
 export function SearchBar({
   entity,
@@ -96,6 +95,10 @@ export function SearchBar({
       {key && type && value && (
         <Link
           href={{
+            pathname: router.pathname
+              .split("/")
+              .filter((part) => part !== "search")
+              .join("/"),
             query: {},
           }}
         >
