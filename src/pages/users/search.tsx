@@ -25,19 +25,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       ["userFields"],
       () =>
         new Promise((resolve) =>
-          resolve([
-            "id",
-            "name",
-            "lastname",
-            "email",
-            "password",
-            "phone",
-            "points",
-            "role",
-            "status",
-            "created_at",
-            "updated_at",
-          ]),
+          resolve(["id", "name", "lastname", "email", "password", "phone", "points", "role", "status"]),
         ),
     );
 

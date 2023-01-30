@@ -36,7 +36,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         ...res,
         data: {
           ...res.data,
-          fields: ["id", "slug", "title", "content", "priority", "created_at", "updated_at"],
+          fields: ["id", "slug", "title", "content", "priority"],
         },
       })),
     );

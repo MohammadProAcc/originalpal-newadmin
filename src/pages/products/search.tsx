@@ -1,31 +1,31 @@
-import { ProductsPage } from 'components'
-import { GetServerSideProps, NextPage } from 'next'
-import { PermissionEnum } from 'types'
-import { asyncHas, search_in } from 'utils'
+import { ProductsPage } from "components";
+import { GetServerSideProps, NextPage } from "next";
+import { PermissionEnum } from "types";
+import { asyncHas, search_in } from "utils";
 
-const PageName: NextPage = () => <ProductsPage />
-export default PageName
+const PageName: NextPage = () => <ProductsPage />;
+export default PageName;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  const token = context?.req?.cookies?.[process.env.TOKEN!];
   if (token) {
     if (!(await asyncHas(PermissionEnum.browseProduct, token)))
       return {
         props: {},
         redirect: {
-          destination: '/dashboard',
+          destination: "/dashboard",
         },
-      }
-    const response = await search_in('products', context.query, context.query, context.req.cookies[process.env.TOKEN!])
+      };
+    const response = await search_in("products", context.query, context.query, context.req.cookies[process.env.TOKEN!]);
 
     if (!response) {
       return {
         props: {},
         redirect: {
-          destination: '/products',
+          destination: "/products",
           permanent: false,
         },
-      }
+      };
     }
 
     return {
@@ -34,43 +34,37 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           products: {
             data: response?.data,
             fields: [
-              'brand_id',
-              'category_id',
-              'code',
-              'collection_id',
-              'created_at',
-              'description',
-              'discount_exp',
-              'discount_price',
-              'Enable',
-              'id',
-              'media',
-              'meta_description',
-              'meta_keywords',
-              'meta_title',
-              'name',
-              'onesize',
-              'price',
-              'site_main_picture',
-              'slug',
-              'sold',
-              'state',
-              'summary',
-              'title',
-              'title_page',
-              'trend',
-              'updated_at',
+              "id",
+              "code",
+              "name",
+              "title",
+              "slug",
+              "price",
+              "discount_price",
+              "description",
+              "state",
+              "meta_keywords",
+              "meta_description",
+              "brand_id",
+              "sold",
+              "trend",
+              "category_id",
+              "summary",
+              "meta_title",
+              "title_page",
+              "onesize",
+              "Enable",
             ],
           },
         },
       },
-    }
+    };
   } else {
     return {
       props: {},
       redirect: {
-        destination: '/auth/login',
+        destination: "/auth/login",
       },
-    }
+    };
   }
-}
+};
