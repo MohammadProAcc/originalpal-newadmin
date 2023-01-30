@@ -50,7 +50,17 @@ export const ProductsPage = () => {
     setLoading(false);
   };
 
-  const columns: any[] = ["شناسه", "تصویر محصول", "قیمت", "قیمت با تخفیف", "نام", "کد", "برند", "وضعیت", "فعالیت ها"];
+  const columns: any[] = [
+    "شناسه",
+    "تصویر محصول",
+    "برند",
+    "نام",
+    "کد",
+    "قیمت",
+    "قیمت تخفیف خورده",
+    "فعال یا غیرفعال",
+    "فعالیت ها",
+  ];
 
   const data = products?.data?.data?.map((product: any) => [
     // =====>> Table Columns <<=====
@@ -60,15 +70,15 @@ export const ProductsPage = () => {
       style={{ width: "5rem", height: "3rem" }}
       src={`${process.env.SRC}/${product?.site_main_picture?.u}`}
     />,
+    product?.brand?.name ? product?.brand?.name : product?.brand ?? "-",
+    product?.name,
+    product?.code,
     <span>
       <strong>{numeralize(product?.price)}</strong> تومان
     </span>,
     <span>
       <strong>{numeralize(product?.discount_price)}</strong> تومان
     </span>,
-    product?.name,
-    product?.code,
-    product?.brand?.name ? product?.brand?.name : product?.brand ?? "-",
     product?.Enable == 1 ? <Badge color="green">فعال</Badge> : <Badge color="red">غیرفعال</Badge>,
     <Flex gap="0.25rem">
       {/* FIXME: fix the url */}

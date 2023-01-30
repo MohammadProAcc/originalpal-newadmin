@@ -405,6 +405,15 @@ export const EditProductPage: React.FC = () => {
         </Card>
 
         <Card>
+          <CardHeader>نام</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input {...register("name", { required: true })} />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
           <CardHeader>H1 صفحه</CardHeader>
           <CardBody>
             <InputGroup>
@@ -462,15 +471,6 @@ export const EditProductPage: React.FC = () => {
         <br />
 
         <Card>
-          <CardHeader>نام</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input {...register("name", { required: true })} />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
           <CardHeader>قیمت</CardHeader>
           <CardBody>
             <InputGroup>
@@ -501,7 +501,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>SEO</CardHeader>
           <CardBody>
             <Card>
-              <CardHeader>تگ (title)</CardHeader>
+              <CardHeader>تگ title</CardHeader>
               <CardBody>
                 <InputGroup>
                   <input {...register("title_page")} />
@@ -510,7 +510,7 @@ export const EditProductPage: React.FC = () => {
             </Card>
 
             <Card>
-              <CardHeader>تگ (meta title)</CardHeader>
+              <CardHeader>تگ meta title</CardHeader>
               <CardBody>
                 <InputGroup>
                   <input {...register("meta_title")} placeholder="عنوان سئو (tag title)" />
@@ -519,7 +519,7 @@ export const EditProductPage: React.FC = () => {
             </Card>
 
             <Card>
-              <CardHeader>تگ (meta_keywords)</CardHeader>
+              <CardHeader>تگ meta_keywords</CardHeader>
               <CardBody>
                 <InputGroup>
                   <textarea style={{ minWidth: "100%", height: "8rem" }} {...register("meta_keywords")} />
@@ -528,7 +528,7 @@ export const EditProductPage: React.FC = () => {
             </Card>
 
             <Card>
-              <CardHeader>تگ (meta_description)</CardHeader>
+              <CardHeader>تگ meta_description</CardHeader>
               <CardBody>
                 <InputGroup>
                   <textarea style={{ minWidth: "100%", height: "8rem" }} {...register("meta_description")} />
