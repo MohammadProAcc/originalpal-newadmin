@@ -1,4 +1,4 @@
-import { Flex } from "@mantine/core";
+import { Badge, Flex, Text } from "@mantine/core";
 import { Avatar } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import { Button, Container, Modal } from "@paljs/ui";
@@ -69,51 +69,25 @@ export const MainPages = () => {
 
   const columns = [
     "شناسه بنر",
+    "عنوان",
+    "عنوان 2",
     "تصویر",
-    "عنوان بنر",
     "پلتفرم",
-    "رنگ عنوان بنر",
-    "توضیحات",
-    "رنگ توضیحات",
     "وضعیت",
     <p style={{ margin: 0, textAlign: "center" }}>فعالیت ها</p>,
   ];
 
   const data = mainPageBanners?.data?.data?.map((banner: any) => [
     banner?.id,
+    <Text style={{ color: banner?.title_color }}>
+      <strong>{banner?.title}</strong>
+    </Text>,
+    <Text style={{ color: banner?.title_color }}>
+      <strong>{banner?.content}</strong>
+    </Text>,
     <Avatar src={`${process.env.SRC}/${banner?.media ? banner?.media[0]?.u : null}`} />,
-    banner?.title,
     translator(banner?.platform),
-    <div
-      style={{
-        backgroundColor: banner?.title_color,
-        color: "#212121",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        direction: "ltr",
-        borderRadius: "0.5rem",
-        padding: ".5rem 1rem",
-      }}
-    >
-      {banner?.title_color}
-    </div>,
-    banner?.content,
-    <div
-      style={{
-        backgroundColor: banner?.content_color,
-        color: "#212121",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        direction: "ltr",
-        borderRadius: "0.5rem",
-        padding: ".5rem 1rem",
-      }}
-    >
-      {banner?.content_color}
-    </div>,
-    banner?.active,
+    banner?.active === "0" ? <Badge color="red">غیرفعال</Badge> : <Badge color="green">فعال</Badge>,
     <Flex gap="0.25rem">
       {has(permissions, PermissionEnum.readSlide) && (
         <Link href={`/main-page/${banner?.id}`}>
@@ -171,7 +145,18 @@ export const MainPages = () => {
       {has(permissions, PermissionEnum.browseSlide) && (
         <>
           <SearchBar
-            fields={mainPageBanners.fields}
+            fields={mainPageBanners.fields
+              .filter((f: string) => !["created_at", "updated_at", "deleted_at", "start", "expiration"].includes(f))
+              .map((field: string) => {
+                if (field === "platform") {
+                  return `پلتفرم: mobile یا desktop`;
+                } else if (field === "content") {
+                  return "عنوان 2";
+                } else if (field === "content_color") {
+                  return `رنگ عنوان 2`;
+                }
+                return field;
+              })}
             entity="banners"
             params={router.query}
             callback={(form: any) =>
