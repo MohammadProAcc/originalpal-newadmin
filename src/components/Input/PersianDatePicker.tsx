@@ -15,7 +15,7 @@ interface IPersianDatePickerProps {
 }
 export const PersianDatePicker = (props: IPersianDatePickerProps) => {
   const datePickerRef = useRef<any>(null);
-  useOnClickOutside(datePickerRef, () => props.onClickOutSide());
+  useOnClickOutside(datePickerRef, () => props.onClickOutSide?.());
 
   return (
     <$ zIndex={props.zIndex}>
