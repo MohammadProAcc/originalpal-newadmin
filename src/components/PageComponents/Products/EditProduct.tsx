@@ -26,7 +26,7 @@ import { PersianDatePicker } from "components/Input";
 import Cookies from "js-cookie";
 import Layout from "Layouts";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import styled from "styled-components";
@@ -252,24 +252,6 @@ export const EditProductPage: React.FC = () => {
     }
 
     setLoading(true);
-
-    // VORTEX: why it's not working?
-    // const imagesAsyncIterator = new AsyncIterator(
-    //   imagesToUpload,
-    //   (item: FormData) => {
-    //     await axios.post(
-    //       `${process.env.API}/admin/products/${productId}/image`,
-    //       item,
-    //       {
-    //         headers: {
-    //           Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
-    //           'Content-Type': 'multipart/form-data',
-    //         },
-    //       }
-    //     )
-    //   }
-    // );
-
     let range = {
       items: imagesToUpload,
 
@@ -383,10 +365,20 @@ export const EditProductPage: React.FC = () => {
     })();
   }
 
+  function submitAll() {
+    const mainForm = document.forms[0];
+    mainForm.onsubmit = handleSubmit(onSubmit) as any;
+    mainForm.dispatchEvent(new Event("submit"));
+  }
+
   // <<<=====------ JSX ------=====>>>
   return (
     <Layout title={`ویرایش محصول ${product?.id}`}>
       <h1 style={{ marginBottom: "4rem" }}>محصول "{product?.name}"</h1>
+
+      <Divider variant="dashed" size="md" my="md" />
+
+      {/* <<<=====------ Main Form ------=====>>> */}
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Flex>
           <label>
@@ -663,6 +655,9 @@ export const EditProductPage: React.FC = () => {
         </Button>
       </Form>
 
+      <Divider variant="dotted" size="md" mb="xl" color="dark" />
+
+      {/* <<<=====------ Medias ------=====>>> */}
       <Card>
         <CardHeader>
           <h3 style={{ marginBottom: "1rem" }}>تصاویر </h3>
@@ -716,6 +711,9 @@ export const EditProductPage: React.FC = () => {
         </CardBody>
       </Card>
 
+      <Divider variant="dotted" size="md" mb="xl" color="dark" />
+
+      {/* <<<=====------ Videos ------=====>>> */}
       <Card>
         <CardHeader>
           <h3 style={{ marginBottom: "1rem" }}>ویدیو ها</h3>
@@ -745,6 +743,9 @@ export const EditProductPage: React.FC = () => {
         </CardBody>
       </Card>
 
+      <Divider variant="dotted" size="md" mb="xl" color="dark" />
+
+      {/* <<<=====------ Stocks ------=====>>> */}
       <Card>
         <CardHeader className="flex ali-center">
           انبار{" "}
@@ -789,6 +790,12 @@ export const EditProductPage: React.FC = () => {
           </Flex>
         </CardBody>
       </Card>
+
+      <Divider variant="dashed" size="md" my="md" />
+
+      <MantineButton color="cyan" variant="gradient" onClick={submitAll}>
+        ثبت نهایی
+      </MantineButton>
 
       {/* -===>>> Modals <<<===- */}
       <Modal on={!!imageToRemove} toggle={() => setImageToRemove(null)}>
