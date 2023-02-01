@@ -1,3 +1,4 @@
+import { Flex, Space } from "@mantine/core";
 import { Button, InputGroup as _InputGroup } from "@paljs/ui";
 import { QueryClient, useQuery } from "@tanstack/react-query";
 import { DiscountListCard } from "components";
@@ -60,14 +61,16 @@ export function DiscountList() {
   return (
     <FormProvider {...formMethods}>
       <form onSubmit={formMethods.handleSubmit(onSubmitDiscountForm)}>
-        <FlexBox>
+        <Flex style={{ position: "fixed", top: "6rem" }}>
           <InputGroup>
             <Button type="submit" disabled={loading}>
               ثبت تخفیفات
             </Button>
             <input placeholder="جستجو" onChange={searchCallback} />
           </InputGroup>
-        </FlexBox>
+        </Flex>
+        <br />
+        <br />
         <Ul>
           {stocks
             .filter((_stock: any) => !!_stock.product)

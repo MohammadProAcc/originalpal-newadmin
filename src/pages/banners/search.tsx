@@ -45,8 +45,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               "link",
               "priority",
               "active",
-              "created_at",
-              "updated_at",
             ],
           }),
         ),

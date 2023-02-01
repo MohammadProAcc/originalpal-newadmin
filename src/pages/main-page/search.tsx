@@ -1,32 +1,32 @@
-import { MainPages } from 'components'
-import { GetServerSideProps, NextPage } from 'next'
-import { PermissionEnum } from 'types'
-import { asyncHas, search_in } from 'utils'
+import { MainPages } from "components";
+import { GetServerSideProps, NextPage } from "next";
+import { PermissionEnum } from "types";
+import { asyncHas, search_in } from "utils";
 
-const Main: NextPage = () => <MainPages />
-export default Main
+const Main: NextPage = () => <MainPages />;
+export default Main;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  const token = context?.req?.cookies?.[process.env.TOKEN!];
   if (token) {
     if (!(await asyncHas(PermissionEnum.browseSlide, token)))
       return {
         props: {},
         redirect: {
-          destination: '/dashboard',
+          destination: "/dashboard",
         },
-      }
-    const response = await search_in('banners', context.query, context.query, context.req.cookies[process.env.TOKEN!])
-    response.data.data = response?.data?.data.filter((banner: any) => banner?.type === 'slide')
+      };
+    const response = await search_in("banners", context.query, context.query, context.req.cookies[process.env.TOKEN!]);
+    response.data.data = response?.data?.data.filter((banner: any) => banner?.type === "slide");
 
     if (!response) {
       return {
         props: {},
         redirect: {
-          destination: '/main-page',
+          destination: "/main-page",
           permanent: false,
         },
-      }
+      };
     }
 
     return {
@@ -35,30 +35,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           mainPageBanners: {
             data: response?.data,
             fields: [
-              'id',
-              'type',
-              'platform',
-              'media',
-              'content',
-              'content_color',
-              'title_color',
-              'title',
-              'link',
-              'priority',
-              'active',
-              'created_at',
-              'updated_at',
+              "id",
+              "type",
+              "platform",
+              "content",
+              "content_color",
+              "title_color",
+              "title",
+              "link",
+              "priority",
+              "active",
             ],
           },
         },
       },
-    }
+    };
   } else {
     return {
       props: {},
       redirect: {
-        destination: '/auth/login',
+        destination: "/auth/login",
       },
-    }
+    };
   }
-}
+};

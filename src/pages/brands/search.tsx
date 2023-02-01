@@ -1,29 +1,29 @@
-import { BrandsPage } from 'components'
-import { GetServerSideProps, NextPage } from 'next'
-import { PermissionEnum } from 'types'
-import { asyncHas, search_in } from 'utils'
+import { BrandsPage } from "components";
+import { GetServerSideProps, NextPage } from "next";
+import { PermissionEnum } from "types";
+import { asyncHas, search_in } from "utils";
 
-const PageName: NextPage = () => <BrandsPage />
-export default PageName
+const PageName: NextPage = () => <BrandsPage />;
+export default PageName;
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  const token = context?.req?.cookies?.[process.env.TOKEN!];
   if (token) {
     if (!(await asyncHas(PermissionEnum.browseBrand, token)))
       return {
         props: {},
         redirect: {
-          destination: '/dashboard',
+          destination: "/dashboard",
         },
-      }
-    const response = await search_in('brands', context.query, context.query, context.req.cookies[process.env.TOKEN!])
+      };
+    const response = await search_in("brands", context.query, context.query, context.req.cookies[process.env.TOKEN!]);
 
     if (!response) {
       return {
         props: {},
         redirect: {
-          destination: '/brands',
+          destination: "/brands",
         },
-      }
+      };
     }
 
     return {
@@ -31,27 +31,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         initialState: {
           brands: {
             data: response?.data,
-            fields: [
-              'id',
-              'name',
-              'created_at',
-              'updated_at',
-              'meta_title',
-              'meta_keywords',
-              'meta_description',
-              'title_page',
-              'tagtext',
-            ],
+            fields: ["id", "name", "title_page", "meta_title", "meta_keywords", "meta_description"],
           },
         },
       },
-    }
+    };
   } else {
     return {
       props: {},
       redirect: {
-        destination: '/auth/login',
+        destination: "/auth/login",
       },
-    }
+    };
   }
-}
+};

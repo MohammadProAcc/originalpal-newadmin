@@ -1,10 +1,11 @@
-import { InputGroup, Select } from '@paljs/ui';
-import { Button } from 'components';
-import React from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import styled from 'styled-components';
-import { ZIndex } from 'styles';
-import { search_in, translator } from 'utils';
+import { InputGroup, Select } from "@paljs/ui";
+import { Button } from "components";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { Controller, useForm } from "react-hook-form";
+import styled from "styled-components";
+import { ZIndex } from "styles";
+import { translator } from "utils";
 
 export function SearchBar({
   entity,
@@ -18,12 +19,22 @@ export function SearchBar({
   callback: any;
 }) {
   const searchFields = fields?.map((field) => ({ label: translator(field), value: field }));
+  const router = useRouter();
+
   const searchTypes = [
-    { label: 'موجود', value: 'contain' },
-    { label: 'برابر', value: '=' },
+    { label: "موجود", value: "contain" },
+    { label: "برابر", value: "=" },
   ];
 
-  const { register, handleSubmit, control } = useForm();
+  const { type, key, value } = router.query;
+
+  const { register, handleSubmit, control } = useForm({
+    defaultValues: {
+      type,
+      key,
+      value,
+    },
+  });
 
   // const onSubmit = async (form: any) => {
   //     const { data: result } = await search_in(entity, form, params)
@@ -42,6 +53,7 @@ export function SearchBar({
         render={({ field }) => (
           <StyledSelect
             onChange={({ value }: any) => field.onChange(value)}
+            value={searchFields.find((f) => f.value === field.value)}
             options={searchFields}
             placeholder="فیلد جستجو"
           />
@@ -58,6 +70,7 @@ export function SearchBar({
           <StyledSelect
             onChange={({ value }: any) => field.onChange(value)}
             options={searchTypes}
+            value={searchTypes.find((f) => f.value === field.value)}
             placeholder="نوع جستجو"
           />
         )}
@@ -65,19 +78,35 @@ export function SearchBar({
 
       <InputGroup>
         <input
-          {...register('value', { required: true })}
+          {...register("value", { required: true })}
           style={{
-            width: '100%',
-            height: '2.25rem',
-            margin: '0 0 0 1rem',
+            width: "100%",
+            height: "2.25rem",
+            margin: "0 0 0 1rem",
           }}
           placeholder="جستجو"
         />
       </InputGroup>
 
-      <Button style={{ display: 'flex', alignItems: 'center' }} type="submit">
+      <Button style={{ display: "flex", alignItems: "center" }} type="submit">
         جستجو
       </Button>
+
+      {key && type && value && (
+        <Link
+          href={{
+            pathname: router.pathname
+              .split("/")
+              .filter((part) => part !== "search")
+              .join("/"),
+            query: {},
+          }}
+        >
+          <Button status="Danger" style={{ display: "flex", alignItems: "center", marginRight: "1rem" }} type="submit">
+            پاک کردن جستجو
+          </Button>
+        </Link>
+      )}
     </Component>
   );
 }

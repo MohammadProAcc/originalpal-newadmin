@@ -26,18 +26,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       () =>
         new Promise((resolve) =>
           resolve({
-            fields: [
-              "id",
-              "name",
-              "type",
-              "title",
-              "meta_title",
-              "meta_description",
-              "description",
-              "priority",
-              "updated_at",
-              "created_at",
-            ],
+            fields: ["id", "name", "type", "title", "meta_title", "meta_description", "description", "priority"],
           }),
         ),
     );

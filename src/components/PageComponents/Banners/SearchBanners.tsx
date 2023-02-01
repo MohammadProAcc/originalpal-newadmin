@@ -8,7 +8,7 @@ import Cookies from "js-cookie";
 import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { PermissionEnum } from "types";
@@ -56,6 +56,7 @@ export const SearchBanners = () => {
   const [itemsToRemove, setItemsToRemove] = useState<any>(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
 
@@ -85,6 +86,7 @@ export const SearchBanners = () => {
       },
       async () => {
         setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف  بنر با  شناسه ${id} موفقیت آمیز نبود`),
@@ -210,7 +212,14 @@ export const SearchBanners = () => {
             }
           />
 
-          {bannersQuery.data && <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />}
+          {bannersQuery.data && (
+            <BasicTable
+              getSelections={setTableSelections}
+              columns={columns}
+              rows={data}
+              clearSelectionTriggerRef={clearSelectionsRef}
+            />
+          )}
 
           <PaginationBar
             totalPages={bannersQuery?.data?.data?.last_page}

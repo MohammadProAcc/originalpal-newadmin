@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import { useStore, deleteMenu, pluralRemove, editMenu, translator, has, useUserStore } from "utils";
-import Layout from "Layouts";
+import { Flex } from "@mantine/core";
 import { Button, Container, InputGroup, Modal, Popover } from "@paljs/ui";
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from "components";
+import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { toast } from "react-toastify";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import styled from "styled-components";
 import { PermissionEnum } from "types";
-import { Flex } from "@mantine/core";
+import { deleteMenu, editMenu, has, pluralRemove, translator, useStore, useUserStore } from "utils";
 
 export const MenuPage = () => {
   const router = useRouter();
@@ -41,6 +41,7 @@ export const MenuPage = () => {
   };
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const [itemsToRemove, setItemsToRemove] = useState<any>(null);
   const togglePluralRemoveModal = () => setItemsToRemove(null);
@@ -56,6 +57,7 @@ export const MenuPage = () => {
       },
       async () => {
         setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف  سقارش با  شناسه ${id} موفقیت آمیز نبود`),
@@ -128,7 +130,12 @@ export const MenuPage = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable
+            getSelections={setTableSelections}
+            columns={columns}
+            rows={data}
+            clearSelectionTriggerRef={clearSelectionsRef}
+          />
           <PaginationBar
             totalPages={menu?.data?.last_page}
             activePage={router.query.page ? Number(router.query.page) : 1}

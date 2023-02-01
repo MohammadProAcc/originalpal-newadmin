@@ -1,22 +1,22 @@
-import { OrdersPage } from 'components'
-import { GetServerSideProps, NextPage } from 'next'
-import { PermissionEnum } from 'types'
-import { asyncHas, getOrdersList, search_in } from 'utils'
+import { OrdersPage } from "components";
+import { GetServerSideProps, NextPage } from "next";
+import { PermissionEnum } from "types";
+import { asyncHas, getOrdersList, search_in } from "utils";
 
-const SearchOrders: NextPage = () => <OrdersPage />
-export default SearchOrders
+const SearchOrders: NextPage = () => <OrdersPage />;
+export default SearchOrders;
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const token = context?.req?.cookies?.[process.env.TOKEN!]
+  const token = context?.req?.cookies?.[process.env.TOKEN!];
   if (token) {
     if (!(await asyncHas(PermissionEnum.browseUser, token)))
       return {
         props: {},
         redirect: {
-          destination: '/dashboard',
+          destination: "/dashboard",
         },
-      }
+      };
     const response = await search_in(
-      'orders',
+      "orders",
       {
         key: context?.query?.key,
         type: context?.query?.type,
@@ -24,16 +24,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
       context.query,
       context.req.cookies[process.env.TOKEN!],
-    )
+    );
 
     if (!response) {
       return {
         props: {},
         redirect: {
-          destination: '/orders',
+          destination: "/orders",
           permanent: false,
         },
-      }
+      };
     }
 
     return {
@@ -42,36 +42,33 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           orders: {
             data: response?.data,
             fields: [
-              'id',
-              'number',
-              'status',
-              'user_id',
-              'payment_id',
-              'address_id',
-              'notes',
-              'price',
-              'post_fee',
-              'payable',
-              'newprice',
-              'Events',
-              'created_at',
-              'updated_at',
-              'deleted_at',
-              'delivery',
-              'admin_check',
-              'coupon_id',
-              'typesell',
+              "id",
+              "number",
+              "status",
+              "user_id",
+              "payment_id",
+              "address_id",
+              "notes",
+              "price",
+              "post_fee",
+              "payable",
+              "newprice",
+              "Events",
+              "delivery",
+              "admin_check",
+              "coupon_id",
+              "typesell",
             ],
           },
         },
       },
-    }
+    };
   } else {
     return {
       props: {},
       redirect: {
-        destination: '/auth/login',
+        destination: "/auth/login",
       },
-    }
+    };
   }
-}
+};

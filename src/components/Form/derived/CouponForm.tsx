@@ -40,6 +40,8 @@ export function CouponForm(props: ICouponFormProps) {
 
   const onSubmit = async (form: any) => {
     setLoading(true);
+    form.type = form.type.value;
+
     let response;
     if (props.defaultValues) {
       response = await editCoupon(props.defaultValues?.id, form);
@@ -94,7 +96,7 @@ export function CouponForm(props: ICouponFormProps) {
       <br />
 
       <Card>
-        <CardHeader>مقدار تخفیف</CardHeader>
+        <CardHeader>مقدار تخفیف (تومان یا درصد - با توجه به نوع)</CardHeader>
         <CardBody>
           <InputGroup fullWidth>
             <input {...register("amount", { required: true })} type="number" placeholder="مقدار" />

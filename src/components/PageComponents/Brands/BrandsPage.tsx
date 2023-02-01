@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { has, pluralRemove, useStore, useUserStore } from "utils";
 import Layout from "Layouts";
@@ -27,6 +27,7 @@ export const BrandsPage = () => {
   const [itemsToRemove, setItemsToRemove] = useState<any>(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
   const togglePluralRemoveModal = () => setItemsToRemove(null);
@@ -56,6 +57,7 @@ export const BrandsPage = () => {
       },
       async () => {
         await setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف  برند با  شناسه ${id} موفقیت آمیز نبود`),
@@ -136,7 +138,12 @@ export const BrandsPage = () => {
         }
       />
 
-      <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+      <BasicTable
+        getSelections={setTableSelections}
+        columns={columns}
+        rows={data}
+        clearSelectionTriggerRef={clearSelectionsRef}
+      />
       <PaginationBar
         totalPages={brands?.data?.last_page}
         activePage={router.query.page ? Number(router.query.page) : 1}

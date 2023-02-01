@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
 import { deleteAddress, has, pluralRemove, translator, useStore, useUserStore } from "utils";
 import Layout from "Layouts";
@@ -27,6 +27,7 @@ export const AddressesPage = () => {
   const togglePluralRemoveModal = () => setItemsToRemove(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
 
@@ -54,6 +55,7 @@ export const AddressesPage = () => {
       },
       async () => {
         setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       // TODO: add a proper error callback
@@ -123,7 +125,12 @@ export const AddressesPage = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable
+            getSelections={setTableSelections}
+            columns={columns}
+            rows={data}
+            clearSelectionTriggerRef={clearSelectionsRef}
+          />
 
           <PaginationBar
             totalPages={addresses?.data?.last_page}

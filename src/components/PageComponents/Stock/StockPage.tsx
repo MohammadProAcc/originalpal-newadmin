@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { useStore, deleteStock, numeralize, useUserStore, has, getStocksList } from "utils";
 import Layout from "Layouts";
@@ -24,6 +24,7 @@ export const StockPage = () => {
   const [itemsToRemove, setItemsToRemove] = useState<any>(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
   const togglePluralRemoveModal = () => setItemsToRemove(null);
@@ -55,6 +56,7 @@ export const StockPage = () => {
       });
 
       await setTableSelections([]);
+      clearSelectionsRef.current?.();
       await setItemsToRemove(null);
     }
 
@@ -136,7 +138,12 @@ export const StockPage = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable
+            getSelections={setTableSelections}
+            columns={columns}
+            rows={data}
+            clearSelectionTriggerRef={clearSelectionsRef}
+          />
 
           <PaginationBar
             totalPages={stocksQuery?.data?.data?.last_page}

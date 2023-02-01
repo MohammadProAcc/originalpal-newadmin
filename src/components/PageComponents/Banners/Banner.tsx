@@ -1,36 +1,38 @@
-import Layout from 'Layouts'
-import { removeItem, translator, useStore, useUserStore, has } from 'utils'
-import { Alert, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
-import React, { useState } from 'react'
-import styled from 'styled-components'
-import { Button, Dot, FlexContainer, HeaderButton, ModalBox } from 'components'
-import { deleteBanner } from 'utils/api/REST/actions/banners'
-import router from 'next/router'
-import { PermissionEnum } from 'types'
-import { DatesCard } from 'components/Card/DatesCard'
+import Layout from "Layouts";
+import { removeItem, translator, useStore, useUserStore, has } from "utils";
+import { Alert, Card, CardBody, CardHeader, Modal } from "@paljs/ui";
+import React, { useState } from "react";
+import styled from "styled-components";
+import { Button, Dot, FlexContainer, HeaderButton, ModalBox } from "components";
+import Image from "next/image";
+import { deleteBanner } from "utils/api/REST/actions/banners";
+import router from "next/router";
+import { PermissionEnum } from "types";
+import { DatesCard } from "components/Card/DatesCard";
+import { Text } from "@mantine/core";
 
 export const Banner: React.FC = () => {
   const { banner } = useStore((state: any) => ({
     banner: state?.banner,
-  }))
-  const permissions = useUserStore().getPermissions()
+  }));
+  const permissions = useUserStore().getPermissions();
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
-  const closeRemovalModal = () => setItemToRemove(false)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const closeRemovalModal = () => setItemToRemove(false);
 
   const remove = async (removeId: any) => {
-    await removeItem('banners', removeId, deleteBanner, () => router.push('/banners'), [
+    await removeItem("banners", removeId, deleteBanner, () => router.push("/banners"), [
       `بنر ${removeId} با موفقیت حذف شد`,
-      'حذف بنر موفقیت آمیز نبود',
-    ])
-  }
+      "حذف بنر موفقیت آمیز نبود",
+    ]);
+  };
 
   return (
     <Layout title="بنر صفحه اصلی">
-      <h1 style={{ marginBottom: '3rem' }}>
-        مشاهده بنر شماره {banner?.id ?? '?'}
+      <h1 style={{ marginBottom: "3rem" }}>
+        مشاهده بنر شماره {banner?.id ?? "?"}
         {has(permissions, PermissionEnum.editStand) && (
           <HeaderButton status="Info" href={`/banners/edit/${banner?.id}`}>
             ویرایش
@@ -46,7 +48,7 @@ export const Banner: React.FC = () => {
       {/* ....:::::: Modals :::::.... */}
       <Modal on={itemToRemove} toggle={closeRemovalModal}>
         <ModalBox>
-          <div style={{ marginBottom: '1rem' }}>
+          <div style={{ marginBottom: "1rem" }}>
             آیا از حذف بنر
             <span className="mx-1">{itemToRemove?.id}</span>
             اطمینان دارید؟
@@ -70,7 +72,7 @@ export const Banner: React.FC = () => {
         <CardBody>
           {
             <span>
-              <Dot color={banner?.title_color} /> {banner?.title_color}{' '}
+              <Dot color={banner?.title_color} /> {banner?.title_color}{" "}
             </span>
           }
         </CardBody>
@@ -86,7 +88,7 @@ export const Banner: React.FC = () => {
         <CardBody>
           {
             <span>
-              <Dot color={banner?.content_color} /> {banner?.content_color}{' '}
+              <Dot color={banner?.content_color} /> {banner?.content_color}{" "}
             </span>
           }
         </CardBody>
@@ -117,25 +119,33 @@ export const Banner: React.FC = () => {
       <Card>
         <CardHeader>تصویر بنر</CardHeader>
         <CardBody>
+<<<<<<< HEAD
           <img src={`${process?.env.SRC}/${banner?.media?.u ?? ''}`} />
+=======
+          <img src={`${process?.env.SRC}/${banner?.media?.u ?? ""}`} />
+>>>>>>> 341106e9013319bfca18c7b5beb6358c95b699b9
         </CardBody>
       </Card>
 
       <Card>
         <CardHeader>تگ های تصویر</CardHeader>
-        <CardBody style={{ display: 'flex', flexDirection: 'column' }}>
-          <span>تگ alt : {banner?.media?.a}</span>
-          <span>تگ title : {banner?.media?.t}</span>
+        <CardBody style={{ display: "flex", flexDirection: "column" }}>
+          <span>
+            تگ alt : <Text>{banner?.media?.a}</Text>
+          </span>
+          <span>
+            تگ title : <Text>{banner?.media?.t}</Text>
+          </span>
         </CardBody>
       </Card>
 
       <DatesCard createdAt={banner?.created_at} updatedAt={banner?.updated_at} />
     </Layout>
-  )
-}
+  );
+};
 
 const Form = styled.form`
   width: 100%;
   display: flex;
   flex-direction: column;
-`
+`;

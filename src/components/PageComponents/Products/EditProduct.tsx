@@ -1,4 +1,14 @@
-import { Badge, Button as MantineButton, Collapse, Divider, Flex, Group, MultiSelect, Text } from "@mantine/core";
+import {
+  Badge,
+  Button as MantineButton,
+  Collapse,
+  Divider,
+  Flex,
+  Group,
+  MultiSelect,
+  Space,
+  Text,
+} from "@mantine/core";
 import { Dropzone, IMAGE_MIME_TYPE, MIME_TYPES } from "@mantine/dropzone";
 import {
   Alert,
@@ -16,7 +26,7 @@ import { PersianDatePicker } from "components/Input";
 import Cookies from "js-cookie";
 import Layout from "Layouts";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import styled from "styled-components";
@@ -91,7 +101,7 @@ export const EditProductPage: React.FC = () => {
   const { register, handleSubmit, control, watch } = useForm({
     defaultValues: {
       slug: product?.slug,
-      Enable: product?.Enable,
+      Enable: product?.Enable == 0 ? false : true,
       brand_id: product?.brand_id,
       code: product?.code,
       description: product?.description,
@@ -136,6 +146,7 @@ export const EditProductPage: React.FC = () => {
 
     delete form?.url;
     delete form?.color;
+    form.Enable = form.Enable ? "1" : "0";
 
     const response = await editProduct(product?.id, form);
 
@@ -241,24 +252,6 @@ export const EditProductPage: React.FC = () => {
     }
 
     setLoading(true);
-
-    // VORTEX: why it's not working?
-    // const imagesAsyncIterator = new AsyncIterator(
-    //   imagesToUpload,
-    //   (item: FormData) => {
-    //     await axios.post(
-    //       `${process.env.API}/admin/products/${productId}/image`,
-    //       item,
-    //       {
-    //         headers: {
-    //           Authorization: `Bearer ${Cookies.get(process.env.TOKEN!)}`,
-    //           'Content-Type': 'multipart/form-data',
-    //         },
-    //       }
-    //     )
-    //   }
-    // );
-
     let range = {
       items: imagesToUpload,
 
@@ -372,16 +365,42 @@ export const EditProductPage: React.FC = () => {
     })();
   }
 
+  function submitAll() {
+    const mainForm = document.forms[0];
+    mainForm.onsubmit = handleSubmit(onSubmit) as any;
+    mainForm.dispatchEvent(new Event("submit"));
+  }
+
   // <<<=====------ JSX ------=====>>>
   return (
     <Layout title={`ویرایش محصول ${product?.id}`}>
       <h1 style={{ marginBottom: "4rem" }}>محصول "{product?.name}"</h1>
+
+      <Divider variant="dashed" size="md" my="md" />
+
+      {/* <<<=====------ Main Form ------=====>>> */}
       <Form onSubmit={handleSubmit(onSubmit)}>
+        <Flex>
+          <label>
+            <input type="checkbox" {...register("Enable")} />
+            فعال
+          </label>
+        </Flex>
+
         <Card>
           <CardHeader>َUrl منحصر به فرد</CardHeader>
           <CardBody>
             <InputGroup>
               <input value={product?.url} />
+            </InputGroup>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>نام</CardHeader>
+          <CardBody>
+            <InputGroup>
+              <input {...register("name", { required: true })} />
             </InputGroup>
           </CardBody>
         </Card>
@@ -404,24 +423,24 @@ export const EditProductPage: React.FC = () => {
           </CardBody>
         </Card>
 
-        <Card>
-          <CardHeader>برند : {product?.brand?.name ?? "-"}</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <Controller
-                name="brand_id"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    options={brandsOptions}
-                    onChange={(e: any) => field.onChange(e?.value)}
-                    placeholder="برای تغییر دادن برند ضربه بزنید"
-                  />
-                )}
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
+        <Space mt="sm" />
+        <Text>
+          <strong>برند</strong>
+        </Text>
+        <Space mt="xs" />
+        <Controller
+          name="brand_id"
+          control={control}
+          render={({ field }) => (
+            <Select
+              options={brandsOptions}
+              onChange={(e: any) => field.onChange(e?.value)}
+              value={brandsOptions.find((b: any) => b.value == field.value)}
+              placeholder="برای تغییر دادن برند ضربه بزنید"
+            />
+          )}
+        />
+        <Space mt="sm" />
 
         <Flex direction="column">
           <Text mb="sm">
@@ -444,15 +463,6 @@ export const EditProductPage: React.FC = () => {
         <br />
 
         <Card>
-          <CardHeader>نام</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <input {...register("name", { required: true })} />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
           <CardHeader>قیمت</CardHeader>
           <CardBody>
             <InputGroup>
@@ -471,21 +481,6 @@ export const EditProductPage: React.FC = () => {
         </Card>
 
         <Card>
-          <CardHeader>فعال یا غیرفعال کردن محصول : {product?.Enable ? "فعال" : "غیر فعال"}</CardHeader>
-          <CardBody>
-            <InputGroup>
-              <Controller
-                control={control}
-                name="Enable"
-                render={({ field }) => (
-                  <Select options={activationOptions} onChange={(e: any) => field?.onChange(e?.value)} />
-                )}
-              />
-            </InputGroup>
-          </CardBody>
-        </Card>
-
-        <Card>
           <CardHeader>وضعیت</CardHeader>
           <CardBody>
             <InputGroup>
@@ -498,7 +493,7 @@ export const EditProductPage: React.FC = () => {
           <CardHeader>SEO</CardHeader>
           <CardBody>
             <Card>
-              <CardHeader>عنوان صفحه (tag title)</CardHeader>
+              <CardHeader>تگ title</CardHeader>
               <CardBody>
                 <InputGroup>
                   <input {...register("title_page")} />
@@ -507,7 +502,7 @@ export const EditProductPage: React.FC = () => {
             </Card>
 
             <Card>
-              <CardHeader>عنوان سئو (meta title)</CardHeader>
+              <CardHeader>تگ meta title</CardHeader>
               <CardBody>
                 <InputGroup>
                   <input {...register("meta_title")} placeholder="عنوان سئو (tag title)" />
@@ -516,7 +511,7 @@ export const EditProductPage: React.FC = () => {
             </Card>
 
             <Card>
-              <CardHeader>مترادف ها (meta_keywords)</CardHeader>
+              <CardHeader>تگ meta_keywords</CardHeader>
               <CardBody>
                 <InputGroup>
                   <textarea style={{ minWidth: "100%", height: "8rem" }} {...register("meta_keywords")} />
@@ -525,7 +520,7 @@ export const EditProductPage: React.FC = () => {
             </Card>
 
             <Card>
-              <CardHeader>توضیح متا (meta_description)</CardHeader>
+              <CardHeader>تگ meta_description</CardHeader>
               <CardBody>
                 <InputGroup>
                   <textarea style={{ minWidth: "100%", height: "8rem" }} {...register("meta_description")} />
@@ -660,6 +655,9 @@ export const EditProductPage: React.FC = () => {
         </Button>
       </Form>
 
+      <Divider variant="dotted" size="md" mb="xl" color="dark" />
+
+      {/* <<<=====------ Medias ------=====>>> */}
       <Card>
         <CardHeader>
           <h3 style={{ marginBottom: "1rem" }}>تصاویر </h3>
@@ -713,6 +711,9 @@ export const EditProductPage: React.FC = () => {
         </CardBody>
       </Card>
 
+      <Divider variant="dotted" size="md" mb="xl" color="dark" />
+
+      {/* <<<=====------ Videos ------=====>>> */}
       <Card>
         <CardHeader>
           <h3 style={{ marginBottom: "1rem" }}>ویدیو ها</h3>
@@ -742,6 +743,9 @@ export const EditProductPage: React.FC = () => {
         </CardBody>
       </Card>
 
+      <Divider variant="dotted" size="md" mb="xl" color="dark" />
+
+      {/* <<<=====------ Stocks ------=====>>> */}
       <Card>
         <CardHeader className="flex ali-center">
           انبار{" "}
@@ -786,6 +790,12 @@ export const EditProductPage: React.FC = () => {
           </Flex>
         </CardBody>
       </Card>
+
+      <Divider variant="dashed" size="md" my="md" />
+
+      <MantineButton color="cyan" variant="gradient" onClick={submitAll}>
+        ثبت نهایی
+      </MantineButton>
 
       {/* -===>>> Modals <<<===- */}
       <Modal on={!!imageToRemove} toggle={() => setImageToRemove(null)}>
@@ -836,7 +846,7 @@ export const EditProductPage: React.FC = () => {
       </Modal>
 
       <Modal on={showAddStockModal} toggle={() => setShowAddStockModal(false)}>
-        <ModalBox style={{ width: "50vw", height: "90vh" }}>
+        <ModalBox style={{ width: "50vw", height: "90vh", overflowY: "scroll" }}>
           <StockForm callback={afterStockCreation} />
         </ModalBox>
       </Modal>

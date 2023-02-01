@@ -7,39 +7,47 @@ import {
   TableContainer,
   TableHead,
   TableRow as _TableRow,
-} from '@material-ui/core'
-import styledEngine from '@mui/styled-engine-sc'
-import { Popover } from '@paljs/ui'
-import { OrderDetails } from 'components/PageComponents/Orders/components/OrderDetails'
-import { useNonInitialEffect } from 'hooks'
-import { useState } from 'react'
-import { css } from 'styled-components'
+} from "@material-ui/core";
+import styledEngine from "@mui/styled-engine-sc";
+import { Popover } from "@paljs/ui";
+import { OrderDetails } from "components/PageComponents/Orders/components/OrderDetails";
+import { useNonInitialEffect } from "hooks";
+import { useEffect, useState } from "react";
+import { css } from "styled-components";
 
 function createData(number, item, qty, price) {
-  return { number, item, qty, price }
+  return { number, item, qty, price };
 }
 
-export function BasicTable({ columns, rows, getSelections, isOrder = false }) {
-  const [selectedIds, setSelectedIds] = useState([])
+export function BasicTable({ columns, rows, getSelections, clearSelectionTriggerRef, isOrder = false }) {
+  const [selectedIds, setSelectedIds] = useState([]);
   const handleSelection = (id) => {
     selectedIds?.length > 0
       ? selectedIds?.includes(id)
         ? setSelectedIds(selectedIds?.filter((item) => item !== id))
         : setSelectedIds([...selectedIds, id])
-      : setSelectedIds([id])
+      : setSelectedIds([id]);
+  };
+
+  function clearSelections() {
+    setSelectedIds([]);
   }
 
   useNonInitialEffect(() => {
-    getSelections(selectedIds)
-  }, [selectedIds])
+    getSelections(selectedIds);
+  }, [selectedIds]);
+
+  useEffect(() => {
+    clearSelectionTriggerRef.current = clearSelections;
+  }, [])
 
   return (
     <TableContainer component={Paper}>
       <Table aria-label="simple table">
-        <TableHead style={{ backgroundColor: '#bdbdbd' }}>
+        <TableHead style={{ backgroundColor: "#bdbdbd" }}>
           <TableRow>
             {columns?.map((column) => (
-              <TableCell style={{ fontSize: '1.125rem' }} align="right">
+              <TableCell style={{ fontSize: "1.125rem" }} align="right">
                 {column}
               </TableCell>
             ))}
@@ -53,7 +61,7 @@ export function BasicTable({ columns, rows, getSelections, isOrder = false }) {
                   {row.map((item, index) =>
                     index === 0 ? (
                       <TableCell primary align="right" component="th" scope="row">
-                        <label style={{ display: 'flex', alignItems: 'center', cursor: "pointer" }}>
+                        <label style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
                           <Checkbox
                             checked={selectedIds?.includes(row[0])}
                             value={row[0]}
@@ -79,7 +87,7 @@ export function BasicTable({ columns, rows, getSelections, isOrder = false }) {
         </TableBody>
       </Table>
     </TableContainer>
-  )
+  );
 }
 
 const TableRow = styledEngine(_TableRow)`
@@ -87,12 +95,12 @@ const TableRow = styledEngine(_TableRow)`
     
     transition: 150ms;
 
-    background-color ${(p) => p.selected && 'rgba(0,149,255,0.25)'};
+    background-color ${(p) => p.selected && "rgba(0,149,255,0.25)"};
 
     &:hover {
         background-color: rgba(0,149,255,0.2);
     }
-`
+`;
 
 const TableCell = styledEngine(_TableCell)`
     transition: 50ms;
@@ -104,4 +112,4 @@ const TableCell = styledEngine(_TableCell)`
           background-color: rgba(0, 149, 255, 0.3);
         }
       `}   
-`
+`;

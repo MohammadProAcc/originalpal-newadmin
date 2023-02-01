@@ -5,20 +5,11 @@ import Cookies from "js-cookie";
 import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { PermissionEnum } from "types";
-import {
-  deleteComment,
-  editComment,
-  getCommentsList,
-  has,
-  pluralRemove,
-  search_in,
-  toLocalDate,
-  useUserStore,
-} from "utils";
+import { deleteComment, editComment, has, pluralRemove, search_in, toLocalDate, useUserStore } from "utils";
 
 export const SearchCommentsPage = () => {
   const router = useRouter();
@@ -57,6 +48,7 @@ export const SearchCommentsPage = () => {
   const [itemToRemove, setItemToRemove] = useState<any>(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const [commentToReply, setShowCommentToReply] = useState<any>(null);
 
@@ -106,6 +98,7 @@ export const SearchCommentsPage = () => {
       },
       async () => {
         setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف  نظر با  شناسه ${id} موفقیت آمیز نبود`),
@@ -214,7 +207,14 @@ export const SearchCommentsPage = () => {
             }
           />
 
-          {comments && <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />}
+          {comments && (
+            <BasicTable
+              getSelections={setTableSelections}
+              columns={columns}
+              rows={data}
+              clearSelectionTriggerRef={clearSelectionsRef}
+            />
+          )}
 
           <PaginationBar
             totalPages={comments?.data?.last_page}

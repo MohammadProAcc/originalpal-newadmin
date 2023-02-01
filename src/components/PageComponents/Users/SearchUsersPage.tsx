@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { PermissionEnum } from "types";
@@ -46,6 +46,7 @@ export const SearchUsersPage = () => {
   const [itemToRemove, setItemToRemove] = useState<any>(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
 
@@ -80,6 +81,7 @@ export const SearchUsersPage = () => {
     );
     setLoading(false);
     setTableSelections([]);
+    clearSelectionsRef.current?.();
     setItemsToRemove(null);
   };
 
@@ -163,7 +165,14 @@ export const SearchUsersPage = () => {
             }
           />
 
-          {usersQuery.data && <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />}
+          {usersQuery.data && (
+            <BasicTable
+              getSelections={setTableSelections}
+              columns={columns}
+              rows={data}
+              clearSelectionTriggerRef={clearSelectionsRef}
+            />
+          )}
 
           <PaginationBar
             totalPages={usersQuery?.data?.data?.last_page}

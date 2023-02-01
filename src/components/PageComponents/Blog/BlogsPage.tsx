@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { useStore, deleteBlog, pluralRemove, useUserStore, has, getBlogList } from "utils";
 import Layout from "Layouts";
@@ -42,6 +42,7 @@ export const BlogsPage = () => {
   };
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const [itemsToRemove, setItemsToRemove] = useState<any>(null);
   const togglePluralRemoveModal = () => setItemsToRemove(null);
@@ -57,6 +58,7 @@ export const BlogsPage = () => {
       },
       async () => {
         setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف  وبلاگ با  شناسه ${id} موفقیت آمیز نبود`),
@@ -139,7 +141,12 @@ export const BlogsPage = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable
+            getSelections={setTableSelections}
+            columns={columns}
+            rows={data}
+            clearSelectionTriggerRef={clearSelectionsRef}
+          />
           <PaginationBar
             totalPages={blogsQuery?.data?.data?.last_page}
             activePage={router.query.page ? Number(router.query.page) : 1}

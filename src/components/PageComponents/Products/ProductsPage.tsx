@@ -1,18 +1,18 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { useStore, deleteProduct, numeralize, pluralRemove, useUserStore, has } from "utils";
-import Layout from "Layouts";
+import { Badge, Flex } from "@mantine/core";
+import { Avatar } from "@material-ui/core";
+import { Add } from "@material-ui/icons";
 import { Button, Container, Modal } from "@paljs/ui";
+import axios from "axios";
 import { BasicTable, FlexContainer, HeaderButton, PaginationBar, SearchBar } from "components";
+import Cookies from "js-cookie";
+import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Add } from "@material-ui/icons";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { Avatar } from "@material-ui/core";
-import axios from "axios";
-import Cookies from "js-cookie";
+import styled from "styled-components";
 import { PermissionEnum } from "types";
-import { Flex } from "@mantine/core";
+import { deleteProduct, has, numeralize, pluralRemove, useStore, useUserStore } from "utils";
 
 export const ProductsPage = () => {
   const router = useRouter();
@@ -28,6 +28,7 @@ export const ProductsPage = () => {
   const [itemToRemove, setItemToRemove] = useState<any>(null);
 
   const [tableSelections, setTableSelections] = useState<number[] | []>([]);
+  const clearSelectionsRef = useRef<any>();
 
   const toggleModal = () => setItemToRemove(null);
 
@@ -49,7 +50,17 @@ export const ProductsPage = () => {
     setLoading(false);
   };
 
-  const columns: any[] = ["شناسه", "تصویر محصول", "قیمت", "قیمت با تخفیف", "نام", "کد", "برند", "وضعیت", "فعالیت ها"];
+  const columns: any[] = [
+    "شناسه",
+    "تصویر محصول",
+    "برند",
+    "نام",
+    "کد",
+    "قیمت",
+    "قیمت تخفیف خورده",
+    "فعال یا غیرفعال",
+    "فعالیت ها",
+  ];
 
   const data = products?.data?.data?.map((product: any) => [
     // =====>> Table Columns <<=====
@@ -59,16 +70,16 @@ export const ProductsPage = () => {
       style={{ width: "5rem", height: "3rem" }}
       src={`${process.env.SRC}/${product?.site_main_picture?.u}`}
     />,
+    product?.brand?.name ? product?.brand?.name : product?.brand ?? "-",
+    product?.name,
+    product?.code,
     <span>
       <strong>{numeralize(product?.price)}</strong> تومان
     </span>,
     <span>
       <strong>{numeralize(product?.discount_price)}</strong> تومان
     </span>,
-    product?.name,
-    product?.code,
-    product?.brand?.name ? product?.brand?.name : product?.brand ?? "-",
-    product?.Enable,
+    product?.Enable == 1 ? <Badge color="green">فعال</Badge> : <Badge color="red">غیرفعال</Badge>,
     <Flex gap="0.25rem">
       {/* FIXME: fix the url */}
       <a target="_blank" href={`${process.env.WEBSITE_DOMAIN}/products/${product?.id}`}>
@@ -107,6 +118,7 @@ export const ProductsPage = () => {
       },
       async () => {
         setTableSelections([]);
+        clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
       (id: number) => toast.error(`حذف محصول با شناسه ${id} موفقیت آمیز نبود`),
@@ -156,7 +168,12 @@ export const ProductsPage = () => {
             }
           />
 
-          <BasicTable getSelections={setTableSelections} columns={columns} rows={data} />
+          <BasicTable
+            getSelections={setTableSelections}
+            columns={columns}
+            rows={data}
+            clearSelectionTriggerRef={clearSelectionsRef}
+          />
 
           <PaginationBar
             totalPages={products?.data?.last_page}
