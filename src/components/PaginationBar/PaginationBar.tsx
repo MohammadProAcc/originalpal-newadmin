@@ -1,114 +1,55 @@
-import styled from 'styled-components'
-import Link from 'next/link'
-import { NextRouter } from 'next/router'
+import styled from "styled-components";
+import Link from "next/link";
+import { NextRouter, useRouter } from "next/router";
+import { Divider, Pagination } from "@mantine/core";
 
 interface IProps {
-  totalPages: number
-  activePage: number
-  router: NextRouter
+  totalPages: number;
+  activePage: number;
+  router: NextRouter;
 }
 export const PaginationBar: React.FC<IProps> = ({ totalPages, activePage, router }) => {
-  const pagesToRender = []
+  const pagesToRender = [];
   if (totalPages > 2) {
     for (let i = 1; i < totalPages - 1; i++) {
       if (activePage - 4 < i && activePage + 4 > i) {
-        pagesToRender.push(i + 1)
+        pagesToRender.push(i + 1);
       }
     }
   }
 
+  function onChange(i: number) {
+    router.push({
+      query: {
+        ...router.query,
+        page: i,
+      },
+    });
+  }
+
   return (
     <Component>
-      <nav aria-label="Page navigation example">
-        <ul className="pagination">
-          <li className={`page-item ${activePage === 1 && 'active'}`}>
-            <Link
-              href={{
-                query: {
-                  ...router.query,
-                  page: 1,
-                },
-              }}
-            >
-              <a className="page-link" href="#">
-                1
-              </a>
-            </Link>
-          </li>
-          {activePage !== 1 && (
-            <li className="page-item">
-              <Link
-                href={{
-                  query: {
-                    ...router.query,
-                    page: activePage - 1,
-                  },
-                }}
-              >
-                <a className="page-link" href="#" aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                  <span className="sr-only">Previous</span>
-                </a>
-              </Link>
-            </li>
-          )}
-          {pagesToRender?.map((page: number) => (
-            <li className={`page-item ${activePage === page && 'active'}`}>
-              <Link
-                href={{
-                  query: {
-                    ...router.query,
-                    page,
-                  },
-                }}
-              >
-                <a className="page-link" href="#">
-                  {page}
-                </a>
-              </Link>
-            </li>
-          ))}
-          {activePage !== totalPages && (
-            <li className="page-item">
-              <Link
-                href={{
-                  query: {
-                    ...router.query,
-                    page: activePage === totalPages ? totalPages : activePage + 1,
-                  },
-                }}
-              >
-                <a className="page-link" href="#" aria-label="Next">
-                  <span aria-hidden="true">&raquo; </span>
-                  <span className="sr-only">Next</span>
-                </a>
-              </Link>
-            </li>
-          )}
-          {totalPages > 1 && (
-            <li className={`page-item ${activePage === totalPages && 'active'}`}>
-              <Link
-                href={{
-                  query: {
-                    ...router.query,
-                    page: totalPages,
-                  },
-                }}
-              >
-                <a className="page-link" href="#">
-                  {totalPages}
-                </a>
-              </Link>
-            </li>
-          )}
-        </ul>
-      </nav>
+      <Divider my="md" />
+      <Pagination
+        page={activePage}
+        onChange={onChange}
+        total={10}
+        color="teal"
+        radius="xl"
+        styles={(theme) => ({
+          item: {
+            "&[data-active]": {
+              backgroundImage: theme.fn.gradient({ from: "blue", to: "cyan" }),
+            },
+          },
+        })}
+      />
     </Component>
-  )
-}
+  );
+};
 
 const Component = styled.div`
   margin: 1rem 0;
   position: relative;
   z-index: 0;
-`
+`;

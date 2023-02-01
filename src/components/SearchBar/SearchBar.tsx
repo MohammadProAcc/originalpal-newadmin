@@ -53,7 +53,7 @@ export function SearchBar({
         render={({ field }) => (
           <StyledSelect
             onChange={({ value }: any) => field.onChange(value)}
-            value={searchFields.find((f) => f.value === field.value)}
+            value={searchFields?.find((f) => f.value === field.value)}
             options={searchFields}
             placeholder="فیلد جستجو"
           />
@@ -70,7 +70,7 @@ export function SearchBar({
           <StyledSelect
             onChange={({ value }: any) => field.onChange(value)}
             options={searchTypes}
-            value={searchTypes.find((f) => f.value === field.value)}
+            value={searchTypes?.find((f) => f.value === field.value)}
             placeholder="نوع جستجو"
           />
         )}

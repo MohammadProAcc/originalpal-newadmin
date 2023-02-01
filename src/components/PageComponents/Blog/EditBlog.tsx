@@ -225,9 +225,21 @@ export const EditBlogPage: React.FC = () => {
         </Modal>
 
         <InputGroup className="col mb-4" fullWidth>
-          <label>عنوان</label>
-          <input {...register("title", { required: true })} placeholder="عنوان" />
+          <label>H1 صفحه</label>
+          <input {...register("title", { required: true })} placeholder="H1 صفحه" />
         </InputGroup>
+
+        <InputGroup className="col" fullWidth>
+          <Controller
+            control={control}
+            name="summary"
+            render={({ field }) => (
+              <Editor content={blogQuery?.data?.data?.summary} callback={field?.onChange} title="خلاصه" />
+            )}
+          />
+        </InputGroup>
+
+        <Divider variant="dashed" size="md" my="md" />
 
         <InputGroup className="col" fullWidth>
           <Controller
@@ -237,7 +249,11 @@ export const EditBlogPage: React.FC = () => {
               required: true,
             }}
             render={({ field }) => (
-              <Editor content={blogQuery?.data?.data?.desc} callback={field?.onChange} title="محتوا" />
+              <Editor
+                content={blogQuery?.data?.data?.desc}
+                callback={field?.onChange}
+                title={<Text ff="IRANSansBold">محتوا</Text>}
+              />
             )}
           />
         </InputGroup>
@@ -262,38 +278,29 @@ export const EditBlogPage: React.FC = () => {
           <input {...register("show_categories")} placeholder="دسته بندی ها" />
         </InputGroup>
 
-        <InputGroup className="col" fullWidth>
-          <label>خلاصه</label>
-          <Controller
-            control={control}
-            name="summary"
-            render={({ field }) => (
-              <Editor content={blogQuery?.data?.data?.summary} callback={field?.onChange} title="خلاصه" />
-            )}
-          />
-        </InputGroup>
+        <Divider variant="dashed" my="md" />
 
         <Card>
           <CardHeader>SEO</CardHeader>
           <CardBody>
             <InputGroup className="col" fullWidth>
-              <label>کلمات مترادف (meta_keywords)</label>
-              <input {...register("meta_keywords")} placeholder="کلمات مترادف" />
+              <label>title صفحه</label>
+              <input {...register("title_page")} placeholder="عنوان" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
-              <label>عنوان متا</label>
+              <label>عنوان سئو</label>
               <input {...register("meta_title")} placeholder="عنوان متا" />
+            </InputGroup>
+
+            <InputGroup className="col" fullWidth>
+              <label>مترادف ها</label>
+              <input {...register("meta_keywords")} placeholder="کلمات مترادف" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>توضیحات متا</label>
               <input {...register("meta_description")} placeholder="توضیحات متا" />
-            </InputGroup>
-
-            <InputGroup className="col" fullWidth>
-              <label>عنوان صفحه</label>
-              <input {...register("title_page")} placeholder="عنوان" />
             </InputGroup>
           </CardBody>
         </Card>

@@ -138,17 +138,19 @@ export const SearchBlogCategoriesPage = () => {
 
       {has(permissions, PermissionEnum.browseBlog) && (
         <>
-          <SearchBar
-            fields={blogCategoriesQuery?.data?.fields}
-            entity="categories"
-            params={router.query}
-            callback={(form: any) =>
-              router.push({
-                pathname: "/blog-categories/search",
-                query: form,
-              })
-            }
-          />
+          {blogCategoriesQuery.data && (
+            <SearchBar
+              fields={blogCategoriesQuery?.data?.fields}
+              entity="categories"
+              params={router.query}
+              callback={(form: any) =>
+                router.push({
+                  pathname: "/blog-categories/search",
+                  query: form,
+                })
+              }
+            />
+          )}
 
           {blogCategoriesQuery.data && (
             <BasicTable
