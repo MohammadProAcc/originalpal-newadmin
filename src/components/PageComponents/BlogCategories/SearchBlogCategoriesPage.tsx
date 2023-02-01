@@ -50,9 +50,9 @@ export const SearchBlogCategoriesPage = () => {
     if (response?.status === "success") {
       blogCategoriesQuery.refetch();
       setItemToRemove(null);
-      toast.success("دسته‌بندی مقاله با موفقیت حذف شد");
+      toast.success("دسته‌بندی وبلاگ با موفقیت حذف شد");
     } else {
-      toast.error("حذف دسته‌بندی مقاله موفقیت آمیز نبود");
+      toast.error("حذف دسته‌بندی وبلاگ موفقیت آمیز نبود");
     }
     setLoading(false);
   };
@@ -78,12 +78,12 @@ export const SearchBlogCategoriesPage = () => {
         clearSelectionsRef.current?.();
         setItemsToRemove(null);
       },
-      (id: number) => toast.error(`حذف  دسته‌بندی مقاله با  شناسه ${id} موفقیت آمیز نبود`),
+      (id: number) => toast.error(`حذف  دسته‌بندی وبلاگ با  شناسه ${id} موفقیت آمیز نبود`),
     );
     setLoading(false);
   };
 
-  const columns: any[] = ["شناسه دسته‌بندی", "عنوان", "اسلاگ", "محتوا", "تعداد مقالات", "فعالیت ها"];
+  const columns: any[] = ["شناسه دسته‌بندی", "عنوان", "اسلاگ", "محتوا", "تعداد وبلاگ ها", "فعالیت ها"];
 
   const data = blogCategoriesQuery?.data?.data?.data?.map((blogCategory: BlogCategory) => [
     // =====>> Table Columns <<=====
@@ -112,8 +112,8 @@ export const SearchBlogCategoriesPage = () => {
   ]);
 
   return (
-    <Layout title="دسته بندی مقالات">
-      <h1>دسته بندی مقالات</h1>
+    <Layout title="دسته بندی وبلاگ ها">
+      <h1>دسته بندی وبلاگ ها</h1>
 
       <FlexContainer>
         {has(permissions, PermissionEnum.editBlog) && (
@@ -126,7 +126,7 @@ export const SearchBlogCategoriesPage = () => {
             appearance="outline"
             onClick={toggleCreationModal}
           >
-            افزودن دسته‌بندی مقاله <Add />
+            افزودن دسته‌بندی وبلاگ <Add />
           </Button>
         )}
         {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteBlog) && (
@@ -168,7 +168,7 @@ export const SearchBlogCategoriesPage = () => {
       )}
       <Modal on={!!itemToRemove} toggle={toggleRemoveModal}>
         <ModalBox fluid>
-          آیا از حذف دسته‌بندی مقاله<span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{" "}
+          آیا از حذف دسته‌بندی وبلاگ<span className="text-danger">{`${itemToRemove?.id}`}</span> با عنوان{" "}
           <span className="text-danger">{`${itemToRemove?.title}`}</span> اطمینان دارید؟
           <ButtonGroup>
             <Button onClick={toggleRemoveModal} style={{ marginLeft: "1rem" }}>

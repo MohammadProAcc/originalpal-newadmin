@@ -99,8 +99,8 @@ export const BlogsPage = () => {
   ]);
 
   return (
-    <Layout title="مقالات">
-      <h1>مقالات</h1>
+    <Layout title="وبلاگ ها">
+      <h1>وبلاگ ها</h1>
 
       <FlexContainer>
         {has(permissions, PermissionEnum.editBlog) && (
@@ -114,7 +114,7 @@ export const BlogsPage = () => {
                 status="Success"
                 appearance="outline"
               >
-                انتشار مقاله
+                انتشار وبلاگ
                 <Add />
               </Button>
             </a>

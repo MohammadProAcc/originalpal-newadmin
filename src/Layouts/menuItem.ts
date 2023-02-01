@@ -1,100 +1,100 @@
-import { MenuItemType } from '@paljs/ui/types'
+import { MenuItemType } from "@paljs/ui/types";
 
 const items: MenuItemType[] = [
   {
-    title: 'داشبورد',
-    link: { href: '/dashboard' },
+    title: "داشبورد",
+    link: { href: "/dashboard" },
   },
   {
-    title: 'عمومی',
+    title: "عمومی",
     children: [
       {
-        title: 'منو',
-        link: { href: '/menu' },
+        title: "منو",
+        link: { href: "/menu" },
       },
       {
-        title: 'بخش های صفحه اصلی',
-        link: { href: '/main-page-sections' },
+        title: "بخش های صفحه اصلی",
+        link: { href: "/main-page-sections" },
       },
     ],
   },
   {
-    title: 'بنر ها',
+    title: "بنر ها",
     children: [
       {
-        title: 'بنر های ایستاده',
-        link: { href: '/banners' },
+        title: "بنر های ایستاده",
+        link: { href: "/banners" },
       },
       {
-        title: 'اسلایدر ها',
-        link: { href: '/main-page' },
+        title: "اسلایدر ها",
+        link: { href: "/main-page" },
       },
     ],
   },
   {
-    title: 'انبار',
+    title: "انبار",
     children: [
       {
-        title: 'برند ها',
-        link: { href: '/brands' },
+        title: "برند ها",
+        link: { href: "/brands" },
       },
       {
-        title: 'برچسب ها',
-        link: { href: '/tags' },
+        title: "برچسب ها",
+        link: { href: "/tags" },
       },
       {
-        title: 'محصولات',
-        link: { href: '/products' },
+        title: "محصولات",
+        link: { href: "/products" },
       },
       {
-        title: 'انبار',
-        link: { href: '/stock' },
+        title: "انبار",
+        link: { href: "/stock" },
       },
       {
-        title: 'کوپن ها',
-        link: { href: '/coupons' },
+        title: "کوپن ها",
+        link: { href: "/coupons" },
       },
     ],
   },
   {
-    title: 'کاربران',
+    title: "کاربران",
     children: [
       {
-        title: 'کاربران',
-        link: { href: '/users' },
+        title: "کاربران",
+        link: { href: "/users" },
       },
       {
-        title: 'سفارشات',
-        link: { href: '/orders' },
+        title: "سفارشات",
+        link: { href: "/orders" },
       },
       {
-        title: 'پرداخت ها',
-        link: { href: '/payments' },
+        title: "پرداخت ها",
+        link: { href: "/payments" },
       },
       {
-        title: 'آدرس ها',
-        link: { href: '/address' },
+        title: "آدرس ها",
+        link: { href: "/address" },
       },
       {
-        title: 'نظرات',
-        link: { href: '/comments' },
+        title: "نظرات",
+        link: { href: "/comments" },
       },
       {
-        title: 'نقش ها',
-        link: { href: '/roles' },
+        title: "نقش ها",
+        link: { href: "/roles" },
       },
     ],
   },
   {
-    title: 'وبلاگ و اخبار',
+    title: "وبلاگ و اخبار",
     children: [
       {
-        title: 'دسته بندی مقالات',
-        link: { href: '/blog-categories' },
+        title: "دسته بندی وبلاگ ها",
+        link: { href: "/blog-categories" },
       },
       {
-        title: 'مقاله',
-        link: { href: '/blog' },
+        title: "وبلاگ",
+        link: { href: "/blog" },
       },
     ],
   },
@@ -102,24 +102,24 @@ const items: MenuItemType[] = [
     title: "ابزار",
     children: [
       {
-        title: 'فهرست تخفیفات',
-        link: { href: '/coupons/aggregate' },
+        title: "فهرست تخفیفات",
+        link: { href: "/coupons/aggregate" },
       },
       {
-        title: 'ارسال پیامک',
-        link: { href: '/sms' },
+        title: "ارسال پیامک",
+        link: { href: "/sms" },
       },
       {
-        title: 'جستجوی کاربران',
-        link: { href: '/user-details' },
+        title: "جستجوی کاربران",
+        link: { href: "/user-details" },
       },
       {
-        title: 'گرفتن خروجی',
-        link: { href: '/export' },
+        title: "گرفتن خروجی",
+        link: { href: "/export" },
       },
-    ]
-  }
-]
+    ],
+  },
+];
 
-export default items
-export type CurrentItems = typeof items
+export default items;
+export type CurrentItems = typeof items;

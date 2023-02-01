@@ -80,10 +80,10 @@ export function CreateBlog() {
   };
 
   return (
-    <Layout title="انتشار مقاله">
+    <Layout title="انتشار وبلاگ">
       <Form onSubmit={handleSubmit(onSubmit)}>
         <h1>
-          <span style={{ margin: "0 0 0 1rem" }}>انتشار مقاله</span>
+          <span style={{ margin: "0 0 0 1rem" }}>انتشار وبلاگ</span>
           {/* <Controller */}
           {/*   name="is_news" */}
           {/*   control={control} */}
@@ -111,7 +111,7 @@ export function CreateBlog() {
             rules={{
               required: true,
             }}
-            render={({ field }) => <Editor content="محتوای مقاله..." callback={field?.onChange} title="محتوا" />}
+            render={({ field }) => <Editor content="محتوای وبلاگ..." callback={field?.onChange} title="محتوا" />}
           />
         </InputGroup>
 
@@ -145,7 +145,7 @@ export function CreateBlog() {
           <Controller
             control={control}
             name="summary"
-            render={({ field }) => <Editor content="خلاصه مقاله..." callback={field?.onChange} title="خلاصه" />}
+            render={({ field }) => <Editor content="خلاصه وبلاگ..." callback={field?.onChange} title="خلاصه" />}
           />
         </InputGroup>
 
