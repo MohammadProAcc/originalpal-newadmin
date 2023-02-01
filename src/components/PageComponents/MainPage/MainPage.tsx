@@ -2,7 +2,6 @@ import { Alert, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import { Button, Dot, FlexContainer, HeaderButton, ModalBox } from 'components'
 import { DatesCard } from 'components/Card/DatesCard'
 import Layout from 'Layouts'
-import _Image from 'next/image'
 import router from 'next/router'
 import React, { useState } from 'react'
 import styled from 'styled-components'
@@ -129,6 +128,6 @@ export const MainPage: React.FC = () => {
   )
 }
 
-const Image = styled(_Image)`
+const Image = styled.img`
   object-fit: cover;
 `

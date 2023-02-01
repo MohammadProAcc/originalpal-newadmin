@@ -4,7 +4,6 @@ import { Alert, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Button, Dot, FlexContainer, HeaderButton, ModalBox } from 'components'
-import Image from 'next/image'
 import { deleteBanner } from 'utils/api/REST/actions/banners'
 import router from 'next/router'
 import { PermissionEnum } from 'types'
@@ -118,7 +117,7 @@ export const Banner: React.FC = () => {
       <Card>
         <CardHeader>تصویر بنر</CardHeader>
         <CardBody>
-          <Image layout="fill" src={`${process?.env.SRC}/${banner?.media?.u ?? ''}`} />
+          <img src={`${process?.env.SRC}/${banner?.media?.u ?? ''}`} />
         </CardBody>
       </Card>
 
