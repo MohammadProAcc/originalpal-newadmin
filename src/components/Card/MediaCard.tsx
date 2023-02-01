@@ -1,6 +1,5 @@
 import { Close } from '@material-ui/icons'
 import { Alert, Button, Card, CardBody, CardHeader, Container, InputGroup as _InputGroup } from '@paljs/ui'
-import Image from 'next/image'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
@@ -103,7 +102,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({
               </Form>
             </Container>
             <InputGroup style={{ width: '100%', marginLeft: '3rem', display: 'flex', justifyContent: 'flex-end' }}>
-              {isVideo ? <Video src={url} controls /> : <Image width="264px" height="264px" src={url} />}
+              {isVideo ? <Video src={url} controls /> : <img width={264} height={264} src={url} />}
             </InputGroup>
           </>
         )}

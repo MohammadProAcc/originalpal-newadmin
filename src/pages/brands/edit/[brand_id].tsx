@@ -16,7 +16,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           destination: '/dashboard',
         },
       }
-    const brand = await getSingleBrand(context?.query?.brand_id as string, context?.req?.cookies?.[process.env.TOKEN!])
+    const brand = await getSingleBrand(context?.query?.brand_id as string, context?.req?.cookies?.[process.env.TOKEN!]!)
 
     return {
       props: {

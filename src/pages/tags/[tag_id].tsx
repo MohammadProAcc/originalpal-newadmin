@@ -16,7 +16,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           destination: '/dashboard',
         },
       }
-    const tag = await getSingleTag(context?.query?.tag_id as string, context?.req?.cookies?.[process.env.TOKEN!])
+    const tag = await getSingleTag(context?.query?.tag_id as string, context?.req?.cookies?.[process.env.TOKEN!]!)
 
     return {
       props: {

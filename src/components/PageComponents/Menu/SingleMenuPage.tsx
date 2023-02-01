@@ -1,7 +1,6 @@
 import { deleteMenu, has, removeItem, toLocalDate, useStore, useUserStore } from 'utils'
 import Layout from 'Layouts'
 import { Alert as _Alert, Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
-import Image from 'next/image'
 import styled from 'styled-components'
 import React, { useState } from 'react'
 import router from 'next/router'
