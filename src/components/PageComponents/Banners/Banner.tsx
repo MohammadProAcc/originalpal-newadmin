@@ -119,11 +119,7 @@ export const Banner: React.FC = () => {
       <Card>
         <CardHeader>تصویر بنر</CardHeader>
         <CardBody>
-<<<<<<< HEAD
-          <img src={`${process?.env.SRC}/${banner?.media?.u ?? ''}`} />
-=======
           <img src={`${process?.env.SRC}/${banner?.media?.u ?? ""}`} />
->>>>>>> 341106e9013319bfca18c7b5beb6358c95b699b9
         </CardBody>
       </Card>
 
