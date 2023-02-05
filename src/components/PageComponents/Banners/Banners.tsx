@@ -1,4 +1,4 @@
-import { Flex } from "@mantine/core";
+import { Badge, Flex, Text } from "@mantine/core";
 import { Avatar } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import { Button, Container, Modal } from "@paljs/ui";
@@ -70,53 +70,21 @@ export const Banners = () => {
 
   const columns = [
     "شناسه بنر",
-    "تصویر",
     "عنوان بنر",
+    "محتوا",
+    "تصویر",
     "پلتفرم",
-    "رنگ عنوان بنر",
-    "توضیحات",
-    "رنگ توضیحات",
     "وضعیت",
     <p style={{ margin: 0, textAlign: "center" }}>فعالیت ها</p>,
   ];
 
   const data = banners?.data?.data?.map((banner: any) => [
-    banner?.id,
+    <Text>{banner?.id}</Text>,
+    <p style={{ color: banner?.title_color, margin: 0 }}>{banner?.title}</p>,
+    <p style={{ color: banner?.content_color, margin: 0 }}>{banner?.content}</p>,
     <Avatar src={`${process.env.SRC}/${banner?.media ? banner?.media[0]?.u : null}`} />,
-    banner?.title,
     translator(banner?.platform),
-    <div
-      style={{
-        backgroundColor: banner?.title_color,
-        maxWidth: "5rem",
-        color: "#212121",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        direction: "ltr",
-        borderRadius: "0.5rem",
-        padding: ".5rem 1rem",
-      }}
-    >
-      {banner?.title_color}
-    </div>,
-    banner?.content,
-    <div
-      style={{
-        backgroundColor: banner?.content_color,
-        maxWidth: "5rem",
-        color: "#212121",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        direction: "ltr",
-        borderRadius: "0.5rem",
-        padding: ".5rem 1rem",
-      }}
-    >
-      {banner?.content_color}
-    </div>,
-    banner?.active ? "فعال" : "غیر فعال",
+    <Badge color={banner?.active ? "green" : "red"}>{banner?.active ? "فعال" : "غیر فعال"}</Badge>,
     <Flex gap="0.25rem">
       {has(permissions, PermissionEnum.readStand) && (
         <Link href={`/banners/${banner?.id}`} passHref>

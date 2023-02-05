@@ -114,7 +114,7 @@ export const BlogsPage = () => {
                 status="Success"
                 appearance="outline"
               >
-                انتشار وبلاگ
+                افزودن وبلاگ
                 <Add />
               </Button>
             </a>

@@ -195,33 +195,38 @@ export const SearchCouponsPage = () => {
 
       {has(permissions, PermissionEnum.browseCoupon) && (
         <>
-          <SearchBar
-            fields={couponsQuery?.data
-              ?.filter((f: string) => !["created_at", "updated_at", "deleted_at", "start", "expiration"].includes(f))
-              ?.map((field: string) => {
-                if (field === "type") {
-                  return `نوع: cash یا percent`;
-                } else if (field === "deny_off") {
-                  return `فقط محصولات فروش ویژه: 0 یا 1`;
-                }
-                return field;
-              })}
-            entity="coupons"
-            params={router.query}
-            callback={(form: any) =>
-              router.push({
-                pathname: "/coupons/search",
-                query: form,
-              })
-            }
-          />
+          {couponsQuery.data && (
+            <SearchBar
+              fields={couponsQuery.data?.data?.data
+                ?.filter((f: string) => !["created_at", "updated_at", "deleted_at", "start", "expiration"].includes(f))
+                ?.map((field: string) => {
+                  if (field === "type") {
+                    return `نوع: cash یا percent`;
+                  } else if (field === "deny_off") {
+                    return `فقط محصولات فروش ویژه: 0 یا 1`;
+                  }
+                  return field;
+                })}
+              entity="coupons"
+              params={router.query}
+              callback={(form: any) =>
+                router.push({
+                  pathname: "/coupons/search",
+                  query: form,
+                })
+              }
+            />
+          )}
 
-          <BasicTable
-            getSelections={setTableSelections}
-            columns={columns}
-            rows={data}
-            clearSelectionTriggerRef={clearSelectionsRef}
-          />
+          {couponsQuery.data && (
+            <BasicTable
+              getSelections={setTableSelections}
+              columns={columns}
+              rows={data}
+              clearSelectionTriggerRef={clearSelectionsRef}
+            />
+          )}
+
           <PaginationBar
             totalPages={couponsQuery?.data?.data?.last_page}
             activePage={router.query.page ? Number(router.query.page) : 1}

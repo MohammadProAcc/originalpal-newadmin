@@ -10,7 +10,7 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { PostLink } from "types";
-import { search_in, uploadBlogImage, uploadBlogVideo } from "utils";
+import { createBlog, search_in, uploadBlogImage, uploadBlogVideo } from "utils";
 import { handlePostLink, postLinkOptions } from "./handlePostLink";
 
 export function CreateBlog() {
@@ -80,10 +80,10 @@ export function CreateBlog() {
   };
 
   return (
-    <Layout title="انتشار وبلاگ">
+    <Layout title="افزودن وبلاگ">
       <Form onSubmit={handleSubmit(onSubmit)}>
         <h1>
-          <span style={{ margin: "0 0 0 1rem" }}>انتشار وبلاگ</span>
+          <span style={{ margin: "0 0 0 1rem" }}>افزودن وبلاگ</span>
           {/* <Controller */}
           {/*   name="is_news" */}
           {/*   control={control} */}
@@ -107,11 +107,21 @@ export function CreateBlog() {
         <InputGroup className="col" fullWidth>
           <Controller
             control={control}
+            name="summary"
+            render={({ field }) => <Editor content="" callback={field?.onChange} title="خلاصه" />}
+          />
+        </InputGroup>
+
+        <Divider size="md" my="md" />
+
+        <InputGroup className="col" fullWidth>
+          <Controller
+            control={control}
             name="desc"
             rules={{
               required: true,
             }}
-            render={({ field }) => <Editor content="محتوای وبلاگ..." callback={field?.onChange} title="محتوا" />}
+            render={({ field }) => <Editor content="" callback={field?.onChange} title="محتوا" />}
           />
         </InputGroup>
 
@@ -138,15 +148,6 @@ export function CreateBlog() {
         <InputGroup className="col" fullWidth>
           <label>تصویر بنر</label>
           <input type="file" {...register("thumb")} placeholder="تصویر بنر" />
-        </InputGroup>
-
-        <InputGroup className="col" fullWidth>
-          <label>خلاصه</label>
-          <Controller
-            control={control}
-            name="summary"
-            render={({ field }) => <Editor content="خلاصه وبلاگ..." callback={field?.onChange} title="خلاصه" />}
-          />
         </InputGroup>
 
         <Card>
@@ -371,6 +372,3 @@ const Form = styled.form`
     margin-bottom: 1rem;
   }
 `;
-function createBlog(form: any, arg1: string | undefined) {
-  throw new Error("Function not implemented.");
-}

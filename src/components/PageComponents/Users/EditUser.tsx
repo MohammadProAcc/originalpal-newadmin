@@ -1,3 +1,4 @@
+import { LoadingOverlay } from "@mantine/core";
 import { Card, CardBody, CardHeader, InputGroup, Modal, Select } from "@paljs/ui";
 import { useQuery } from "@tanstack/react-query";
 import { Button, FlexContainer, HeaderButton, ModalBox } from "components";
@@ -124,7 +125,8 @@ export const EditUserPage: React.FC = () => {
         </ModalBox>
       </Modal>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} style={{ position: "relative" }}>
+        <LoadingOverlay visible={loading} />
         <Card>
           <CardHeader>نام کاربر</CardHeader>
           <CardBody>

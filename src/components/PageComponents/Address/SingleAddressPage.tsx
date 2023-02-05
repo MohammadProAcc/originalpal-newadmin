@@ -48,18 +48,41 @@ export const SingleAddressPage: React.FC = () => {
         )}
       </h1>
 
-      {/* FIXME: make it static */}
-      {Object.keys(address).map(
-        (key) =>
-          key !== "created_at" &&
-          key !== "updated_at" && (
-            <Card key={key}>
-              <CardHeader>{translator(key)}</CardHeader>
+      <Card>
+        <CardHeader>شناسه آدرس</CardHeader>
 
-              <CardBody>{address[key]}</CardBody>
-            </Card>
-          ),
-      )}
+        <CardBody>{address?.id}</CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>کد پستی</CardHeader>
+
+        <CardBody>{address?.postalcode}</CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>استان</CardHeader>
+
+        <CardBody>{address?.province}</CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>شهر</CardHeader>
+
+        <CardBody>{address?.city}</CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>نشانی</CardHeader>
+
+        <CardBody>{address?.address}</CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>شناسه کاربر</CardHeader>
+
+        <CardBody>{address?.user_id}</CardBody>
+      </Card>
 
       <DatesCard createdAt={address?.created_at} updatedAt={address?.updated_at} />
 

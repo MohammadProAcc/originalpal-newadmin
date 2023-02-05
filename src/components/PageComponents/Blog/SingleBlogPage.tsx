@@ -1,38 +1,38 @@
-import { deleteBlog, has, removeItem, toLocalDate, useStore, useUserStore } from 'utils'
-import Layout from 'Layouts'
-import { Alert as _Alert, Button, Card, CardBody, CardHeader, Modal } from '@paljs/ui'
-import styled from 'styled-components'
-import React, { useState } from 'react'
-import router from 'next/router'
-import { FlexContainer, HeaderButton, ModalBox } from 'components'
-import { PermissionEnum } from 'types'
-import { DatesCard } from 'components/Card/DatesCard'
+import { deleteBlog, has, removeItem, toLocalDate, useStore, useUserStore } from "utils";
+import Layout from "Layouts";
+import { Alert as _Alert, Button, Card, CardBody, CardHeader, Modal } from "@paljs/ui";
+import styled from "styled-components";
+import React, { useState } from "react";
+import router from "next/router";
+import { FlexContainer, HeaderButton, ModalBox } from "components";
+import { PermissionEnum } from "types";
+import { DatesCard } from "components/Card/DatesCard";
 
 export const SingleBlogPage: React.FC = () => {
   const { blog } = useStore((state: any) => ({
     blog: state?.blog,
-  }))
-  const permissions = useUserStore().getPermissions()
+  }));
+  const permissions = useUserStore().getPermissions();
 
-  const [itemToRemove, setItemToRemove] = useState<any>(null)
-  const closeRemovalModal = () => setItemToRemove(false)
+  const [itemToRemove, setItemToRemove] = useState<any>(null);
+  const closeRemovalModal = () => setItemToRemove(false);
 
   const remove = async (removeId: any) => {
-    await removeItem('blog', removeId, deleteBlog, () => router.push('/blog'), [
+    await removeItem("blog", removeId, deleteBlog, () => router.push("/blog"), [
       `وبلاگ ${removeId} با موفقیت حذف شد`,
-      'حذف وبلاگ موفقیت آمیز نبود',
-    ])
-  }
+      "حذف وبلاگ موفقیت آمیز نبود",
+    ]);
+  };
 
   return (
     <Layout title={`مشاهده وبلاگ ${blog?.id}`}>
-      <h1 style={{ marginBottom: '4rem' }}>
-        <span style={{ marginLeft: '1rem' }}>مشاهده وبلاگ {blog?.id}</span>{' '}
+      <h1 style={{ marginBottom: "4rem" }}>
+        <span style={{ marginLeft: "1rem" }}>مشاهده وبلاگ {blog?.id}</span>{" "}
         {blog?.is_news ? (
           <Alert status="Info">
             <h2
               style={{
-                color: '#fff',
+                color: "#fff",
               }}
             >
               اخبار
@@ -56,7 +56,7 @@ export const SingleBlogPage: React.FC = () => {
       {/* ....:::::: Removal Modals :::::.... */}
       <Modal on={itemToRemove} toggle={closeRemovalModal}>
         <ModalBox>
-          <div style={{ marginBottom: '1rem' }}>
+          <div style={{ marginBottom: "1rem" }}>
             آیا از حذف برچسب
             <span className="mx-1">{itemToRemove?.id}</span>
             اطمینان دارید؟
@@ -82,42 +82,47 @@ export const SingleBlogPage: React.FC = () => {
 
       <Card>
         <CardHeader>هدر ها</CardHeader>
-        <CardBody>{blog?.headers ?? '-'}</CardBody>
+        <CardBody>{blog?.headers ?? "-"}</CardBody>
       </Card>
 
       <Card>
         <CardHeader>ترند</CardHeader>
-        <CardBody>{blog?.trend ?? '-'}</CardBody>
+        <CardBody>{blog?.trend ?? "-"}</CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>خلاصه</CardHeader>
+        <CardBody dangerouslySetInnerHTML={{ __html: blog?.summary ?? "-" }} />
       </Card>
 
       <Card>
         <CardHeader>متن وبلاگ</CardHeader>
-        <CardBody dangerouslySetInnerHTML={{ __html: blog?.desc ?? '-' }} />
+        <CardBody dangerouslySetInnerHTML={{ __html: blog?.desc ?? "-" }} />
       </Card>
 
       <Card>
         <CardHeader>نویسنده</CardHeader>
-        <CardBody>{blog?.weiter ?? '-'}</CardBody>
+        <CardBody>{blog?.weiter ?? "-"}</CardBody>
       </Card>
 
       <Card>
         <CardHeader>اسلاگ</CardHeader>
-        <CardBody>{blog?.slug ?? '-'}</CardBody>
+        <CardBody>{blog?.slug ?? "-"}</CardBody>
       </Card>
 
       <Card>
         <CardHeader>دسته بندی ها</CardHeader>
-        <CardBody>{blog?.show_categories ?? '-'}</CardBody>
+        <CardBody>{blog?.show_categories ?? "-"}</CardBody>
       </Card>
 
       <Card>
         <CardHeader>برچسب ها</CardHeader>
-        <CardBody>{blog?.labels ?? '-'}</CardBody>
+        <CardBody>{blog?.labels ?? "-"}</CardBody>
       </Card>
 
       <Card>
         <CardHeader>نظرات</CardHeader>
-        <CardBody>{blog?.comments ?? '-'}</CardBody>
+        <CardBody>{blog?.comments ?? "-"}</CardBody>
       </Card>
 
       <Card>
@@ -126,31 +131,26 @@ export const SingleBlogPage: React.FC = () => {
       </Card>
 
       <Card>
-        <CardHeader>خلاصه</CardHeader>
-        <CardBody dangerouslySetInnerHTML={{ __html: blog?.summary ?? '-' }} />
-      </Card>
-
-      <Card>
         <CardHeader>SEO</CardHeader>
         <CardBody>
           <Card>
             <CardHeader>عنوان (meta)</CardHeader>
-            <CardBody>{blog?.meta_title ?? '-'}</CardBody>
+            <CardBody>{blog?.meta_title ?? "-"}</CardBody>
           </Card>
 
           <Card>
             <CardHeader>عنوان صفحه</CardHeader>
-            <CardBody>{blog?.title_page ?? '-'}</CardBody>
+            <CardBody>{blog?.title_page ?? "-"}</CardBody>
           </Card>
 
           <Card>
-            <CardHeader>کلمات کلیدی (meta)</CardHeader>
-            <CardBody>{blog?.meta_keywords ?? '-'}</CardBody>
+            <CardHeader>مترادف ها</CardHeader>
+            <CardBody>{blog?.meta_keywords ?? "-"}</CardBody>
           </Card>
 
           <Card>
             <CardHeader>توضیحات (meta)</CardHeader>
-            <CardBody>{blog?.meta_description ?? '-'}</CardBody>
+            <CardBody>{blog?.meta_description ?? "-"}</CardBody>
           </Card>
         </CardBody>
       </Card>
@@ -167,28 +167,28 @@ export const SingleBlogPage: React.FC = () => {
 
           <Card>
             <CardHeader>عنوان تصویر پایانی</CardHeader>
-            <CardBody>{blog?.endtitle ?? '-'}</CardBody>
+            <CardBody>{blog?.endtitle ?? "-"}</CardBody>
           </Card>
 
           <Card>
             <CardHeader>تگ alt تصویر پایانی</CardHeader>
-            <CardBody>{blog?.endalt ?? '-'}</CardBody>
+            <CardBody>{blog?.endalt ?? "-"}</CardBody>
           </Card>
 
           <Card>
             <CardHeader>متن تصویر پایانی</CardHeader>
-            <CardBody>{blog?.endtext ?? '-'}</CardBody>
+            <CardBody>{blog?.endtext ?? "-"}</CardBody>
           </Card>
         </CardBody>
       </Card>
 
       <DatesCard createdAt={blog?.created_at} updatedAt={blog?.updated_at} />
     </Layout>
-  )
-}
+  );
+};
 
 const Alert = styled(_Alert)`
   width: 10rem;
   display: inline-flex;
   text-align: center;
-`
+`;

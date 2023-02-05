@@ -1,11 +1,12 @@
-import { Button as _Button, Checkbox, InputGroup as _InputGroup } from '@paljs/ui'
-import { BasicModal, ModalBox } from 'components'
-import produce from 'immer'
-import React, { useEffect, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
-import styled from 'styled-components'
-import { Colors } from 'styles'
+import { Space } from "@mantine/core";
+import { Button as _Button, Checkbox, InputGroup as _InputGroup } from "@paljs/ui";
+import { BasicModal, ModalBox } from "components";
+import produce from "immer";
+import React, { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import styled from "styled-components";
+import { Colors } from "styles";
 import {
   initialTopSiteMenu,
   initialTopSiteMenuColumn,
@@ -13,125 +14,125 @@ import {
   TopSiteColumn,
   TopSiteMenu,
   TopSiteRow,
-} from 'types'
-import { uploadMediaFile, updateMedia } from 'utils'
+} from "types";
+import { uploadMediaFile, updateMedia } from "utils";
 
 interface TopSiteMenuFormProps {
-  loading?: boolean
-  callback: any
-  defaultValues?: any
+  loading?: boolean;
+  callback: any;
+  defaultValues?: any;
 }
 
 export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callback, defaultValues }) => {
-  const [menu, setMenu] = useState<TopSiteMenu[]>(defaultValues)
+  const [menu, setMenu] = useState<TopSiteMenu[]>(defaultValues);
 
   async function uploadColumnBanner(file: File, column: any) {
-    const response = await uploadMediaFile(file)
+    const response = await uploadMediaFile(file);
     if (response !== null) {
       const updateResponse = await updateMedia(response.data.data.id, {
-        type: 'top-site-menu',
+        type: "top-site-menu",
         reference_id: column.menuTitle,
         meta: {
           a: `نمایه فهرست ${column.menuTitle}`,
           t: `نمایه فهرست ${column.menuTitle}`,
         },
-      })
+      });
       if (updateResponse !== null) {
-        return updateResponse.data.data
+        return updateResponse.data.data;
       } else {
-        toast.error('بارگذاری تصویر موفقیت آمیز نبود')
+        toast.error("بارگذاری تصویر موفقیت آمیز نبود");
       }
     } else {
-      toast.error('بارگذاری تصویر موفقیت آمیز نبود')
+      toast.error("بارگذاری تصویر موفقیت آمیز نبود");
     }
   }
 
   const findMenuIndex = (targetMenu: TopSiteMenu) => {
-    return menu?.findIndex((item) => item?.menuTitle === targetMenu?.menuTitle)
-  }
+    return menu?.findIndex((item) => item?.menuTitle === targetMenu?.menuTitle);
+  };
 
   const findMenuColumnIndex = (targetMenu: TopSiteMenu, targetColumn: TopSiteColumn) => {
-    const menuIndex = findMenuIndex(targetMenu)
-    return menu[menuIndex]?.columns?.findIndex((item) => item?.columnTitle === targetColumn?.columnTitle)
-  }
+    const menuIndex = findMenuIndex(targetMenu);
+    return menu[menuIndex]?.columns?.findIndex((item) => item?.columnTitle === targetColumn?.columnTitle);
+  };
 
   const findMenuColumnRowIndex = (targetMenu: TopSiteMenu, targetColumn: TopSiteColumn, targetRow: TopSiteRow) => {
-    const menuIndex = findMenuIndex(targetMenu)
-    const columnIndex = findMenuColumnIndex(targetMenu, targetColumn)
-    return menu[menuIndex]?.columns[columnIndex]?.rows?.findIndex((item) => item?.name === targetRow?.name)
-  }
+    const menuIndex = findMenuIndex(targetMenu);
+    const columnIndex = findMenuColumnIndex(targetMenu, targetColumn);
+    return menu[menuIndex]?.columns[columnIndex]?.rows?.findIndex((item) => item?.name === targetRow?.name);
+  };
 
   // <<<------------ Menu ------------>>>
   const addMenu = (menu: TopSiteMenu) =>
     setMenu((current) =>
       produce(current, (draft) => {
-        draft?.push(menu)
+        draft?.push(menu);
       }),
-    )
+    );
 
   const removeMenu = (menu: any) =>
     setMenu((current) =>
       produce(current, (draft) => {
-        draft?.splice(findMenuIndex(menu), 1)
+        draft?.splice(findMenuIndex(menu), 1);
       }),
-    )
+    );
 
   const editMenu = (menu: any, form: TopSiteMenu) => {
     setMenu((current) =>
       produce(current, (draft) => {
-        draft[findMenuIndex(menu)] = form
+        draft[findMenuIndex(menu)] = form;
       }),
-    )
-  }
+    );
+  };
 
   // <<<------------ Column ------------>>>
   const addColumn = (menu: any, column: TopSiteColumn) =>
     setMenu((current) =>
       produce(current, (draft) => {
-        draft[findMenuIndex(menu)]?.columns?.push(column)
+        draft[findMenuIndex(menu)]?.columns?.push(column);
       }),
-    )
+    );
 
   const removeColumn = (menu: any, column: any) =>
     setMenu((current) =>
       produce(current, (draft) => {
-        const menuIndex = findMenuIndex(menu)
+        const menuIndex = findMenuIndex(menu);
         draft[menuIndex].columns = draft[menuIndex]?.columns?.filter(
           (item) => item?.columnTitle !== column?.columnTitle,
-        )
+        );
       }),
-    )
+    );
 
   const editColumn = (menu: any, column: any, form: TopSiteColumn) => {
     setMenu((current) =>
       produce(current, (draft) => {
-        draft[findMenuIndex(menu)].columns[findMenuColumnIndex(menu, column)] = form
+        draft[findMenuIndex(menu)].columns[findMenuColumnIndex(menu, column)] = form;
       }),
-    )
-  }
+    );
+  };
 
   const removeColumnFooter = (menu: any, column: any) =>
     setMenu((current) =>
       produce(current, (draft) => {
-        draft[findMenuIndex(menu)].columns[findMenuColumnIndex(menu, column)].footer = undefined
+        draft[findMenuIndex(menu)].columns[findMenuColumnIndex(menu, column)].footer = undefined;
       }),
-    )
+    );
 
   const editColumnFooter = (menu: any, column: any, form: TopSiteRow) => {
     setMenu((current) =>
       produce(current, (draft) => {
-        draft[findMenuIndex(menu)].columns[findMenuColumnIndex(menu, column)].footer = form
+        draft[findMenuIndex(menu)].columns[findMenuColumnIndex(menu, column)].footer = form;
       }),
-    )
-  }
+    );
+  };
 
   // <<<------------ Row ------------>>>
   const addColumnRow = (menu: any, column: any, row: TopSiteRow) =>
     setMenu((current) =>
       produce(current, (draft) => {
-        draft[findMenuIndex(menu)]?.columns[findMenuColumnIndex(menu, column)]?.rows?.push(row)
+        draft[findMenuIndex(menu)]?.columns[findMenuColumnIndex(menu, column)]?.rows?.push(row);
       }),
-    )
+    );
 
   const removeColumnRow = (menu: any, column: any, row: any) =>
     setMenu((current) =>
@@ -139,25 +140,25 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
         draft[findMenuIndex(menu)]?.columns[findMenuColumnIndex(menu, column)]?.rows?.splice(
           findMenuColumnRowIndex(menu, column, row),
           1,
-        )
+        );
       }),
-    )
+    );
 
   const editColumnRow = (menu: any, column: any, row: any, form: TopSiteRow) =>
     setMenu((current) =>
       produce(current, (draft) => {
         draft[findMenuIndex(menu)].columns[findMenuColumnIndex(menu, column)].rows[
           findMenuColumnRowIndex(menu, column, row)
-        ] = form
+        ] = form;
       }),
-    )
+    );
 
   // <<<------------ Forms ------------>>>
-  const [selectedMenu, setSelectedMenu] = useState<TopSiteMenu | null>(null)
-  const [selectedColumn, setSelectedColumn] = useState<TopSiteColumn | null>(null)
-  const [selectedRow, setSelectedRow] = useState<TopSiteRow | null>(null)
+  const [selectedMenu, setSelectedMenu] = useState<TopSiteMenu | null>(null);
+  const [selectedColumn, setSelectedColumn] = useState<TopSiteColumn | null>(null);
+  const [selectedRow, setSelectedRow] = useState<TopSiteRow | null>(null);
 
-  const [activeForm, setActiveForm] = useState<'menu' | 'column' | 'columnFooter' | 'row' | null>(null)
+  const [activeForm, setActiveForm] = useState<"menu" | "column" | "columnFooter" | "row" | null>(null);
 
   const {
     register: menuRegister,
@@ -165,7 +166,7 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
     control: menuControl,
     setValue: menuSetValue,
     reset: menuReset,
-  } = useForm()
+  } = useForm();
 
   const {
     register: columnRegister,
@@ -173,7 +174,7 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
     control: columnControl,
     setValue: columnSetValue,
     reset: columnReset,
-  } = useForm()
+  } = useForm();
 
   const {
     register: columnFooterRegister,
@@ -181,7 +182,7 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
     control: columnFooterControl,
     setValue: columnFooterSetValue,
     reset: columnFooterReset,
-  } = useForm()
+  } = useForm();
 
   const {
     register: rowRegister,
@@ -189,7 +190,7 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
     control: rowControl,
     setValue: rowSetValue,
     reset: rowReset,
-  } = useForm()
+  } = useForm();
 
   const onMenuFormSubmit = (form: TopSiteMenu) => {
     selectedMenu
@@ -198,119 +199,119 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
           ...initialTopSiteMenu,
           menuTitle: form?.menuTitle,
           href: form?.href,
-        })
-    menuReset()
-    setActiveForm(null)
+        });
+    menuReset();
+    setActiveForm(null);
     toast.success(
       <p>
         <div>
           <strong>"{form?.menuTitle}"</strong>
-        </div>{' '}
-        {selectedMenu ? 'بروز' : 'ساخته'} شد
+        </div>{" "}
+        {selectedMenu ? "بروز" : "ساخته"} شد
       </p>,
-    )
-  }
+    );
+  };
 
   const onColumnFormSubmit = async (form: TopSiteColumn) => {
     if (form.thumb) {
-      const response = await uploadColumnBanner(form.thumb[0], selectedColumn)
-      form.thumb = response
+      const response = await uploadColumnBanner(form.thumb[0], selectedColumn);
+      form.thumb = response;
     }
     selectedColumn
       ? editColumn(selectedMenu, selectedColumn, form)
-      : addColumn(selectedMenu, { ...initialTopSiteMenuColumn, columnTitle: form?.columnTitle })
-    columnReset()
-    setActiveForm(null)
+      : addColumn(selectedMenu, { ...initialTopSiteMenuColumn, columnTitle: form?.columnTitle });
+    columnReset();
+    setActiveForm(null);
     toast.success(
       <p>
         <div>
           <strong>"{form?.columnTitle}"</strong>
-        </div>{' '}
-        {selectedColumn ? 'بروز' : 'ساخته'} شد
+        </div>{" "}
+        {selectedColumn ? "بروز" : "ساخته"} شد
       </p>,
-    )
-  }
+    );
+  };
 
   const onColumnFooterFormSubmit = (form: TopSiteRow) => {
-    editColumnFooter(selectedMenu, selectedColumn, form)
-    columnReset()
-    setActiveForm(null)
+    editColumnFooter(selectedMenu, selectedColumn, form);
+    columnReset();
+    setActiveForm(null);
     toast.success(
       <p>
         <div>
           <strong>"{selectedColumn?.columnTitle}"</strong>
-        </div>{' '}
+        </div>{" "}
         بروز شد
       </p>,
-    )
-  }
+    );
+  };
 
   const onRowFormSubmit = (form: TopSiteRow) => {
     selectedRow
       ? editColumnRow(selectedMenu, selectedColumn, selectedRow, form)
-      : addColumnRow(selectedMenu, selectedColumn, form)
-    setActiveForm(null)
+      : addColumnRow(selectedMenu, selectedColumn, form);
+    setActiveForm(null);
     toast.success(
       <p>
         <div>
           <strong>"{form?.name}"</strong>
-        </div>{' '}
-        {selectedRow ? 'بروز' : 'ساخته'} شد
+        </div>{" "}
+        {selectedRow ? "بروز" : "ساخته"} شد
       </p>,
-    )
-    rowReset()
-  }
+    );
+    rowReset();
+  };
 
   useEffect(() => {
     selectedMenu
       ? Object.entries(selectedMenu)?.map((entry) => menuSetValue(entry[0], entry[1]))
-      : Object.entries(initialTopSiteMenu)?.map((entry) => menuSetValue(entry[0], null))
-  }, [selectedMenu])
+      : Object.entries(initialTopSiteMenu)?.map((entry) => menuSetValue(entry[0], null));
+  }, [selectedMenu]);
 
   useEffect(() => {
     selectedColumn
       ? Object.entries(selectedColumn)?.map((entry) => columnSetValue(entry[0], entry[1]))
-      : Object.entries(initialTopSiteMenuColumn)?.map((entry) => columnSetValue(entry[0], null))
-    activeForm === 'columnFooter' && selectedColumn?.footer
+      : Object.entries(initialTopSiteMenuColumn)?.map((entry) => columnSetValue(entry[0], null));
+    activeForm === "columnFooter" && selectedColumn?.footer
       ? Object.entries(selectedColumn?.footer)?.map((entry) => columnFooterSetValue(entry[0], entry[1]))
-      : Object.entries(initialTopSiteMenuColumn?.footer)?.map((entry) => columnFooterSetValue(entry[0], entry[1]))
-  }, [selectedColumn])
+      : Object.entries(initialTopSiteMenuColumn?.footer)?.map((entry) => columnFooterSetValue(entry[0], entry[1]));
+  }, [selectedColumn]);
 
   useEffect(() => {
     selectedRow
       ? Object.entries(selectedRow)?.map((entry) => rowSetValue(entry[0], entry[1]))
-      : Object.entries(initialTopSiteMenuColumnRow)?.map((entry) => rowSetValue(entry[0], null))
-  }, [selectedRow])
+      : Object.entries(initialTopSiteMenuColumnRow)?.map((entry) => rowSetValue(entry[0], null));
+  }, [selectedRow]);
 
   const onMenuRemoval = (menu: TopSiteMenu) => {
-    removeMenu(menu)
-    setActiveForm(null)
+    removeMenu(menu);
+    setActiveForm(null);
     toast.success(
       <p>
         <div>
           <strong>"{menu?.menuTitle}"</strong>
-        </div>{' '}
+        </div>{" "}
         حذف شد
       </p>,
-    )
-  }
+    );
+  };
 
   const onColumnRemoval = (menu: TopSiteMenu, column: TopSiteColumn) => {
-    removeColumn(menu, column)
-    setActiveForm(null)
+    removeColumn(menu, column);
+    setActiveForm(null);
     toast.success(
       <p>
         <div>
           <strong>"{column?.columnTitle}"</strong>
-        </div>{' '}
+        </div>{" "}
         حذف شد
       </p>,
-    )
-  }
+    );
+  };
 
   const onColumnFooterRemoval = (menu: TopSiteMenu, column: TopSiteColumn) => {
-    removeColumnFooter(menu, column)
-    setActiveForm(null)
+    removeColumnFooter(menu, column);
+    setActiveForm(null);
     toast.success(
       <p>
         پاورقی فهرست
@@ -319,25 +320,25 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
         </div>
         حذف شد
       </p>,
-    )
-  }
+    );
+  };
 
   const onRowRemoval = (menu: TopSiteMenu, column: TopSiteColumn, row: TopSiteRow) => {
-    removeColumnRow(menu, column, row)
-    setActiveForm(null)
+    removeColumnRow(menu, column, row);
+    setActiveForm(null);
     toast.success(
       <p>
         <div>
           <strong>"{row?.name}"</strong>
-        </div>{' '}
+        </div>{" "}
         حذف شد
       </p>,
-    )
-  }
+    );
+  };
 
   function removeColumnBanner() {
-    columnSetValue('thumb', null)
-    toast.success('بنر فهرست حذف شد, پس از ثبت موارد اعمال خواهد شد')
+    columnSetValue("thumb", null);
+    toast.success("بنر فهرست حذف شد, پس از ثبت موارد اعمال خواهد شد");
   }
 
   return (
@@ -349,8 +350,8 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
           className="add-menu"
           type="button"
           onClick={() => {
-            setSelectedMenu(null)
-            setActiveForm('menu')
+            setSelectedMenu(null);
+            setActiveForm("menu");
           }}
         >
           افزودن منو
@@ -359,8 +360,8 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
           <Menu key={_menu?.menuTitle}>
             <MenuTitle
               onClick={() => {
-                setSelectedMenu(_menu)
-                setActiveForm('menu')
+                setSelectedMenu(_menu);
+                setActiveForm("menu");
               }}
             >
               {_menu?.menuTitle}
@@ -371,9 +372,9 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
                   <ColumnTitle
                     title="برای ویرایش فهرست کلیک کنید"
                     onClick={() => {
-                      setSelectedMenu(_menu)
-                      setSelectedColumn(_column)
-                      setActiveForm('column')
+                      setSelectedMenu(_menu);
+                      setSelectedColumn(_column);
+                      setActiveForm("column");
                     }}
                   >
                     {_column?.columnTitle}
@@ -390,10 +391,10 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
                       <MenuRow
                         key={_row?.name}
                         onClick={() => {
-                          setSelectedMenu(_menu)
-                          setSelectedColumn(_column)
-                          setSelectedRow(_row)
-                          setActiveForm('row')
+                          setSelectedMenu(_menu);
+                          setSelectedColumn(_column);
+                          setSelectedRow(_row);
+                          setActiveForm("row");
                         }}
                       >
                         {_row?.name}
@@ -404,9 +405,9 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
                         footer
                         key={_column?.footer?.name}
                         onClick={() => {
-                          setSelectedMenu(_menu)
-                          setSelectedColumn(_column)
-                          setActiveForm('columnFooter')
+                          setSelectedMenu(_menu);
+                          setSelectedColumn(_column);
+                          setActiveForm("columnFooter");
                         }}
                       >
                         {_column?.footer?.name}
@@ -415,9 +416,9 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
                       <MenuRow
                         invalid
                         onClick={() => {
-                          setSelectedMenu(_menu)
-                          setSelectedColumn(_column)
-                          setActiveForm('columnFooter')
+                          setSelectedMenu(_menu);
+                          setSelectedColumn(_column);
+                          setActiveForm("columnFooter");
                         }}
                       >
                         + افزودن پاورقی
@@ -425,10 +426,10 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
                     )}
                     <Button
                       onClick={() => {
-                        setSelectedMenu(_menu)
-                        setSelectedColumn(_column)
-                        setSelectedRow(null)
-                        setActiveForm('row')
+                        setSelectedMenu(_menu);
+                        setSelectedColumn(_column);
+                        setSelectedRow(null);
+                        setActiveForm("row");
                       }}
                       status="Info"
                       appearance="outline"
@@ -442,9 +443,9 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
                 status="Info"
                 appearance="outline"
                 onClick={() => {
-                  setSelectedMenu(_menu)
-                  setSelectedColumn(null)
-                  setActiveForm('column')
+                  setSelectedMenu(_menu);
+                  setSelectedColumn(null);
+                  setActiveForm("column");
                 }}
               >
                 افزودن ستون
@@ -460,38 +461,31 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
         <ModalBox>
           <Form
             onSubmit={
-              activeForm === 'menu'
+              activeForm === "menu"
                 ? menuHandleSubmit(onMenuFormSubmit)
-                : activeForm === 'column'
+                : activeForm === "column"
                 ? columnHandleSubmit(onColumnFormSubmit)
-                : activeForm === 'columnFooter'
+                : activeForm === "columnFooter"
                 ? columnFooterHandleSubmit(onColumnFooterFormSubmit)
                 : rowHandleSubmit(onRowFormSubmit)
             }
           >
-            {activeForm === 'menu' ? (
+            {activeForm === "menu" ? (
               <>
                 <InputGroup>
                   <label>نام منو</label>
-                  <input {...menuRegister('menuTitle')} />
+                  <input {...menuRegister("menuTitle")} />
                 </InputGroup>
 
                 <InputGroup>
                   <label>لینک عنوان منو</label>
-                  <input {...menuRegister('href')} />
+                  <input {...menuRegister("href")} />
                 </InputGroup>
 
-                <InputGroup>
-                  <Controller
-                    control={menuControl}
-                    name="bold"
-                    render={({ field }) => (
-                      <Checkbox {...field} checked={field.value}>
-                        برجسته
-                      </Checkbox>
-                    )}
-                  />
-                </InputGroup>
+                <label>
+                  <input type="checkbox" {...menuRegister("bold")} disabled /> برجسته (پس از ساخت منو، از بخش ویرایش این
+                  گزینه را تغییر دهید)
+                </label>
 
                 <InputGroup>
                   <Controller
@@ -505,16 +499,16 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
                   />
                 </InputGroup>
               </>
-            ) : activeForm === 'column' ? (
+            ) : activeForm === "column" ? (
               <>
                 <InputGroup>
                   <label>نام فهرست</label>
-                  <input {...columnRegister('columnTitle', { required: true })} />
+                  <input {...columnRegister("columnTitle", { required: true })} />
                 </InputGroup>
 
                 <InputGroup>
                   <label>تصویر فهرست</label>
-                  <input type="file" {...columnRegister('...thumb')} />
+                  <input type="file" {...columnRegister("...thumb")} />
                 </InputGroup>
                 {selectedColumn?.thumb && (
                   <ThumbContainer>
@@ -535,20 +529,20 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
                   />
                 </InputGroup>
               </>
-            ) : activeForm === 'columnFooter' ? (
+            ) : activeForm === "columnFooter" ? (
               <>
                 <H3 className="column-footer">
-                  پاورقی منوی ({selectedMenu?.menuTitle})، فهرست ({selectedColumn?.columnTitle}){' '}
+                  پاورقی منوی ({selectedMenu?.menuTitle})، فهرست ({selectedColumn?.columnTitle}){" "}
                 </H3>
 
                 <InputGroup>
                   <label>عنوان لینک پاورقی</label>
-                  <input {...columnFooterRegister('name')} />
+                  <input {...columnFooterRegister("name")} />
                 </InputGroup>
 
                 <InputGroup>
                   <label>لینک پاورقی</label>
-                  <input {...columnFooterRegister('href')} />
+                  <input {...columnFooterRegister("href")} />
                 </InputGroup>
 
                 <InputGroup>
@@ -567,12 +561,12 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
               <>
                 <InputGroup>
                   <label>عنوان لینک</label>
-                  <input {...rowRegister('name', { required: true })} />
+                  <input {...rowRegister("name", { required: true })} />
                 </InputGroup>
 
                 <InputGroup>
                   <label>لینک</label>
-                  <input {...rowRegister('href', { required: true })} />
+                  <input {...rowRegister("href", { required: true })} />
                 </InputGroup>
 
                 <InputGroup>
@@ -599,11 +593,11 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
 
               <Button
                 disabled={
-                  activeForm === 'menu'
+                  activeForm === "menu"
                     ? !selectedMenu
-                    : activeForm === 'column'
+                    : activeForm === "column"
                     ? !selectedColumn
-                    : activeForm === 'columnFooter'
+                    : activeForm === "columnFooter"
                     ? !selectedColumn?.footer
                     : !selectedRow
                 }
@@ -612,11 +606,11 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
                 status="Danger"
                 appearance="outline"
                 onClick={() =>
-                  activeForm === 'menu'
+                  activeForm === "menu"
                     ? onMenuRemoval(selectedMenu!)
-                    : activeForm === 'column'
+                    : activeForm === "column"
                     ? onColumnRemoval(selectedMenu!, selectedColumn!)
-                    : activeForm === 'columnFooter'
+                    : activeForm === "columnFooter"
                     ? onColumnFooterRemoval(selectedMenu!, selectedColumn!)
                     : onRowRemoval(selectedMenu!, selectedColumn!, selectedRow!)
                 }
@@ -631,16 +625,16 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
         بروزرسانی منو
       </Button>
     </Component>
-  )
-}
+  );
+};
 
-const Component = styled.div``
+const Component = styled.div``;
 
 const Menus = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-`
+`;
 
 const Menu = styled.div`
   padding: 1rem;
@@ -650,26 +644,26 @@ const Menu = styled.div`
 
   display: flex;
   flex-direction: column;
-`
+`;
 
 const MenuTitle = styled.h3`
   &:hover {
     cursor: pointer;
     color: ${Colors.Danger};
   }
-`
+`;
 
 const MenuColumns = styled.div`
   display: flex;
-`
+`;
 
 interface IMenuColumnProps {
-  highlight?: boolean
+  highlight?: boolean;
 }
 const Column = styled.div<IMenuColumnProps>`
   flex: 1;
   padding: 1rem;
-  border: ${(props) => (props.highlight ? '0.175rem' : '0.125rem')} solid
+  border: ${(props) => (props.highlight ? "0.175rem" : "0.125rem")} solid
     ${(props) => (props?.highlight ? Colors.grayDark : Colors.grayBorder)};
   border-radius: 0.5rem;
   margin: 1rem 0 0 1rem;
@@ -680,14 +674,14 @@ const Column = styled.div<IMenuColumnProps>`
   &:hover {
     border-color: ${Colors.Danger};
   }
-`
+`;
 
 const ColumnTitle = styled.h4`
   &:hover {
     cursor: pointer;
     color: ${Colors.Danger};
   }
-`
+`;
 
 const ThumbContainer = styled.div`
   width: 100%;
@@ -696,7 +690,7 @@ const ThumbContainer = styled.div`
   margin: 1rem 0;
 
   position: relative;
-`
+`;
 
 const ColumnThumb = styled.img`
   width: 100%;
@@ -707,18 +701,18 @@ const ColumnThumb = styled.img`
   position: absolute;
   top: 0;
   left: 0;
-`
+`;
 
 const MenuRows = styled.div`
   margin-top: 1rem;
 
   display: flex;
   flex-direction: column;
-`
+`;
 
 interface IMenuRowProps {
-  footer?: boolean
-  invalid?: boolean
+  footer?: boolean;
+  invalid?: boolean;
 }
 const MenuRow = styled.div<IMenuRowProps>`
   padding: 1rem;
@@ -731,11 +725,11 @@ const MenuRow = styled.div<IMenuRowProps>`
     cursor: pointer;
     background-color: ${Colors.grayBorder};
   }
-`
+`;
 
 const Container = styled.div`
   display: flex;
-`
+`;
 
 const Button = styled(_Button)`
   &.form {
@@ -745,29 +739,29 @@ const Button = styled(_Button)`
   &.add-menu {
     margin-botto: 1rem;
   }
-`
+`;
 
 const Form = styled.form`
   label {
     min-width: 5rem;
   }
-`
+`;
 
 const InputGroup = styled(_InputGroup)`
   margin-bottom: 1rem;
-`
+`;
 
 const H3 = styled.h3`
   &.column-footer {
     margin-bottom: 2rem;
   }
-`
+`;
 
 const ColumnThumbDeleteButton = styled.button.attrs({
-  type: 'button',
+  type: "button",
 })`
   position: absolute;
   top: 0;
   left: 0;
   z-index: 1;
-`
+`;

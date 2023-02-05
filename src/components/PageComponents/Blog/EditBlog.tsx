@@ -34,9 +34,7 @@ export const EditBlogPage: React.FC = () => {
   const [postLinkToAddName, setPostLinkToAddName] = useState<string | null>(null);
   const [postLinkToAddHref, setPostLinkToAddHref] = useState<string | null>(null);
 
-  const reloadBlog = async () => {
-    blogQuery.refetch();
-  };
+  const [mediaToRemove, setMediaToRemove] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -95,7 +93,7 @@ export const EditBlogPage: React.FC = () => {
     });
 
     if (response?.status === "success") {
-      await reloadBlog();
+      blogQuery.refetch();
       toast.success("وبلاگ  بروز شد");
     } else {
       toast.error("بروزرسانی وبلاگ موفقیت آمیز نبود");
@@ -110,7 +108,7 @@ export const EditBlogPage: React.FC = () => {
     const response = await editBlogVideo(blogQuery?.data?.data?.id, form);
 
     if (response?.status === "success") {
-      await reloadBlog();
+      blogQuery.refetch();
       toast.success("ویدیو وبلاگ  بروز شد");
     } else {
       toast.error("بروزرسانی ویدیو وبلاگ موفقیت آمیز نبود");
@@ -154,7 +152,7 @@ export const EditBlogPage: React.FC = () => {
       response = await uploadBlogImage(blogQuery?.data?.data?.id, source, file);
     }
     if (response?.status === "success") {
-      await reloadBlog();
+      blogQuery.refetch();
       toast.success("وبلاگ با موفقیت بروز شد");
     } else {
       toast.error("بروزرسانی وبلاگ موفقیت آمیز نبود");
@@ -176,7 +174,7 @@ export const EditBlogPage: React.FC = () => {
       <Form onSubmit={handleSubmit(onSubmit)} style={{ position: "relative" }}>
         <LoadingOverlay visible={loading} />
         <h2>
-          <span style={{ margin: "0 0 0 1rem" }}>ساخت وبلاگ</span>
+          <span style={{ margin: "0 0 0 1rem" }}>افزودن وبلاگ</span>
           <Controller
             name="is_news"
             control={control}
@@ -198,7 +196,7 @@ export const EditBlogPage: React.FC = () => {
         <Modal on={itemToRemove} toggle={closeRemovalModal}>
           <ModalBox>
             <div style={{ marginBottom: "1rem" }}>
-              آیا از حذف برچسب
+              آیا از حذف وبلاگ
               <span className="mx-1">{itemToRemove?.id}</span>
               اطمینان دارید؟
             </div>
@@ -224,6 +222,18 @@ export const EditBlogPage: React.FC = () => {
           </ModalBox>
         </Modal>
 
+        <Modal on={!!mediaToRemove} toggle={() => setMediaToRemove(null)}>
+          <ModalBox>
+            <div style={{ marginBottom: "1rem" }}>آیا از حذف ویدیو زیر اطمینان دارید؟</div>
+            <img src={`${process.env.SRC}/${watch(mediaToRemove!)?.u}`} style={{ maxHeight: "75vh" }} />
+            <FlexContainer jc="space-between">
+              <Button onClick={() => setMediaToRemove(null)}>انصراف</Button>
+              <Button onClick={() => removeVideo(videoToRemove)} status="Danger" disabled={loading}>
+                حذف
+              </Button>
+            </FlexContainer>
+          </ModalBox>
+        </Modal>
         <InputGroup className="col mb-4" fullWidth>
           <label>H1 صفحه</label>
           <input {...register("title", { required: true })} placeholder="H1 صفحه" />
@@ -480,7 +490,7 @@ export const EditBlogPage: React.FC = () => {
             />
             <MediaCard
               media={coerce.media(watch("endimage"))}
-              removalCallback={console.log}
+              removalCallback={() => toast.info("وضعیت نمایش را به 0 تغییر دهید")}
               updateCallback={(form: any) => updateBlogMedia(form, "endimage")}
               index={0}
             />
@@ -518,7 +528,7 @@ export const EditBlogPage: React.FC = () => {
 
             <MediaCard
               media={coerce.media(watch("thumb"))}
-              removalCallback={console.log}
+              removalCallback={() => toast.info("وضعیت نمایش را به 0 تغییر دهید")}
               updateCallback={(form: any) => updateBlogMedia(form, "thumb")}
               index={0}
             />
