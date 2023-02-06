@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
 
     const queryClient = new QueryClient();
-    await queryClient.prefetchQuery(["roles"], () => $_get_roles_list({}, token));
+    await queryClient.prefetchQuery(["roles"], () => $_get_roles_list({ page: "total" }, token));
     await queryClient.prefetchQuery(["user"], () =>
       getSingleUser(context?.query?.user_id as string, token).then((res) => res.data),
     );

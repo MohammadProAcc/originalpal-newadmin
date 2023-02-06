@@ -33,7 +33,7 @@ export const PaginationBar: React.FC<IProps> = ({ totalPages, activePage, router
       <Pagination
         page={activePage}
         onChange={onChange}
-        total={10}
+        total={totalPages}
         color="teal"
         radius="xl"
         styles={(theme) => ({

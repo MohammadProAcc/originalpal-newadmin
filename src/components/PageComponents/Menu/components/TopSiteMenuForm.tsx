@@ -1,4 +1,3 @@
-import { Space } from "@mantine/core";
 import { Button as _Button, Checkbox, InputGroup as _InputGroup } from "@paljs/ui";
 import { BasicModal, ModalBox } from "components";
 import produce from "immer";
@@ -15,7 +14,7 @@ import {
   TopSiteMenu,
   TopSiteRow,
 } from "types";
-import { uploadMediaFile, updateMedia } from "utils";
+import { updateMedia, uploadMediaFile } from "utils";
 
 interface TopSiteMenuFormProps {
   loading?: boolean;
@@ -23,6 +22,7 @@ interface TopSiteMenuFormProps {
   defaultValues?: any;
 }
 
+// TODO: rebuild it
 export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callback, defaultValues }) => {
   const [menu, setMenu] = useState<TopSiteMenu[]>(defaultValues);
 
@@ -199,6 +199,8 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
           ...initialTopSiteMenu,
           menuTitle: form?.menuTitle,
           href: form?.href,
+          bold: form?.bold,
+          footer: form?.footer,
         });
     menuReset();
     setActiveForm(null);
@@ -220,6 +222,7 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
     selectedColumn
       ? editColumn(selectedMenu, selectedColumn, form)
       : addColumn(selectedMenu, { ...initialTopSiteMenuColumn, columnTitle: form?.columnTitle });
+    menuReset();
     columnReset();
     setActiveForm(null);
     toast.success(
@@ -260,6 +263,8 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
       </p>,
     );
     rowReset();
+    columnReset();
+    menuReset();
   };
 
   useEffect(() => {
@@ -339,6 +344,12 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
   function removeColumnBanner() {
     columnSetValue("thumb", null);
     toast.success("بنر فهرست حذف شد, پس از ثبت موارد اعمال خواهد شد");
+  }
+
+  function resetAll() {
+    menuReset();
+    columnReset();
+    rowReset();
   }
 
   return (
@@ -483,8 +494,7 @@ export const TopSiteMenuForm: React.FC<TopSiteMenuFormProps> = ({ loading, callb
                 </InputGroup>
 
                 <label>
-                  <input type="checkbox" {...menuRegister("bold")} disabled /> برجسته (پس از ساخت منو، از بخش ویرایش این
-                  گزینه را تغییر دهید)
+                  <input type="checkbox" {...menuRegister("bold")} /> برجسته
                 </label>
 
                 <InputGroup>

@@ -25,7 +25,7 @@ export function CreateUser() {
 
   const onSubmit = async (form: any) => {
     setLoading(true);
-    form.roles = form.roles.map((role: any) => role.value);
+    form.roles = form.roles?.map((role: any) => role.value) ?? [];
     const response = await createUser(form, Cookies.get(process.env.TOKEN!));
     if (response?.status === "success") {
       reset();

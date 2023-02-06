@@ -2,7 +2,7 @@ import { Flex } from "@mantine/core";
 import { Add } from "@material-ui/icons";
 import { Button, Container, Modal } from "@paljs/ui";
 import { useQuery } from "@tanstack/react-query";
-import { BasicTable, CreateRoleModal, EditRoleModal, FlexContainer, HeaderButton } from "components";
+import { BasicTable, CreateRoleModal, EditRoleModal, FlexContainer, HeaderButton, PaginationBar } from "components";
 import Layout from "Layouts";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
@@ -128,6 +128,11 @@ export const RolesPage = () => {
           clearSelectionTriggerRef={clearSelectionsRef}
         />
       )}
+      <PaginationBar
+        totalPages={roles?.last_page}
+        activePage={router.query.page ? Number(router.query.page) : 1}
+        router={router}
+      />
 
       <Modal on={itemToRemove} toggle={toggleModal}>
         <ModalBox fluid>
