@@ -1,7 +1,8 @@
 export const FIELDS = {
-  "product": [
+  product: [
     "id",
     "code",
+    "size",
     "name",
     "title",
     "slug",
@@ -26,9 +27,9 @@ export const FIELDS = {
     "discount_exp",
     "updated_at",
     "created_at",
-    "video"
+    "video",
   ],
-  "stock": [
+  stock: [
     "id",
     "product_id",
     "count",
@@ -41,9 +42,9 @@ export const FIELDS = {
     "discount_start",
     "discount_end",
     "code",
-    "disc"
+    "disc",
   ],
-  "order": [
+  order: [
     "id",
     "number",
     "status",
@@ -62,19 +63,10 @@ export const FIELDS = {
     "delivery",
     "admin_check",
     "coupon_id",
-    "typesell"
+    "typesell",
   ],
-  "address": [
-    "id",
-    "postalcode",
-    "city",
-    "address",
-    "province",
-    "user_id",
-    "created_at",
-    "updated_at"
-  ],
-  "article": [
+  address: ["id", "postalcode", "city", "address", "province", "user_id", "created_at", "updated_at"],
+  article: [
     "id",
     "title",
     "slug",
@@ -105,9 +97,9 @@ export const FIELDS = {
     "headers",
     "trend",
     "is_news",
-    "video"
+    "video",
   ],
-  "comment": [
+  comment: [
     "id",
     "title",
     "content",
@@ -123,9 +115,9 @@ export const FIELDS = {
     "updated_at",
     "admin_check",
     "blog_id",
-    "parent_id"
+    "parent_id",
   ],
-  "user": [
+  user: [
     "id",
     "phone",
     "name",
@@ -136,21 +128,11 @@ export const FIELDS = {
     "points",
     "created_at",
     "updated_at",
-    "role"
+    "role",
   ],
-  "menu": [
-    "id",
-    "type",
-    "items",
-    "created_at",
-    "updated_at"
-  ],
-  "role": [
-    "id",
-    "name",
-    "permissions"
-  ],
-  "tag": [
+  menu: ["id", "type", "items", "created_at", "updated_at"],
+  role: ["id", "name", "permissions"],
+  tag: [
     "id",
     "name",
     "type",
@@ -160,9 +142,9 @@ export const FIELDS = {
     "description",
     "priority",
     "updated_at",
-    "created_at"
+    "created_at",
   ],
-  "brand": [
+  brand: [
     "id",
     "name",
     "created_at",
@@ -171,9 +153,9 @@ export const FIELDS = {
     "meta_keywords",
     "meta_description",
     "title_page",
-    "tagtext"
+    "tagtext",
   ],
-  "coupon": [
+  coupon: [
     "id",
     "code",
     "decription",
@@ -188,10 +170,9 @@ export const FIELDS = {
     "user_id",
     "created_at",
     "updated_at",
-    "deleted_at"
-
+    "deleted_at",
   ],
-  "payment": [
+  payment: [
     "id",
     "port",
     "price",
@@ -204,6 +185,6 @@ export const FIELDS = {
     "payment_date",
     "created_at",
     "updated_at",
-    "deleted_at"
-  ]
-}
+    "deleted_at",
+  ],
+};

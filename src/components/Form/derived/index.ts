@@ -5,3 +5,4 @@ export * from "./SendSmsForm";
 export * from "./RoleForm";
 export * from "./CouponForm";
 export * from "./TagForm";
+export * from "./NewTopSiteMenuForm";

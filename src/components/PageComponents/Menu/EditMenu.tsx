@@ -1,11 +1,12 @@
+import { Menu } from "@mantine/core";
 import { Modal } from "@paljs/ui";
-import { AdsMenuForm, Button, FlexContainer, ModalBox, TopSiteMenuForm } from "components";
+import { AdsMenuForm, Button, FlexContainer, ModalBox, NewTopSiteMenuForm, TopSiteMenuForm } from "components";
 import Cookies from "js-cookie";
 import Layout from "Layouts";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { MenuType, TopSiteMenu } from "types";
+import { IMenu, MenuType, TopSiteMenu } from "types";
 import { deleteMenu, editMenu, removeItem, useStore } from "utils";
 import { BottomSiteDescriptionForm, ProductsBottomSiteMenuForm } from "./components";
 import { BottomSiteMenuForm } from "./components/ProductsBottomSiteMenuForm";
@@ -44,48 +45,53 @@ export const EditMenuPage: React.FC = () => {
     switch (type) {
       case "top-site":
         return (
-          <TopSiteMenuForm
+          // <TopSiteMenuForm
+          //   loading={loading}
+          //   callback={(menu: TopSiteMenu) => updateMenuCallback("top-site", JSON.parse(JSON.stringify(menu)))}
+          //   defaultValues={defaultValues}
+          // />
+          <NewTopSiteMenuForm
+            menu={defaultValues}
+            callback={(menu: IMenu<TopSiteMenu>) => updateMenuCallback("top-site", menu.items)}
             loading={loading}
-            callback={(menu: TopSiteMenu) => updateMenuCallback("top-site", JSON.parse(JSON.stringify(menu)))}
-            defaultValues={defaultValues}
           />
         );
 
-      case "ad":
-        return (
-          <AdsMenuForm
-            loading={loading}
-            callback={(items: any) => updateMenuCallback("ad", items)}
-            defaultValues={defaultValues}
-          />
-        );
+      // case "ad":
+      //   return (
+      //     <AdsMenuForm
+      //       loading={loading}
+      //       callback={(items: any) => updateMenuCallback("ad", items)}
+      //       defaultValues={defaultValues}
+      //     />
+      //   );
 
-      case "bottom-site":
-        return (
-          <BottomSiteMenuForm
-            loading={loading}
-            callback={(items: any) => updateMenuCallback("bottom-site", items)}
-            defaultValues={defaultValues}
-          />
-        );
+      // case "bottom-site":
+      //   return (
+      //     <BottomSiteMenuForm
+      //       loading={loading}
+      //       callback={(items: any) => updateMenuCallback("bottom-site", items)}
+      //       defaultValues={defaultValues}
+      //     />
+      //   );
 
-      case "bottom-site-descrpitions":
-        return (
-          <BottomSiteDescriptionForm
-            loading={loading}
-            callback={(items: any) => updateMenuCallback("bottom-site-descriptions", items)}
-            defaultValues={defaultValues}
-          />
-        );
+      // case "bottom-site-descrpitions":
+      //   return (
+      //     <BottomSiteDescriptionForm
+      //       loading={loading}
+      //       callback={(items: any) => updateMenuCallback("bottom-site-descriptions", items)}
+      //       defaultValues={defaultValues}
+      //     />
+      //   );
 
-      case "products-bottom-site-menu":
-        return (
-          <ProductsBottomSiteMenuForm
-            loading={loading}
-            callback={(items: any) => updateMenuCallback("products-bottom-site-menu", items)}
-            defaultValues={defaultValues}
-          />
-        );
+      // case "products-bottom-site-menu":
+      //   return (
+      //     <ProductsBottomSiteMenuForm
+      //       loading={loading}
+      //       callback={(items: any) => updateMenuCallback("products-bottom-site-menu", items)}
+      //       defaultValues={defaultValues}
+      //     />
+      //   );
     }
   };
 
@@ -93,7 +99,7 @@ export const EditMenuPage: React.FC = () => {
     <Layout title={`ویرایش منوی ${menu?.id}`}>
       <h1 style={{ marginBottom: "4rem" }}>ویرایش منو شماره {menu?.id}</h1>
 
-      {renderForm(menu?.type, menu?.items)}
+      {renderForm(menu?.type, menu)}
 
       {/* ....:::::: Remove Modals :::::.... */}
       <Modal on={itemToRemove} toggle={closeRemovalModal}>
