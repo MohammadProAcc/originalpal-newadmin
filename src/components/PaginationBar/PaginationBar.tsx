@@ -28,23 +28,27 @@ export const PaginationBar: React.FC<IProps> = ({ totalPages, activePage, router
   }
 
   return (
-    <Component>
-      <Divider my="md" />
-      <Pagination
-        page={activePage}
-        onChange={onChange}
-        total={totalPages}
-        color="teal"
-        radius="xl"
-        styles={(theme) => ({
-          item: {
-            "&[data-active]": {
-              backgroundImage: theme.fn.gradient({ from: "blue", to: "cyan" }),
-            },
-          },
-        })}
-      />
-    </Component>
+    <>
+      {totalPages > 1 && (
+        <Component>
+          <Divider my="md" />
+          <Pagination
+            page={activePage}
+            onChange={onChange}
+            total={totalPages}
+            color="teal"
+            radius="xl"
+            styles={(theme) => ({
+              item: {
+                "&[data-active]": {
+                  backgroundImage: theme.fn.gradient({ from: "blue", to: "cyan" }),
+                },
+              },
+            })}
+          />
+        </Component>
+      )}
+    </>
   );
 };
 

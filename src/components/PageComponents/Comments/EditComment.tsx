@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, InputGroup, Modal } from "@paljs/ui";
 import { useQuery } from "@tanstack/react-query";
 import { Button, HeaderButton } from "components";
 import { FlexContainer, ModalBox } from "components/Container";
-import { AnswerCommentForm, Form as _Form } from "components/Form";
+import { AnswerCommentForm, Form } from "components/Form";
 import Cookies from "js-cookie";
 import Layout from "Layouts";
 import { useRouter } from "next/router";
@@ -126,7 +126,7 @@ export const EditCommentPage: React.FC = () => {
         </ModalBox>
       </Modal>
 
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(onSubmit)} style={{ marginBottom: "3rem" }}>
         <Card>
           <CardHeader>عنوان نظر</CardHeader>
           <CardBody>
@@ -156,7 +156,3 @@ export const EditCommentPage: React.FC = () => {
     </Layout>
   );
 };
-
-const Form = styled(_Form)`
-  margin-bottom: 3rem;
-`;

@@ -1,9 +1,9 @@
-export interface OwnMedia {
-  url: string
-  meta: number
-  type: number
-  reference_id: number
-  updated_at: string
-  created_at: string
-  id: number
+export interface FreeMedia {
+  url: string;
+  meta: any | null;
+  type: number;
+  reference_id: number;
+  updated_at: string;
+  created_at: string;
+  id: number;
 }

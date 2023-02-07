@@ -1,10 +1,35 @@
-import { Accordion, Button, Divider, Flex, Modal, Text, Title } from "@mantine/core";
+import {
+  Accordion,
+  ActionIcon,
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Loader,
+  LoadingOverlay,
+  Modal,
+  Radio,
+  Space,
+  Text,
+  Title,
+} from "@mantine/core";
 import { ConfirmButtons } from "components/Button";
+import { useNonInitialEffect } from "hooks";
 import _ from "lodash";
 import { ReactNode, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import styled from "styled-components";
-import { IMenu, TopSiteColumn, TopSiteMenu, TopSiteRow } from "types";
+import {
+  FreeMedia,
+  IMenu,
+  initialTopSiteMenu,
+  initialTopSiteMenuColumn,
+  TopSiteColumn,
+  TopSiteMenu,
+  TopSiteRow,
+} from "types";
+import { deleteMedia, preppend, updateMedia, uploadMediaFile } from "utils";
 import { v4 } from "uuid";
 
 interface ITopSiteMenuFormProps {
@@ -14,12 +39,157 @@ interface ITopSiteMenuFormProps {
 }
 export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
   // <<<=====------ STATES ------=====>>>
-  const [items, setItems] = useState(props.menu.items);
+  const [items, setItems] = useState<TopSiteMenu[]>(props.menu.items);
+  const [innerLoading, setInnerLoading] = useState(false);
+
+  const [selectedItem, setSelectedItem] = useState<TopSiteMenu | null>(null);
+  const [selectedColumn, setSelectedColumn] = useState<TopSiteColumn | null>(null);
+  const [selectedRow, setSelectedRow] = useState<TopSiteRow | null>(null);
+
+  const [activeForm, setActiveForm] = useState<"item" | "column" | "row" | null>(null);
+
   const [itemToRemove, setItemToRemove] = useState<TopSiteMenu | null>(null);
   const [columnToRemove, setColumnToRemove] = useState<TopSiteColumn | null>(null);
   const [rowToRemove, setRowToRemove] = useState<TopSiteRow | null>(null);
 
+  // <<<=====------ FORMS ------=====>>>
+  const itemForm = useForm();
+
+  const columnForm = useForm();
+
+  const rowForm = useForm();
+
   // <<<=====------ FUNCTIONS ------=====>>>
+  function resetAll() {
+    setActiveForm(null);
+    setSelectedItem(null);
+    setSelectedColumn(null);
+    setSelectedRow(null);
+    itemForm.reset();
+    columnForm.reset();
+    rowForm.reset();
+  }
+
+  async function changeColumnMedia(file: File | undefined) {
+    if (file) {
+      setInnerLoading(true);
+      try {
+        const response = await uploadMediaFile(file);
+        // setItems((currentItems) =>
+        //   currentItems.map((item) => ({
+        //     ...item,
+        //     columns: item.columns.map((column) => ({
+        //       ...column,
+        //       thumb: _.isEqual(column, selectedColumn) ? response?.data.data : column.thumb,
+        //     })),
+        //   })),
+        // );
+        // setSelectedColumn((currentColumn: any) => ({
+        //   ...currentColumn,
+        //   thumb: response?.data.data,
+        // }));
+        columnForm.setValue("thumb", response?.data.data);
+        toast.success("تصویر ستون بروز شد");
+      } catch (err) {
+        toast.error("بروزرسانی تصویر ستون موفقیت آمیز نبود");
+      } finally {
+        setInnerLoading(false);
+      }
+    }
+  }
+
+  async function removeColumnMedia(media: FreeMedia) {
+    setInnerLoading(true);
+    try {
+      await deleteMedia(media.id);
+      setItems((currentItems) =>
+        currentItems.map((item) => ({
+          ...item,
+          columns: item.columns.map((column) => ({
+            ...column,
+            thumb: _.isEqual(column, selectedColumn) ? null : column.thumb,
+          })),
+        })),
+      );
+      // FIXME:
+      toast.success("تصویر ستون حذف شد");
+    } catch (err) {
+      // FIXME:
+      toast.error("حذف تصویر ستون موفقیت آمیز نبود");
+    } finally {
+      setInnerLoading(false);
+    }
+  }
+
+  async function updateColumnMedia(media: FreeMedia) {
+    setInnerLoading(true);
+    try {
+      const response = await updateMedia(media.id, media);
+      setItems((currentItems) =>
+        currentItems.map((item) => ({
+          ...item,
+          columns: item.columns.map((column) => ({
+            ...column,
+            thumb: _.isEqual(column, selectedColumn) ? response?.data.data : column.thumb,
+          })),
+        })),
+      );
+      // FIXME:
+      toast.success("تصویر ستون بروزرسانی شد");
+    } catch (err) {
+      // FIXME:
+      toast.error("حذف تصویر ستون موفقیت آمیز نبود");
+    } finally {
+      setInnerLoading(false);
+    }
+  }
+
+  function onSubmitItem(form: TopSiteMenu) {
+    if (selectedItem) {
+      setItems((currentItems) => currentItems.map((item) => (item.menuTitle === selectedItem.menuTitle ? form : item)));
+      toast.success(<Text>بخش {selectedItem.menuTitle} بروزرسانی شد</Text>);
+    } else {
+      setItems((currentItems) => [...currentItems, { ...initialTopSiteMenu, ...form }]);
+      toast.success(<Text>بخش {form.menuTitle} افزوده شد</Text>);
+    }
+    resetAll();
+  }
+
+  function onSubmitColumn(form: TopSiteColumn) {
+    const { footerExistance, ...finalForm } = form as any;
+    if (footerExistance === "false") {
+      finalForm.footer = false;
+    } else {
+      finalForm.footer = form.footer;
+    }
+
+    if (selectedColumn) {
+      setItems((currentItems) =>
+        currentItems.map((item) => ({
+          ...item,
+          columns: item.columns.map((column) => (_.isEqual(column, selectedColumn) ? finalForm : column)),
+        })),
+      );
+      // FIXME:
+      toast.success(<Text>ستون {selectedColumn.columnTitle} بروزرسانی شد</Text>);
+    } else {
+      setItems((currentItems) =>
+        currentItems.map((item) => ({
+          ...item,
+          columns: [...item.columns, { ...initialTopSiteMenuColumn, ...finalForm }],
+        })),
+      );
+      // FIXME:
+      toast.success(<Text>ستون {finalForm.columnTitle} افزوده شد</Text>);
+    }
+    resetAll();
+  }
+  function onSubmitRow(form: TopSiteRow) {
+    if (selectedRow) {
+    } else {
+    }
+  }
+
   function removeItem(itemToRemove: TopSiteMenu) {
     if (itemToRemove) {
       setItems((currentItems) => currentItems.filter((item) => !_.isEqual(item, itemToRemove)));
@@ -28,49 +198,166 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
     }
   }
 
+  function removeColumn(columnToRemove: TopSiteColumn) {
+    if (columnToRemove) {
+      setItems((currentItems) =>
+        currentItems.map((item) => ({
+          ...item,
+          columns: item.columns.filter((column) => !_.isEqual(column, columnToRemove)),
+        })),
+      );
+      toast.success(
+        <Text>
+          ستون "{columnToRemove.columnTitle}" از بخش "{selectedItem?.menuTitle}" حذف شد
+        </Text>,
+      );
+      setSelectedItem(null);
+      setColumnToRemove(null);
+    }
+  }
+
+  function removeRow(rowToRemove: TopSiteRow) {
+    if (rowToRemove) {
+      setItems((currentItems) =>
+        currentItems.map((item) => ({
+          ...item,
+          columns: item.columns.map((column) => ({
+            ...column,
+            rows: column.rows.filter((row) => !_.isEqual(row, rowToRemove)),
+          })),
+        })),
+      );
+      toast.success(
+        <Text>
+          لینک{" "}
+          <strong>
+            "<a>{rowToRemove?.name}</a>"
+          </strong>
+          از ستون
+          <strong>
+            "<a>{selectedColumn?.columnTitle}</a>"
+          </strong>
+          از بخش
+          <strong>
+            "<a>{selectedItem?.menuTitle}</a>"
+          </strong>
+          حذف شد
+        </Text>,
+      );
+      setSelectedItem(null);
+      setSelectedColumn(null);
+      setRowToRemove(null);
+    }
+  }
+
+  // <<<=====------ Effects ------=====>>>
+  useNonInitialEffect(() => {
+    if (!activeForm) {
+      resetAll();
+    }
+  }, [activeForm]);
+
   // <<<=====------ JSX ------=====>>>
   return (
     <$>
-      <Title>منوی بالای صفحه</Title>
+      <LoadingOverlay visible={props.loading} />
+      <Flex align="center" gap="md">
+        <Title>منوی بالای صفحه</Title>
+        <Button
+          variant="gradient"
+          gradient={{ from: "teal", to: "lime", deg: 105 }}
+          onClick={() => setActiveForm("item")}
+        >
+          افزودن بخش
+        </Button>
+      </Flex>
       <Divider variant="dotted" size="lg" my="lg" />
       <Accordion>
         {/* <<<=====------ ITEMS ------=====>>> */}
         {items.map((item) => (
           <Accordion.Item value={v4()}>
-            <AccordionControl title={item.menuTitle} deletionCallback={() => setItemToRemove(item)} />
+            <AccordionControl
+              title={item.menuTitle}
+              deletionCallback={() => setItemToRemove(item)}
+              updationCallback={() => {
+                setSelectedItem(item);
+                Object.entries(item).forEach(([key, value]) => {
+                  itemForm.setValue(key, value);
+                });
+                setActiveForm("item");
+              }}
+              creation={{
+                title: "افزودن ستون",
+                callback: () => {
+                  setSelectedItem(item);
+                  setActiveForm("column");
+                },
+              }}
+            />
             <Accordion.Panel>
               <Accordion>
                 {/* <<<=====------ COLUMNS ------=====>>> */}
                 {item.columns.map((column) => (
                   <Accordion.Item value={v4()}>
                     <AccordionControl
-                      title={
-                        <Text>
-                          <strong>{item.menuTitle}</strong>
-                          {" > "}
-                          {column.columnTitle}
-                        </Text>
-                      }
-                      deletionCallback={() => setColumnToRemove(column)}
+                      title={<Text>{column.columnTitle}</Text>}
+                      deletionCallback={() => {
+                        setSelectedItem(item);
+                        setColumnToRemove(column);
+                      }}
+                      updationCallback={() => {
+                        setSelectedItem(item);
+                        setSelectedColumn(column);
+                        Object.entries(column).forEach(([key, value]) => {
+                          columnForm.setValue(key, value);
+                        });
+                        columnForm.setValue("footerExistance", String(!!columnForm.getValues("footer")));
+                        setActiveForm("column");
+                      }}
+                      creation={{
+                        title: "افزودن لینک",
+                        callback: () => {
+                          setSelectedItem(item);
+                          setSelectedColumn(column);
+                          setActiveForm("row");
+                        },
+                      }}
                     />
                     <Accordion.Panel>
                       {/* <<<=====------ ROWS ------=====>>> */}
-                      {column.rows.map((row) => (
+                      {column.rows.map((row, index) => (
                         <>
+                          {index === 0 && <Space mt="sm" />}
                           <Flex key={row.name} justify="space-between">
                             <a href={row.href} target="_blank">
                               {row.name}
                             </a>
-                            <Flex>
+                            <Flex gap="md">
                               <Button
                                 type="button"
-                                color="red"
                                 variant="gradient"
                                 gradient={{ from: "#ed6ea0", to: "#ec8c69", deg: 35 }}
-                                onClick={() => setRowToRemove(row)}
+                                onClick={() => {
+                                  setSelectedItem(item);
+                                  setSelectedColumn(column);
+                                  setRowToRemove(row);
+                                }}
                               >
                                 حذف
                               </Button>
+                              <Button
+                                variant="gradient"
+                                gradient={{ from: "teal", to: "blue", deg: 60 }}
+                                onClick={() => {
+                                  setSelectedItem(item);
+                                  setSelectedColumn(column);
+                                  setSelectedRow(row);
+                                  setActiveForm("row");
+                                }}
+                              >
+                                ویرایش
+                              </Button>
+                              <Divider ml="2.5rem" />
                             </Flex>
                           </Flex>
                           <Divider variant="dashed" my="md" color="dark" />
@@ -86,7 +373,13 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
       </Accordion>
 
       {/* <<<=====------ MODALS ------=====>>> */}
-      <Modal opened={!!itemToRemove} onClose={() => setItemToRemove(null)} centered>
+      {/* REMOVE ITEM */}
+      <Modal
+        opened={!!itemToRemove}
+        onClose={() => setItemToRemove(null)}
+        centered
+        styles={{ root: { width: "75vw" } }}
+      >
         آیا از حذف بخش <strong>"{itemToRemove?.menuTitle}"</strong> اطمینان دارید؟
         <Divider size="xs" my="md" />
         <ConfirmButtons
@@ -94,6 +387,232 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
           confirm={{ callback: () => removeItem(itemToRemove!) }}
         />
       </Modal>
+
+      {/* REMOVE COLUMN */}
+      <Modal
+        opened={!!columnToRemove}
+        onClose={() => setColumnToRemove(null)}
+        centered
+        styles={{ root: { width: "75vw" } }}
+      >
+        آیا از حذف ستون <strong>"{columnToRemove?.columnTitle}"</strong> از بخش{" "}
+        <strong>"{selectedItem?.menuTitle}"</strong> اطمینان دارید؟
+        <Divider size="xs" my="md" />
+        <ConfirmButtons
+          cancel={{
+            callback: () => {
+              setSelectedItem(null);
+              setColumnToRemove(null);
+            },
+          }}
+          confirm={{
+            callback: () => {
+              removeColumn(columnToRemove!);
+            },
+          }}
+        />
+      </Modal>
+
+      {/* REMOVE ROW */}
+      <Modal opened={!!rowToRemove} onClose={() => setRowToRemove(null)} centered styles={{ root: { width: "75vw" } }}>
+        آیا از حذف لینک{" "}
+        <strong>
+          "
+          <a href={rowToRemove?.href} target="_blank">
+            {rowToRemove?.name}
+          </a>
+          "
+        </strong>{" "}
+        از ستون <strong>"{selectedColumn?.columnTitle}"</strong> از بخش <strong>"{selectedItem?.menuTitle}"</strong>{" "}
+        اطمینان دارید؟
+        <Divider size="xs" my="md" />
+        <ConfirmButtons
+          cancel={{
+            callback: () => {
+              setSelectedItem(null);
+              setSelectedColumn(null);
+              setRowToRemove(null);
+            },
+          }}
+          confirm={{
+            callback: () => {
+              removeRow(rowToRemove!);
+            },
+          }}
+        />
+      </Modal>
+
+      {/* UPDATE ITEM */}
+      <Modal
+        opened={activeForm === "item"}
+        onClose={() => setActiveForm(null)}
+        centered
+        styles={{ root: { width: "75vw" } }}
+      >
+        <Text>
+          {selectedItem ? (
+            <Text>
+              ویرایش بخش <strong>"{selectedItem.menuTitle}"</strong>
+            </Text>
+          ) : (
+            <Text>افزودن بخش جدید</Text>
+          )}
+        </Text>
+        <Divider variant="dashed" my="md" />
+        {activeForm === "item" && (
+          <Form onSubmit={itemForm.handleSubmit(onSubmitItem)}>
+            <label>
+              عنوان بخش :
+              <input {...itemForm.register("menuTitle", { required: true })} />
+            </label>
+            <label>
+              لینک عنوان بخش :
+              <input {...itemForm.register("href", { required: true })} />
+            </label>
+            <label>
+              برجسته :
+              <input {...itemForm.register("bold")} type="checkbox" />
+            </label>
+            <label>
+              دارای پاورقی :
+              <input {...itemForm.register("footer")} type="checkbox" />
+            </label>
+            <Button variant="light" type="submit">
+              {selectedItem ? "بروزرسانی" : "افزودن"} بخش
+            </Button>
+          </Form>
+        )}
+      </Modal>
+
+      {/* UPDATE COLUMN */}
+      <Modal opened={activeForm === "column"} onClose={() => setActiveForm(null)} centered size="auto">
+        <Text>
+          {selectedColumn ? (
+            <Text>
+              ویرایش ستون <strong>"{selectedColumn.columnTitle}"</strong> از بخش{" "}
+              <strong>"{selectedItem?.menuTitle}"</strong>
+            </Text>
+          ) : (
+            <Text>
+              افزودن ستون جدید به بخش <strong>"{selectedItem?.menuTitle}"</strong>
+            </Text>
+          )}
+        </Text>
+        <Divider variant="dashed" my="md" />
+        <Form onSubmit={columnForm.handleSubmit(onSubmitColumn)} style={{ width: "50vw" }}>
+          <label>
+            عنوان ستون :
+            <input {...columnForm.register("columnTitle")} />
+          </label>
+          <label>
+            لینک عنوان ستون :
+            <input {...columnForm.register("href")} />
+          </label>
+          <label>
+            ستون برگزیده :
+            <input {...columnForm.register("highlight")} type="checkbox" />
+          </label>
+
+          <Divider label="تصویر ستون" variant="dashed" />
+
+          <label>
+            <input onChange={(e) => changeColumnMedia(e.target.files?.[0])} type="file" placeholder="بارگذاری تصویر" />
+            {innerLoading && <Loader />}
+          </label>
+          {columnForm.watch("thumb") && (
+            <Flex direction="column" gap="xs">
+              <Box sx={{ position: "relative" }}>
+                <ActionIcon
+                  color="red"
+                  variant="light"
+                  pos="absolute"
+                  top="0.5rem"
+                  left="0.75rem"
+                  sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
+                  onClick={() => columnForm.setValue("thumb", null)}
+                >
+                  ❌
+                </ActionIcon>
+
+                <img
+                  src={preppend(columnForm.watch("thumb")?.url, "med")}
+                  width="192"
+                  height="108"
+                  style={{ objectFit: "cover" }}
+                />
+              </Box>
+              <label style={{ justifyContent: "flex-start", alignItems: "center" }}>
+                <input {...columnForm.register("thumb.meta.a")} /> <Space mx="md" /> alt
+              </label>
+              <label style={{ justifyContent: "flex-start", alignItems: "center" }}>
+                <input {...columnForm.register("thumb.meta.t")} /> <Space mx="md" /> title
+              </label>
+            </Flex>
+          )}
+
+          <Divider label="پاورقی" variant="dashed" />
+
+          <Controller
+            name="footerExistance"
+            control={columnForm.control}
+            render={({ field }) => (
+              <Radio.Group {...field} defaultValue={String(!!columnForm.getValues("footer"))}>
+                <Radio value="false" label="پاورقی ندارد" />
+                <Radio value="true" label="پاورقی دارد" />
+              </Radio.Group>
+            )}
+          />
+
+          {columnForm.watch("footerExistance") === "true" && (
+            <>
+              <label>
+                عنوان لینک پاورقی :
+                <input {...columnForm.register("footer.name")} />
+              </label>
+              <label>
+                لینک پاورقی :
+                <input {...columnForm.register("footer.href")} />
+              </label>
+              <label>
+                پاورقی برجسته :
+                <input {...columnForm.register("footer.bold")} type="checkbox" />
+              </label>
+            </>
+          )}
+          <Button variant="light" type="submit">
+            {selectedItem ? "بروزرسانی" : "افزودن"} ستون
+          </Button>
+        </Form>
+      </Modal>
+
+      {/* UPDATE ROW */}
+      <Modal
+        opened={activeForm === "row"}
+        onClose={() => setActiveForm(null)}
+        centered
+        styles={{ root: { width: "75vw" } }}
+      >
+        <Text>
+          {selectedRow ? (
+            <Text>
+              ویرایش لینک <strong>"{selectedRow.name}"</strong> از ستون <strong>"{selectedColumn?.columnTitle}"</strong>{" "}
+              بخش <strong> "{selectedItem?.menuTitle}"</strong>
+            </Text>
+          ) : (
+            <Text>
+              افزودن لینک جدید به ستون <strong>"{selectedColumn?.columnTitle}"</strong> بخش{" "}
+              <strong>"{selectedItem?.menuTitle}"</strong>
+            </Text>
+          )}
+        </Text>
+        <Divider variant="dashed" my="md" />
+        <Form onSubmit={rowForm.handleSubmit(onSubmitRow)}>
+          <Button variant="light" type="submit">
+            {selectedRow ? "بروزرسانی" : "افزودن"} لینک
+          </Button>
+        </Form>
+      </Modal>
+
       <Divider variant="dotted" size="lg" my="lg" />
       <Button
         variant="gradient"
@@ -113,6 +632,11 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
 interface IAccordionItemControlProps {
   title: ReactNode;
   deletionCallback: any;
+  updationCallback: any;
+  creation?: {
+    title: string;
+    callback: any;
+  };
 }
 function AccordionControl(props: IAccordionItemControlProps) {
   return (
@@ -121,12 +645,23 @@ function AccordionControl(props: IAccordionItemControlProps) {
         {props.title}
         <Flex gap="md">
           <Button
-            color="red"
             variant="gradient"
             gradient={{ from: "#ed6ea0", to: "#ec8c69", deg: 35 }}
             onClick={props.deletionCallback}
           >
             حذف
+          </Button>
+          {!!props.creation && (
+            <Button
+              variant="gradient"
+              gradient={{ from: "teal", to: "lime", deg: 105 }}
+              onClick={props.creation.callback}
+            >
+              {props.creation.title}
+            </Button>
+          )}
+          <Button variant="gradient" gradient={{ from: "teal", to: "blue", deg: 60 }} onClick={props.updationCallback}>
+            ویرایش
           </Button>
         </Flex>
       </Flex>
@@ -136,4 +671,16 @@ function AccordionControl(props: IAccordionItemControlProps) {
 
 const $ = styled.div`
   width: 100%;
+
+  position: relative;
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+
+  label {
+    display: flex;
+    justify-content: space-between;
+  }
 `;
