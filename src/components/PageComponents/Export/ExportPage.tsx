@@ -1,20 +1,25 @@
+import { Group, MultiSelect, Space } from "@mantine/core";
 import { Button, InputGroup } from "@paljs/ui";
+import { useQuery } from "@tanstack/react-query";
 import { FIELDS } from "constants/FIELDS";
 import { useFetchAll, useLoading, useNonInitialEffect } from "hooks";
 import Layout from "Layouts";
 import React, { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import _Select from "react-select";
 import { toast } from "react-toastify";
 import styled from "styled-components";
+import { ProductBrand } from "types";
 import {
   getAddressList,
+  getBrandsList,
   getCouponsList,
   getOrdersList,
   getPayments,
   getProductsList,
   getStocksList,
   getUsersList,
+  search_in,
   translator,
 } from "utils";
 import { utils, writeFile } from "xlsx";
@@ -24,6 +29,8 @@ import { TableForExport } from "./TableForExport";
 export function ExportPage() {
   const [result, setResult] = useState<any>(null);
   const [loadingList, toggleLoading] = useLoading();
+
+  const brandsQuery = useQuery(["brands"], () => getBrandsList({ page: "total" }));
 
   const [exportType, setExportType] = useState(exportTypeOptions[0]);
   function exportTypeHandler(e: any) {
@@ -57,10 +64,6 @@ export function ExportPage() {
   async function onExport() {
     toggleLoading("exporting");
 
-    const selectedFields = [];
-    for (let [key, value] of Object.entries(getValues())) {
-      if (value) selectedFields.push(key);
-    }
     let response;
 
     switch (entityToExport.value) {
@@ -105,9 +108,34 @@ export function ExportPage() {
         break;
 
       case "product":
-        response = await getProductsList();
+        const brandId = getValues("brandToGet")?.value;
+        if (brandId) {
+          response = await search_in("products", { key: "brand_id", type: "contain", value: brandId }, { page: 1 });
+        } else {
+          response = await getProductsList();
+        }
         if (response && response.data) {
-          const allData = await useFetchAll(response.data.last_page, getProductsList);
+          const allData = await useFetchAll(
+            response.data.last_page,
+            brandId
+              ? ({ page }: any) =>
+                  search_in(
+                    "products",
+                    {
+                      key: "brand_id",
+                      type: "contain",
+                      value: brandId,
+                    },
+                    { page },
+                  )
+              : getProductsList,
+          );
+          console.log(allData);
+          allData.forEach((data) => {
+            if (data.brand) {
+              data.brand = data.brand.name;
+            }
+          });
           setResult(allData);
         } else {
           toast.warn("گرفتن خروجی موفقیت آمیز نبود");
@@ -190,7 +218,27 @@ export function ExportPage() {
           </FieldItem>
         ))}
       </FieldsList>
-
+      {/* TODO: add this for stock too */}
+      {entityToExport.value === "product" && (
+        <Group>
+          <Controller
+            name="brandToGet"
+            control={control}
+            render={({ field }) => (
+              <Select
+                isClearable
+                options={brandsQuery.data?.data?.data?.map((brand: ProductBrand) => ({
+                  label: brand?.name,
+                  value: brand?.id?.toString(),
+                }))}
+                placeholder="برند مورد نظر را انتخاب کنید"
+                {...field}
+              />
+            )}
+          />
+        </Group>
+      )}
+      <Space my="md" />
       <Button status="Success" onClick={onExport} disabled={loadingList.includes("exporting")}>
         گرفتن خروجی
       </Button>

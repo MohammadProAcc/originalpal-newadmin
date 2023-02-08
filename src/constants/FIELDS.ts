@@ -2,9 +2,9 @@ export const FIELDS = {
   product: [
     "id",
     "code",
-    "size",
     "name",
     "title",
+    "brand",
     "slug",
     "price",
     "discount_price",

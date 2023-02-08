@@ -11,6 +11,7 @@ const dictionary = {
   meta_keywords: "کلمات کلیدی متا",
   meta_description: "توضیحات متا",
   brand_id: "آیدی برند",
+  brand: "برند",
   sold: "فروخته شده",
   trend: "ترند",
   category_id: "آیدی دسته بندی",
