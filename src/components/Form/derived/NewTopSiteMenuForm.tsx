@@ -3,6 +3,7 @@ import {
   ActionIcon,
   Box,
   Button,
+  ButtonProps,
   Divider,
   Flex,
   Loader,
@@ -299,6 +300,10 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
           <Accordion.Item value={v4()}>
             <AccordionControl
               title={item.menuTitle}
+              buttonProps={{
+                variant: "outline",
+                color: "indigo",
+              }}
               deletionCallback={() => setItemToRemove(item)}
               updationCallback={() => {
                 setSelectedItem(item);
@@ -322,6 +327,9 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
                   <Accordion.Item value={v4()}>
                     <AccordionControl
                       title={<Text>{column.columnTitle}</Text>}
+                      buttonProps={{
+                        variant: "outline",
+                      }}
                       deletionCallback={() => {
                         setSelectedItem(item);
                         setColumnToRemove(column);
@@ -356,8 +364,8 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
                             <Flex gap="md">
                               <Button
                                 type="button"
-                                variant="gradient"
-                                gradient={{ from: "#ed6ea0", to: "#ec8c69", deg: 35 }}
+                                variant="outline"
+                                color="teal"
                                 onClick={() => {
                                   setSelectedItem(item);
                                   setSelectedColumn(column);
@@ -367,8 +375,8 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
                                 حذف
                               </Button>
                               <Button
-                                variant="gradient"
-                                gradient={{ from: "teal", to: "blue", deg: 60 }}
+                                variant="outline"
+                                color="teal"
                                 onClick={() => {
                                   setSelectedItem(item);
                                   setSelectedColumn(column);
@@ -676,6 +684,7 @@ interface IAccordionItemControlProps {
     title: string;
     callback: any;
   };
+  buttonProps?: ButtonProps;
 }
 function AccordionControl(props: IAccordionItemControlProps) {
   return (
@@ -687,6 +696,7 @@ function AccordionControl(props: IAccordionItemControlProps) {
             variant="gradient"
             gradient={{ from: "#ed6ea0", to: "#ec8c69", deg: 35 }}
             onClick={props.deletionCallback}
+            {...props.buttonProps}
           >
             حذف
           </Button>
@@ -695,11 +705,17 @@ function AccordionControl(props: IAccordionItemControlProps) {
               variant="gradient"
               gradient={{ from: "teal", to: "lime", deg: 105 }}
               onClick={props.creation.callback}
+              {...props.buttonProps}
             >
               {props.creation.title}
             </Button>
           )}
-          <Button variant="gradient" gradient={{ from: "teal", to: "blue", deg: 60 }} onClick={props.updationCallback}>
+          <Button
+            variant="gradient"
+            gradient={{ from: "teal", to: "blue", deg: 60 }}
+            onClick={props.updationCallback}
+            {...props.buttonProps}
+          >
             ویرایش
           </Button>
         </Flex>
