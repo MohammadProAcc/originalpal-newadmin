@@ -28,17 +28,18 @@ export function PriceListCard(props: DiscountListCardProps) {
         <span className="product-id nowrap">انبار :‌ {props.stock.id}</span>
       </Flex>
 
+      <Flex style={{ width: "8rem", height: "100%", alignSelf: "flex-start" }} title={product?.name} align="center">
+        <strong style={{ fontSize: "1.5rem" }}>{product?.code}</strong>
+      </Flex>
+
       <ImageContainer>
         <ProductImage src={`${process.env.SRC}/${product?.site_main_picture?.u}`} />
       </ImageContainer>
-      <Flex
-        style={{ width: "8rem", height: "100%", alignSelf: "flex-start" }}
-        title={product?.name}
-        align="center"
-        // justify="center"
-      >
+
+      <Flex style={{ width: "8rem", height: "100%", alignSelf: "flex-start" }} title={product?.name} align="center">
         <strong style={{ fontSize: "1.5rem" }}>{props.stock.size}</strong>
       </Flex>
+
       <div className="col price date">
         <Flex direction="column" style={{ width: "9rem" }} gap="xs">
           <Text>قیمت :</Text> <input defaultValue={props.stock.price} onChange={setNewPrice} />

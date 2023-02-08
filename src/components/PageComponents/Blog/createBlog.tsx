@@ -154,23 +154,23 @@ export function CreateBlog() {
           <CardHeader>SEO</CardHeader>
           <CardBody>
             <InputGroup className="col" fullWidth>
-              <label>کلمات مترادف (meta_keywords)</label>
-              <input {...register("meta_keywords")} placeholder="کلمات مترادف" />
+              <label>title صفحه</label>
+              <input {...register("title_page")} placeholder="عنوان" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
-              <label>عنوان متا</label>
+              <label>عنوان سئو</label>
               <input {...register("meta_title")} placeholder="عنوان متا" />
+            </InputGroup>
+
+            <InputGroup className="col" fullWidth>
+              <label>مترادف ها</label>
+              <input {...register("meta_keywords")} placeholder="کلمات مترادف" />
             </InputGroup>
 
             <InputGroup className="col" fullWidth>
               <label>توضیحات متا</label>
               <input {...register("meta_description")} placeholder="توضیحات متا" />
-            </InputGroup>
-
-            <InputGroup className="col" fullWidth>
-              <label>عنوان صفحه (title)</label>
-              <input {...register("title_page")} placeholder="عنوان" />
             </InputGroup>
           </CardBody>
         </Card>
