@@ -45,11 +45,6 @@ export const EditMenuPage: React.FC = () => {
     switch (type) {
       case "top-site":
         return (
-          // <TopSiteMenuForm
-          //   loading={loading}
-          //   callback={(menu: TopSiteMenu) => updateMenuCallback("top-site", JSON.parse(JSON.stringify(menu)))}
-          //   defaultValues={defaultValues}
-          // />
           <NewTopSiteMenuForm
             menu={defaultValues}
             callback={(menu: IMenu<TopSiteMenu>) => updateMenuCallback("top-site", menu.items)}
@@ -57,41 +52,41 @@ export const EditMenuPage: React.FC = () => {
           />
         );
 
-      // case "ad":
-      //   return (
-      //     <AdsMenuForm
-      //       loading={loading}
-      //       callback={(items: any) => updateMenuCallback("ad", items)}
-      //       defaultValues={defaultValues}
-      //     />
-      //   );
+      case "ad":
+        return (
+          <AdsMenuForm
+            loading={loading}
+            callback={(items: any) => updateMenuCallback("ad", items)}
+            defaultValues={defaultValues}
+          />
+        );
 
-      // case "bottom-site":
-      //   return (
-      //     <BottomSiteMenuForm
-      //       loading={loading}
-      //       callback={(items: any) => updateMenuCallback("bottom-site", items)}
-      //       defaultValues={defaultValues}
-      //     />
-      //   );
+      case "bottom-site":
+        return (
+          <BottomSiteMenuForm
+            loading={loading}
+            callback={(items: any) => updateMenuCallback("bottom-site", items)}
+            defaultValues={defaultValues}
+          />
+        );
 
-      // case "bottom-site-descrpitions":
-      //   return (
-      //     <BottomSiteDescriptionForm
-      //       loading={loading}
-      //       callback={(items: any) => updateMenuCallback("bottom-site-descriptions", items)}
-      //       defaultValues={defaultValues}
-      //     />
-      //   );
+      case "bottom-site-descrpitions":
+        return (
+          <BottomSiteDescriptionForm
+            loading={loading}
+            callback={(items: any) => updateMenuCallback("bottom-site-descriptions", items)}
+            defaultValues={defaultValues}
+          />
+        );
 
-      // case "products-bottom-site-menu":
-      //   return (
-      //     <ProductsBottomSiteMenuForm
-      //       loading={loading}
-      //       callback={(items: any) => updateMenuCallback("products-bottom-site-menu", items)}
-      //       defaultValues={defaultValues}
-      //     />
-      //   );
+      case "products-bottom-site-menu":
+        return (
+          <ProductsBottomSiteMenuForm
+            loading={loading}
+            callback={(items: any) => updateMenuCallback("products-bottom-site-menu", items)}
+            defaultValues={defaultValues}
+          />
+        );
     }
   };
 
