@@ -102,6 +102,10 @@ const items: MenuItemType[] = [
     title: "ابزار",
     children: [
       {
+        title: "فهرست قیمت ها",
+        link: { href: "/products/aggregate" },
+      },
+      {
         title: "فهرست تخفیفات",
         link: { href: "/coupons/aggregate" },
       },

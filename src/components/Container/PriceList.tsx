@@ -1,7 +1,7 @@
 import { Flex } from "@mantine/core";
 import { Button, InputGroup as _InputGroup } from "@paljs/ui";
 import { useQuery } from "@tanstack/react-query";
-import { DiscountListCard } from "components";
+import { PriceListCard } from "components";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -11,7 +11,7 @@ import styled from "styled-components";
 import { Stock } from "types";
 import { admin, pluralEditStock } from "utils";
 
-export function DiscountList() {
+export function PriceList() {
   const router = useRouter();
   const formMethods = useForm();
 
@@ -25,7 +25,7 @@ export function DiscountList() {
   );
   const [stocks, setStocks] = useState(stocksListQuery.data);
 
-  async function onSubmitDiscountForm(form: any) {
+  async function onSubmitPriceForm(form: any) {
     if (!lockSubmittion) {
       setLoading(true);
       const stocks = [];
@@ -64,13 +64,18 @@ export function DiscountList() {
 
   return (
     <FormProvider {...formMethods}>
-      <form onSubmit={formMethods.handleSubmit(onSubmitDiscountForm)}>
+      <form onSubmit={formMethods.handleSubmit(onSubmitPriceForm)}>
         <Flex style={{ position: "fixed", top: "6rem" }}>
           <InputGroup>
             <Button type="submit" disabled={loading}>
-              ثبت تخفیفات
+              اعمال تغییرات
             </Button>
-            <input placeholder="جستجو" onChange={searchCallback} />
+            <input
+              placeholder="جستجو"
+              onChange={searchCallback}
+              onFocus={() => setLockSubmittion(true)}
+              onBlur={() => setLockSubmittion(false)}
+            />
           </InputGroup>
         </Flex>
         <br />
@@ -79,7 +84,7 @@ export function DiscountList() {
           {stocks
             .filter((_stock: any) => !!_stock.product)
             .map((_stock: any) => (
-              <DiscountListCard key={_stock.id} stock={_stock} />
+              <PriceListCard key={_stock.id} stock={_stock} />
             ))}
         </Ul>
       </form>

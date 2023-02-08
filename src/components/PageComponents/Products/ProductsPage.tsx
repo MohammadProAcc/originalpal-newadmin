@@ -152,6 +152,20 @@ export const ProductsPage = () => {
             حذف موارد انتخاب شده
           </HeaderButton>
         )}
+        <Link href="/products/aggregate" passHref>
+          <a target="_blank">
+            <Button
+              style={{
+                margin: "1rem 0 1rem 1rem",
+                display: "flex",
+              }}
+              status="Info"
+              appearance="outline"
+            >
+              فهرست قیمت ها
+            </Button>
+          </a>
+        </Link>
       </FlexContainer>
 
       {has(permissions, PermissionEnum.browseProduct) && (
