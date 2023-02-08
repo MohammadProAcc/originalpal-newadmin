@@ -11,6 +11,7 @@ import styled from "styled-components";
 import { PermissionEnum } from "types";
 import { deleteMenu, editMenu, has, pluralRemove, translator, useStore, useUserStore } from "utils";
 
+// TODO: remove "removeAll" action
 export const MenuPage = () => {
   const router = useRouter();
 
@@ -110,7 +111,11 @@ export const MenuPage = () => {
 
       <FlexContainer>
         {tableSelections?.length > 0 && has(permissions, PermissionEnum.deleteMenu) && (
-          <HeaderButton status="Danger" appearance="outline" onClick={() => setItemsToRemove(tableSelections)}>
+          <HeaderButton
+            status="Danger"
+            appearance="outline"
+            onClick={() => toast.info("امکان حذف برای منو ها وجود ندارد")}
+          >
             حذف موارد انتخاب شده
           </HeaderButton>
         )}

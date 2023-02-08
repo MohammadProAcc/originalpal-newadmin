@@ -1,73 +1,73 @@
 export interface TopSiteRow {
-  name: string
-  href: string
-  bold?: boolean
+  name: string;
+  href: string;
+  bold?: boolean;
 }
 
 export interface TopSiteColumn {
-  columnTitle: string
-  href: string
-  highlight?: boolean
-  thumb?: any
-  footer?: TopSiteRow
-  rows: TopSiteRow[]
+  columnTitle: string;
+  href: string;
+  highlight?: boolean;
+  thumb?: any;
+  footer?: TopSiteRow;
+  rows: TopSiteRow[];
 }
 
 export interface TopSiteMenu {
-  menuTitle: string
-  href: string
-  bold?: boolean
-  footer?: boolean
-  columns: TopSiteColumn[]
+  menuTitle: string;
+  href: string;
+  bold?: boolean;
+  footer?: boolean;
+  columns: TopSiteColumn[];
 }
 
 export const initialTopSiteMenu: TopSiteMenu = {
-  menuTitle: 'منو ۱',
-  href: '',
+  menuTitle: "بخش ۱",
+  href: "",
   bold: false,
   columns: [
     {
-      columnTitle: 'فهرست ۱',
-      href: '',
-      thumb: '',
+      columnTitle: "ستون ۱",
+      href: "",
+      thumb: "",
       highlight: false,
       rows: [
         {
-          name: 'لینک ۱',
-          href: '',
+          name: "لینک ۱",
+          href: "",
           bold: false,
         },
       ],
       footer: {
-        name: 'پاروقی ۱',
-        href: '',
+        name: "پاروقی ۱",
+        href: "",
         bold: false,
       },
     },
   ],
-}
+};
 
 export const initialTopSiteMenuColumn = {
-  columnTitle: 'فهرست جدید',
-  href: '/',
-  thumb: '',
+  columnTitle: "ستون جدید",
+  href: "/",
+  thumb: "",
   highlight: false,
   rows: [
     {
-      name: 'لینک',
-      href: '/',
+      name: "لینک",
+      href: "/",
       bold: false,
     },
   ],
   footer: {
-    name: 'نام پاورقی',
-    href: '',
+    name: "نام پاورقی",
+    href: "",
     bold: false,
   },
-}
+};
 
 export const initialTopSiteMenuColumnRow = {
-  name: '',
-  href: '',
+  name: "",
+  href: "",
   bold: false,
-}
+};

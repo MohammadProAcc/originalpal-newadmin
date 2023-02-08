@@ -75,19 +75,6 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
       setInnerLoading(true);
       try {
         const response = await uploadMediaFile(file);
-        // setItems((currentItems) =>
-        //   currentItems.map((item) => ({
-        //     ...item,
-        //     columns: item.columns.map((column) => ({
-        //       ...column,
-        //       thumb: _.isEqual(column, selectedColumn) ? response?.data.data : column.thumb,
-        //     })),
-        //   })),
-        // );
-        // setSelectedColumn((currentColumn: any) => ({
-        //   ...currentColumn,
-        //   thumb: response?.data.data,
-        // }));
         columnForm.setValue("thumb", response?.data.data);
         toast.success("تصویر ستون بروز شد");
       } catch (err) {
@@ -111,8 +98,13 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
           })),
         })),
       );
+      columnForm.setValue("thumb", null);
       // FIXME:
-      toast.success("تصویر ستون حذف شد");
+      toast.success(
+        <Text>
+          تصویر ستون <strong>"{selectedColumn?.columnTitle}"</strong>حذف شد
+        </Text>,
+      );
     } catch (err) {
       // FIXME:
       toast.error("حذف تصویر ستون موفقیت آمیز نبود");
@@ -186,8 +178,37 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
   }
   function onSubmitRow(form: TopSiteRow) {
     if (selectedRow) {
+      setItems((currentItems) =>
+        currentItems.map((item) => ({
+          ...item,
+          columns: item.columns.map((column) => ({
+            ...column,
+            rows: column.rows.map((row) => (_.isEqual(row, selectedRow) ? form : row)),
+          })),
+        })),
+      );
+      toast.success(
+        <Text>
+          لینک <strong>"{selectedRow.name}"</strong>بروز شد
+        </Text>,
+      );
     } else {
+      setItems((currentItems) =>
+        currentItems.map((item) => ({
+          ...item,
+          columns: item.columns.map((column) => ({
+            ...column,
+            rows: [...column.rows, form],
+          })),
+        })),
+      );
+      toast.success(
+        <Text>
+          لینک <strong>"{form.name}"</strong> افزوده شد
+        </Text>,
+      );
     }
+    resetAll();
   }
 
   function removeItem(itemToRemove: TopSiteMenu) {
@@ -352,6 +373,9 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
                                   setSelectedItem(item);
                                   setSelectedColumn(column);
                                   setSelectedRow(row);
+                                  Object.entries(row).forEach(([key, value]) => {
+                                    rowForm.setValue(key, value);
+                                  });
                                   setActiveForm("row");
                                 }}
                               >
@@ -502,11 +526,11 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
         <Form onSubmit={columnForm.handleSubmit(onSubmitColumn)} style={{ width: "50vw" }}>
           <label>
             عنوان ستون :
-            <input {...columnForm.register("columnTitle")} />
+            <input {...columnForm.register("columnTitle", { required: true })} />
           </label>
           <label>
             لینک عنوان ستون :
-            <input {...columnForm.register("href")} />
+            <input {...columnForm.register("href", { required: true })} />
           </label>
           <label>
             ستون برگزیده :
@@ -529,7 +553,10 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
                   top="0.5rem"
                   left="0.75rem"
                   sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
-                  onClick={() => columnForm.setValue("thumb", null)}
+                  onClick={
+                    // () => columnForm.setValue("thumb", null)
+                    () => removeColumnMedia(columnForm.getValues("thumb"))
+                  }
                 >
                   ❌
                 </ActionIcon>
@@ -567,11 +594,11 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
             <>
               <label>
                 عنوان لینک پاورقی :
-                <input {...columnForm.register("footer.name")} />
+                <input {...columnForm.register("footer.name", { required: true })} />
               </label>
               <label>
                 لینک پاورقی :
-                <input {...columnForm.register("footer.href")} />
+                <input {...columnForm.register("footer.href", { required: true })} />
               </label>
               <label>
                 پاورقی برجسته :
@@ -607,6 +634,18 @@ export function NewTopSiteMenuForm(props: ITopSiteMenuFormProps) {
         </Text>
         <Divider variant="dashed" my="md" />
         <Form onSubmit={rowForm.handleSubmit(onSubmitRow)}>
+          <label>
+            عنوان لینک :
+            <input {...rowForm.register("name", { required: true })} />
+          </label>
+          <label>
+            لینک :
+            <input {...rowForm.register("href", { required: true })} />
+          </label>
+          <label>
+            برجسته :
+            <input {...rowForm.register("bold", { required: true })} type="checkbox" />
+          </label>
           <Button variant="light" type="submit">
             {selectedRow ? "بروزرسانی" : "افزودن"} لینک
           </Button>
