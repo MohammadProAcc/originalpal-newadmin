@@ -68,7 +68,7 @@ export function BasicTable({ columns, rows, getSelections, clearSelectionTrigger
                             onClick={() => handleSelection(row[0])}
                           />
                           {isOrder ? (
-                            <Popover placement="bottom" trigger="hover" overlay={<OrderDetails orderId={row[0]} />}>
+                            <Popover placement="left" trigger="hover" overlay={<OrderDetails orderId={row[0]} />}>
                               {item}
                             </Popover>
                           ) : (
