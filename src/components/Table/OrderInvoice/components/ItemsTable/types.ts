@@ -1,5 +1,6 @@
-import { OrderItems } from 'types'
+import { OrderItems } from "types";
 
 export interface ItemsTableProps {
-  items: OrderItems
+  items: OrderItems;
+  order: number;
 }

@@ -2,11 +2,10 @@ import { Card, Image, Group, Text, Badge, Button, LoadingOverlay, Alert } from "
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { IStockForCreation } from "types";
-import { getSingleStock } from "utils";
+import { getSingleStock, preppend } from "utils";
 
 export function OrderStockCard(props: IOrderStockCardProps) {
-
-  const { isLoading, error, data } = useQuery(['stock', props.stock.id], () => getSingleStock(props.stock.id))
+  const { isLoading, error, data } = useQuery(["stock", props.stock.id], () => getSingleStock(props.stock.id));
 
   return (
     <Card shadow="sm" p="lg" radius="md" withBorder sx={{ position: "relative" }}>
@@ -20,17 +19,19 @@ export function OrderStockCard(props: IOrderStockCardProps) {
         <>
           <Card.Section>
             <Image
-              src={process.env.SRC + data.product?.site_main_picture.u}
+              src={preppend(data.product?.site_main_picture.u)}
               height={160}
               alt={`تصویر ${data.product?.name}`}
               sx={{
-                objectFit: "cover"
+                objectFit: "cover",
               }}
             />
           </Card.Section>
 
           <Group position="apart" mt="md" mb="xs">
-            <Text weight={500}>{data.product_id} - {data.product?.name}</Text>
+            <Text weight={500}>
+              {data.product_id} - {data.product?.name}
+            </Text>
 
             <Badge color="blue" variant="light">
               سایز: <strong>{data.size}</strong>
@@ -38,30 +39,38 @@ export function OrderStockCard(props: IOrderStockCardProps) {
             <Badge color="grape" variant="light">
               × {props.stock.quantity}
             </Badge>
-
           </Group>
 
           <Group position="apart" mt="md" mb="xs">
-            <Button variant="light" color="red" fullWidth mt="md" radius="md"
+            <Button
+              variant="light"
+              color="red"
+              fullWidth
+              mt="md"
+              radius="md"
               onClick={() => props.removeCallback(props.stock.id)}
             >
               حذف
             </Button>
-            <Button variant="light" color="teal" fullWidth mt="md" radius="md"
+            <Button
+              variant="light"
+              color="teal"
+              fullWidth
+              mt="md"
+              radius="md"
               onClick={() => props.reductionCallback(props.stock.id)}
             >
               کاهش تعداد (1-)
             </Button>
           </Group>
         </>
-      )
-      }
+      )}
     </Card>
-  )
+  );
 }
 
 interface IOrderStockCardProps {
-  stock: IStockForCreation
-  removeCallback: (stockId: number) => void
-  reductionCallback: (stockId: number) => void
+  stock: IStockForCreation;
+  removeCallback: (stockId: number) => void;
+  reductionCallback: (stockId: number) => void;
 }

@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from 'react'
-import { numeralize } from 'utils'
-import { ProductImage, Table, TD, TH, TR } from './components'
-import { ItemsTableProps } from './types'
+import React, { useEffect, useState } from "react";
+import { numeralize } from "utils";
+import { ProductImage, Table, TD, TH, TR } from "./components";
+import { ItemsTableProps } from "./types";
 
-export const ItemsTable: React.FC<ItemsTableProps> = ({ items }) => {
-  const [totalItems, setTotalItems] = useState<number>(0)
-  const [totalPrice, setTotalPrice] = useState<number>(0)
-  const [discounted, setDiscounted] = useState(false)
+export const ItemsTable: React.FC<ItemsTableProps> = ({ order, items }) => {
+  const [totalItems, setTotalItems] = useState<number>(0);
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [discounted, setDiscounted] = useState(false);
 
   useEffect(() => {
     // NOTE: total items calculation
-    const priceArr = items?.map((_item) => Number(_item?.price ?? 0) * (_item?.quantity ?? 1))
-    priceArr?.length > 0 && setTotalPrice(priceArr?.reduce((_prev, _curr) => _prev + _curr))
+    const priceArr = items?.map((_item) => Number(_item?.price ?? 0) * (_item?.quantity ?? 1));
+    priceArr?.length > 0 && setTotalPrice(priceArr?.reduce((_prev, _curr) => _prev + _curr));
 
     // NOTE: total price calculation
-    const countArr = items?.map((_item) => _item?.quantity)
-    countArr?.length > 0 && setTotalItems(countArr?.reduce((_prev, _curr) => _prev + _curr))
+    const countArr = items?.map((_item) => _item?.quantity);
+    countArr?.length > 0 && setTotalItems(countArr?.reduce((_prev, _curr) => _prev + _curr));
 
     // NOTE: discounted evaluation
-  }, [])
+  }, []);
 
   return (
     <Table>
@@ -34,7 +34,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({ items }) => {
       </TR>
       {items?.map((_item, index) => (
         <TR>
-          <TD>{index + 1}</TD>
+          <TD>{index + order * 5 + 1}</TD>
           <TD>{_item?.product?.name}</TD>
           <TD>{_item?.quantity}</TD>
           <TD>{_item?.size}</TD>
@@ -55,5 +55,5 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({ items }) => {
         <TD>{numeralize(totalPrice)}</TD>
       </TR>
     </Table>
-  )
-}
+  );
+};

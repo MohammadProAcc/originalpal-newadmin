@@ -1,22 +1,25 @@
-import React from 'react'
-import { useStore } from 'utils'
-import { Column, Row, Strong } from '../Details'
-import { DescriptionComponent } from './components'
-import { DescriptionProps } from './types'
+import { Divider } from "@mantine/core";
+import React from "react";
+import { useStore } from "utils";
+import { Column, Row, Strong } from "../Details";
+import { DescriptionComponent } from "./components";
+import { DescriptionProps } from "./types";
 
 export const Description: React.FC<DescriptionProps> = ({ order }) => {
   const { details } = useStore((state: any) => ({
     details: state?.orderDetails,
-  }))
+  }));
 
   return (
     <DescriptionComponent>
       <Row>
         <Column>
           <Strong>کد تخفیف :</Strong>
-          {!!order?.coupon_id ? order?.coupon_id : 'ندارد'}
+          {!!order?.coupon_id ? order?.coupon_id : "ندارد"}
         </Column>
       </Row>
+
+      <Divider size="lg" variant="dashed" my="md" />
 
       <Row>
         <Column>
@@ -24,10 +27,12 @@ export const Description: React.FC<DescriptionProps> = ({ order }) => {
         </Column>
       </Row>
 
+      <Divider size="lg" variant="dashed" my="md" />
+
       <Row>
         <Column fullWidth>
           <Strong>توضیحات :</Strong>
-          {details?.description ?? '-'}
+          {details?.description ?? "ندارد"}
         </Column>
       </Row>
 
@@ -41,33 +46,41 @@ export const Description: React.FC<DescriptionProps> = ({ order }) => {
         </Column>
       </Row>
 
+      <Divider size="lg" variant="dashed" my="md" />
+
       <Row>
         <Column>
           <Strong>آدرس ایمیل :</Strong>
-          {order?.user?.email ?? ''}
+          {order?.user?.email ?? ""}
         </Column>
       </Row>
 
       <Row>
         <Column>
           <Strong>نحوه ارسال :</Strong>
-          {order?.delivery ?? '-'}
+          {order?.delivery ?? "ندارد"}
         </Column>
       </Row>
+
+      <Divider size="lg" variant="dashed" my="md" />
 
       <Row>
         <Column>
           <Strong>توضیحات ارسال :</Strong>
-          {details?.postDescription ?? '-'}
+          {details?.postDescription ?? "ندارد"}
         </Column>
       </Row>
+
+      <Divider size="lg" variant="dashed" my="md" />
 
       <Row>
         <Column>
           <Strong>کد تخفیف خرید بعدی :</Strong>
-          {details?.nextCoupon ?? '-'}
+          {details?.nextCoupon?.length > 0 ? details?.nextCoupon : "ندارد"}
         </Column>
       </Row>
+
+      <Divider size="lg" variant="dashed" my="md" />
 
       <hr />
 
@@ -87,6 +100,8 @@ export const Description: React.FC<DescriptionProps> = ({ order }) => {
           www.originalpal.co.uk
         </Column>
       </Row>
+
+      <Divider size="lg" variant="dashed" my="md" />
 
       <Row>
         <Column fullWidth>
@@ -116,5 +131,5 @@ export const Description: React.FC<DescriptionProps> = ({ order }) => {
         </Column>
       </Row>
     </DescriptionComponent>
-  )
-}
+  );
+};
