@@ -1,10 +1,13 @@
-import { Group, MultiSelect, Space } from "@mantine/core";
+import { Group, Space } from "@mantine/core";
 import { Button, InputGroup } from "@paljs/ui";
 import { useQuery } from "@tanstack/react-query";
 import { FIELDS } from "constants/FIELDS";
 import { useFetchAll, useLoading, useNonInitialEffect } from "hooks";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import Layout from "Layouts";
-import React, { useRef, useState } from "react";
+import Head from "next/head";
+import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import _Select from "react-select";
 import { toast } from "react-toastify";
@@ -23,8 +26,8 @@ import {
   translator,
 } from "utils";
 import { utils, writeFile } from "xlsx";
-import { MyDocument, Renderer } from "./PdfDoc";
 import { TableForExport } from "./TableForExport";
+import "./iransans";
 
 export function ExportPage() {
   const [result, setResult] = useState<any>(null);
@@ -173,9 +176,30 @@ export function ExportPage() {
     if (result) {
       if (exportType.value === "xslx") {
         xport();
+      } else {
+        const doc = new jsPDF();
+        autoTable(doc, { html: "#Table2XLSX" });
+        doc.setFont("iransans");
+        doc.save("export.pdf");
       }
     }
   }, [result]);
+
+  function manualExport() {
+    if (result) {
+      if (exportType.value === "xslx") {
+        xport();
+      } else {
+        // FIXME: fix the font
+        const doc = new jsPDF();
+        autoTable(doc, { html: "#Table2XLSX" });
+        doc.getFontList();
+        doc.setFont("iransans");
+        doc.setFontSize(32);
+        doc.save("export.pdf");
+      }
+    }
+  }
 
   return (
     <Layout title="خروجی">
@@ -243,25 +267,30 @@ export function ExportPage() {
         گرفتن خروجی
       </Button>
 
-      <hr />
-
       {result && (
-        <Hidden>
-          <TableForExport data={result} fields={getFields()} ref={tableRef} />
-        </Hidden>
+        <>
+          <Space mt="md" />
+          <Button status="Info" onClick={manualExport} disabled={loadingList.includes("exporting")}>
+            دانلود فایل
+          </Button>
+        </>
       )}
 
-      {result && exportType.value === "pdf" && (
+      <hr />
+
+      {result && <TableForExport data={result} fields={getFields()} ref={tableRef} />}
+
+      {/* {result && exportType.value === "pdf" && (
         <Renderer>
           <MyDocument result={result} fields={getFields()} />
         </Renderer>
-      )}
+      )} */}
     </Layout>
   );
 }
 
 const exportTypeOptions = [
-  // { label: 'PDF', value: 'pdf' },
+  { label: "PDF", value: "pdf" },
   { label: "Excel", value: "xslx" },
 ];
 

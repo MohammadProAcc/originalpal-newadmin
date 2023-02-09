@@ -102,6 +102,10 @@ const items: MenuItemType[] = [
     title: "ابزار",
     children: [
       {
+        title: "گرفتن خروجی",
+        link: { href: "/export" },
+      },
+      {
         title: "فهرست قیمت ها",
         link: { href: "/products/aggregate" },
       },
@@ -110,16 +114,8 @@ const items: MenuItemType[] = [
         link: { href: "/coupons/aggregate" },
       },
       {
-        title: "ارسال پیامک",
-        link: { href: "/sms" },
-      },
-      {
         title: "جستجوی کاربران",
         link: { href: "/user-details" },
-      },
-      {
-        title: "گرفتن خروجی",
-        link: { href: "/export" },
       },
     ],
   },
