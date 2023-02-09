@@ -47,7 +47,7 @@
     "jspdf": "^2.5.1",
     "lodash": "^4.17.21",
     "material-table": "^1.69.3",
-    "next": "^13.1.6",
+    "next": "12.3.2",
     "nextjs-progressbar": "^0.0.13",
     "numeral": "^2.0.6",
     "pdf-creator-node": "^2.3.5",
