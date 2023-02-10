@@ -1,11 +1,11 @@
-import { Divider } from "@mantine/core";
+import { Divider, Text } from "@mantine/core";
 import React from "react";
-import { useStore } from "utils";
+import { numeralize, useStore } from "utils";
 import { Column, Row, Strong } from "../Details";
 import { DescriptionComponent } from "./components";
 import { DescriptionProps } from "./types";
 
-export const Description: React.FC<DescriptionProps> = ({ order }) => {
+export const Description: React.FC<DescriptionProps> = ({ order, payable, totalCount, isLastPage }) => {
   const { details } = useStore((state: any) => ({
     details: state?.orderDetails,
   }));
@@ -19,15 +19,23 @@ export const Description: React.FC<DescriptionProps> = ({ order }) => {
         </Column>
       </Row>
 
-      <Divider size="lg" variant="dashed" my="md" />
+      <Divider size="lg" variant="dashed" mb="md" />
 
       <Row>
         <Column>
-          جمع کل پرداخت نقدی شما <Strong className="mx-1">{order?.newprice ?? order?.price}</Strong> تومان میباشد.
+          جمع کل پرداخت نقدی شما برای کل{" "}
+          <Text fw="bolder" mx="sm" td="underline">
+            {totalCount}
+          </Text>{" "}
+          مورد
+          <Text fw="bolder" mx="sm" td="underline">
+            {numeralize(order?.newprice ?? order?.price ?? payable)}
+          </Text>{" "}
+          تومان میباشد.
         </Column>
       </Row>
 
-      <Divider size="lg" variant="dashed" my="md" />
+      <Divider size="lg" variant="dashed" mb="md" />
 
       <Row>
         <Column fullWidth>
@@ -36,17 +44,7 @@ export const Description: React.FC<DescriptionProps> = ({ order }) => {
         </Column>
       </Row>
 
-      <Row className="mt-5">
-        <Column fullWidth>
-          <Strong>مهر و امضای خریدار :</Strong>
-        </Column>
-
-        <Column fullWidth>
-          <Strong>مهر و امضای فروشنده :</Strong>
-        </Column>
-      </Row>
-
-      <Divider size="lg" variant="dashed" my="md" />
+      <Divider size="lg" variant="dashed" mb="md" />
 
       <Row>
         <Column>
@@ -58,11 +56,11 @@ export const Description: React.FC<DescriptionProps> = ({ order }) => {
       <Row>
         <Column>
           <Strong>نحوه ارسال :</Strong>
-          {order?.delivery ?? "ندارد"}
+          {order?.delivery ?? details.postMethod ?? "ندارد"}
         </Column>
       </Row>
 
-      <Divider size="lg" variant="dashed" my="md" />
+      <Divider size="lg" variant="dashed" mb="md" />
 
       <Row>
         <Column>
@@ -71,18 +69,38 @@ export const Description: React.FC<DescriptionProps> = ({ order }) => {
         </Column>
       </Row>
 
-      <Divider size="lg" variant="dashed" my="md" />
+      {details?.nextCoupon?.length > 0 && (
+        <>
+          <Divider size="lg" variant="dashed" mb="md" />
 
-      <Row>
-        <Column>
-          <Strong>کد تخفیف خرید بعدی :</Strong>
-          {details?.nextCoupon?.length > 0 ? details?.nextCoupon : "ندارد"}
-        </Column>
-      </Row>
+          <Row>
+            <Column>
+              <Strong>کد تخفیف خرید بعدی :</Strong>
+              {details?.nextCoupon?.length > 0 ? details?.nextCoupon : "ندارد"}
+            </Column>
+          </Row>
+        </>
+      )}
 
-      <Divider size="lg" variant="dashed" my="md" />
+      <Divider size="lg" variant="dashed" mb="md" />
 
-      <hr />
+      {isLastPage && (
+        <>
+          <Row>
+            <Column fullWidth>
+              <Strong>مهر و امضای خریدار :</Strong>
+            </Column>
+
+            <Column fullWidth>
+              <Strong>مهر و امضای فروشنده :</Strong>
+            </Column>
+          </Row>
+
+          <hr />
+
+          <Divider size="lg" variant="dashed" mb="md" />
+        </>
+      )}
 
       <Row>
         <Column>
@@ -92,7 +110,7 @@ export const Description: React.FC<DescriptionProps> = ({ order }) => {
 
         <Column>
           <Strong>تلگرام :</Strong>
-          @ORIGINALPAL
+          ORIGINALPAL@
         </Column>
 
         <Column>
@@ -101,7 +119,7 @@ export const Description: React.FC<DescriptionProps> = ({ order }) => {
         </Column>
       </Row>
 
-      <Divider size="lg" variant="dashed" my="md" />
+      <Divider size="lg" variant="dashed" mb="md" />
 
       <Row>
         <Column fullWidth>

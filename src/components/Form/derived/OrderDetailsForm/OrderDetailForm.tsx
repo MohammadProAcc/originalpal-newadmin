@@ -1,21 +1,21 @@
-import { Button, Form, InputGroup } from 'components'
-import { FlexContainer } from './components'
-import React from 'react'
-import { useForm } from 'react-hook-form'
-import { useStore } from 'utils'
-import { onOrderDetailsFormSubmit } from './funtions'
-import { OrderDetailsFormProps } from './styles'
-import { useRouter } from 'next/router'
+import { Button, Form, InputGroup } from "components";
+import { FlexContainer } from "./components";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { useStore } from "utils";
+import { onOrderDetailsFormSubmit } from "./funtions";
+import { OrderDetailsFormProps } from "./styles";
+import { useRouter } from "next/router";
 
 export const OrderDetailsForm: React.FC<OrderDetailsFormProps> = ({ close }) => {
-  const router = useRouter()
-  const { order_id } = router?.query
+  const router = useRouter();
+  const { order_id } = router?.query;
 
-  const { register, handleSubmit } = useForm()
+  const { register, handleSubmit } = useForm();
 
   const { setOrderDetails } = useStore((state: any) => ({
     setOrderDetails: state?.setOrderDetails,
-  }))
+  }));
 
   return (
     <Form
@@ -26,19 +26,25 @@ export const OrderDetailsForm: React.FC<OrderDetailsFormProps> = ({ close }) => 
       <InputGroup col>
         <label>توضیحات</label>
 
-        <textarea {...register('description')} />
+        <textarea {...register("description")} />
       </InputGroup>
 
       <InputGroup col>
         <label>توضیحات ارسال</label>
 
-        <textarea {...register('postDescription')} />
+        <textarea {...register("postDescription")} />
+      </InputGroup>
+
+      <InputGroup col>
+        <label>نحوه ارسال</label>
+
+        <textarea {...register("postMethod")} />
       </InputGroup>
 
       <InputGroup col>
         <label>کد تخفیف خرید بعدی</label>
 
-        <input {...register('nextCoupon')} />
+        <input {...register("nextCoupon")} />
       </InputGroup>
 
       <FlexContainer fullWidth jc="space-between">
@@ -49,5 +55,5 @@ export const OrderDetailsForm: React.FC<OrderDetailsFormProps> = ({ close }) => 
         <Button status="Success">پرینت فاکتور</Button>
       </FlexContainer>
     </Form>
-  )
-}
+  );
+};

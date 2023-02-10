@@ -1,6 +1,8 @@
-import { OrderInvoiceDetails } from 'components/PageComponents/Orders/types'
-import { IOrder } from 'types'
+import { IOrder } from "types";
 
 export interface DescriptionProps {
-  order: IOrder
+  order: IOrder;
+  payable: number;
+  totalCount: number;
+  isLastPage: boolean;
 }

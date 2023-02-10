@@ -15,7 +15,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({ order, items }) => {
 
     // NOTE: total price calculation
     const countArr = items?.map((_item) => _item?.quantity);
-    countArr?.length > 0 && setTotalItems(countArr?.reduce((_prev, _curr) => _prev + _curr));
+    countArr?.length > 0 && setTotalItems(countArr?.reduce((_prev, _curr) => Number(_prev) + Number(_curr)));
 
     // NOTE: discounted evaluation
   }, []);
@@ -24,6 +24,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({ order, items }) => {
     <Table>
       <TR>
         <TH>ردیف</TH>
+        <TH>کد محصول</TH>
         <TH>نام محصول</TH>
         <TH>تعداد</TH>
         <TH>سایز</TH>
@@ -35,6 +36,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({ order, items }) => {
       {items?.map((_item, index) => (
         <TR>
           <TD>{index + order * 5 + 1}</TD>
+          <TD>{_item?.product?.code}</TD>
           <TD>{_item?.product?.name}</TD>
           <TD>{_item?.quantity}</TD>
           <TD>{_item?.size}</TD>
@@ -47,7 +49,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({ order, items }) => {
         </TR>
       ))}
       <TR>
-        <TD>جمع فاکتور</TD>
+        <TD>جمع کل فاکتور</TD>
         <TD />
         <TD>{totalItems}</TD>
         <TD />

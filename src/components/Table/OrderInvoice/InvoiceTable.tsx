@@ -1,12 +1,13 @@
-import { OrderInvoiceDetails } from "components/PageComponents/Orders/types";
 import React, { useState } from "react";
 import { IOrder } from "types";
 import { toLocalDate, toLocalTime } from "utils";
+import { v4 } from "uuid";
 import {
   Column,
-  DescriptionComponent,
   Date,
   DateContainer,
+  Description,
+  DescriptionComponent,
   Details,
   H1,
   Header,
@@ -14,7 +15,6 @@ import {
   Row,
   Span,
   Strong,
-  Description,
 } from "./components";
 import { ItemsTable } from "./components/ItemsTable";
 import { InvoiceMode } from "./types";
@@ -37,13 +37,21 @@ export const InvoiceTable: React.FC<IInvoiceTableProps> = ({ order, mode }) => {
     return grouped;
   });
 
+  const priceArr = order?.order_items?.map((_item) => Number(_item?.price ?? 0) * (_item?.quantity ?? 1));
+  const payable = priceArr.reduce((curr, prev) => curr + prev, 0);
+  const countArr = order?.order_items?.map((_item) => _item?.quantity);
+  const totalCount = countArr?.reduce((_prev, _curr) => Number(_prev) + Number(_curr));
+
   return (
     <>
-      {orderItemSlices.map((orderItems: any, index: number) => (
-        <DescriptionComponent>
+      {orderItemSlices.map((orderItems: any, index: number, array: any[]) => (
+        <DescriptionComponent key={v4()}>
           <Header>
+            <span>
+              صفحه <strong>{index + 1}</strong> از <strong>{orderItemSlices.length}</strong>
+            </span>
             <H1>
-              Original Pal اوریجینال پَل
+              ORIGINALPAL اوریجینال پَل
               <Span>فاکتور فروش</Span>
             </H1>
 
@@ -86,7 +94,12 @@ export const InvoiceTable: React.FC<IInvoiceTableProps> = ({ order, mode }) => {
 
           <ItemsTable order={index} items={orderItems} />
 
-          <Description order={order} />
+          <Description
+            order={order}
+            payable={payable}
+            totalCount={totalCount}
+            isLastPage={index === array.length - 1}
+          />
         </DescriptionComponent>
       ))}
     </>
