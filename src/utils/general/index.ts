@@ -9,3 +9,4 @@ export * from "./mediaCoersion";
 export * from "./preppend";
 export * from "./truncateString";
 export * from "./coerce";
+export * from "./loadFont";

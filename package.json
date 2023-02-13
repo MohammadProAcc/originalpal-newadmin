@@ -69,6 +69,7 @@
     "react-multi-date-picker": "^3.3.4",
     "react-persian-datepicker": "^3.0.2",
     "react-select": "^5.5.2",
+    "react-to-print": "^2.14.11",
     "react-toastify": "^8.1.0",
     "styled-components": "^5.3.3",
     "stylis": "^4.1.3",

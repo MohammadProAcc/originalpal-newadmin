@@ -3,10 +3,7 @@ import { Button, InputGroup } from "@paljs/ui";
 import { useQuery } from "@tanstack/react-query";
 import { FIELDS } from "constants/FIELDS";
 import { useFetchAll, useLoading, useNonInitialEffect } from "hooks";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import Layout from "Layouts";
-import Head from "next/head";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import _Select from "react-select";
@@ -26,8 +23,9 @@ import {
   translator,
 } from "utils";
 import { utils, writeFile } from "xlsx";
-import { TableForExport } from "./TableForExport";
 import "./iransans";
+import { TableForExport } from "./TableForExport";
+import { useReactToPrint } from "react-to-print";
 
 export function ExportPage() {
   const [result, setResult] = useState<any>(null);
@@ -133,7 +131,6 @@ export function ExportPage() {
                   )
               : getProductsList,
           );
-          console.log(allData);
           allData.forEach((data) => {
             if (data.brand) {
               data.brand = data.brand.name;
@@ -172,17 +169,10 @@ export function ExportPage() {
     toggleLoading("exporting");
   }
 
+  const exportToPDF = useReactToPrint({ content: () => tableRef.current });
+
   useNonInitialEffect(() => {
-    if (result) {
-      if (exportType.value === "xslx") {
-        xport();
-      } else {
-        const doc = new jsPDF();
-        autoTable(doc, { html: "#Table2XLSX" });
-        doc.setFont("iransans");
-        doc.save("export.pdf");
-      }
-    }
+    manualExport();
   }, [result]);
 
   function manualExport() {
@@ -190,13 +180,7 @@ export function ExportPage() {
       if (exportType.value === "xslx") {
         xport();
       } else {
-        // FIXME: fix the font
-        const doc = new jsPDF();
-        autoTable(doc, { html: "#Table2XLSX" });
-        doc.getFontList();
-        doc.setFont("iransans");
-        doc.setFontSize(32);
-        doc.save("export.pdf");
+        exportToPDF();
       }
     }
   }
@@ -278,7 +262,7 @@ export function ExportPage() {
 
       <hr />
 
-      {result && <TableForExport data={result} fields={getFields()} ref={tableRef} />}
+      {result && <TableForExport data={result} fields={getFields()} upperRef={tableRef} />}
 
       {/* {result && exportType.value === "pdf" && (
         <Renderer>
