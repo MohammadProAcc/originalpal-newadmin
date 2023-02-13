@@ -1,17 +1,14 @@
 module.exports = {
   env: {
-    API: 'https://api.originalpal.co.uk',
-    TOKEN: 'OPAD_TKN!',
-    SRC: 'http://api.originalpal.co.uk/images',
-    VID_SRC: 'http://api.originalpal.co.uk/videos',
-    MED_SRC: 'http://api.originalpal.co.uk/media',
-    _SRC: 'http://api.originalpal.co.uk/images',
-    WEBSITE_DOMAIN: 'https://originalpal.co.uk'
+    API: "https://originalpalapi.iran.liara.run",
+    TOKEN: "OPAD_TKN!",
+    SRC: "https://originalpalapi.iran.liara.run/images",
+    VID_SRC: "https://originalpalapi.iran.liara.run/videos",
+    MED_SRC: "https://originalpalapi.iran.liara.run/media",
+    _SRC: "https://originalpalapi.iran.liara.run/images",
+    WEBSITE_DOMAIN: "https://originalpalapi.iran.liara.run",
   },
   images: {
-    domains: [
-      'originalpal.com',
-      'api.originalpal.co.uk'
-    ]
-  }
-}
+    domains: ["originalpal.com", "api.originalpal.co.uk"],
+  },
+};
