@@ -30,7 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     const queryClient = new QueryClient();
     await queryClient.prefetchQuery(["brands"], () => getAllBrands(token));
-    await queryClient.prefetchQuery(["tags"], () => getTagsList({ page: "total" }, token));
+    await queryClient.prefetchQuery(["tags"], () => getTagsList({ q: "total" }, token));
     await queryClient.prefetchQuery(["banners"], () =>
       search_in(
         "banners",

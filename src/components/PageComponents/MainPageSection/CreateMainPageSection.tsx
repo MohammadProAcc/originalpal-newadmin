@@ -22,7 +22,7 @@ export function CreateMainPageSection() {
   const [loading, setLoading] = useState(false);
 
   const brandsQuery = useQuery(["brands"], () => getAllBrands());
-  const tagsQuery = useQuery(["tags"], () => getTagsList({ page: "total" }));
+  const tagsQuery = useQuery(["tags"], () => getTagsList({ q: "total" }));
   const bannersQuery = useQuery(["banners"], () =>
     search_in("banners", { key: "type", type: "=", value: "stand" }, router.query, Cookies.get(process.env.TOKEN!)),
   );

@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
     const queryClient = new QueryClient();
     await queryClient.prefetchQuery(["roles"], () =>
-      $_get_roles_list({ page: "total" }, context?.req?.cookies?.[process.env.TOKEN!]),
+      $_get_roles_list({ q: "total" }, context?.req?.cookies?.[process.env.TOKEN!]),
     );
 
     return {

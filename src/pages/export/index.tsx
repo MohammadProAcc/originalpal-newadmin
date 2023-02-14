@@ -19,7 +19,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
 
     const queryClient = new QueryClient();
-    await queryClient.prefetchQuery(["brands"], () => getBrandsList({ page: "total" }));
+    await queryClient.prefetchQuery(["brands"], () => getBrandsList({ q: "total" }));
 
     return { props: {} };
   } else {

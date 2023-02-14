@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       };
 
     const queryClient = new QueryClient();
-    await queryClient.prefetchQuery(["tags"], () => getTagsList({ page: "total" }));
+    await queryClient.prefetchQuery(["tags"], () => getTagsList({ q: "total" }));
 
     return {
       props: {

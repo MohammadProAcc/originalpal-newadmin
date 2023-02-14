@@ -24,7 +24,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     await queryClient.prefetchQuery(["order", orderId], () => getSingleOrder(orderId, token));
     await queryClient.prefetchQuery(["stocks"], () => (admin(token).get('/stock/select')).then(res => res.data));
-    await queryClient.prefetchQuery(["coupons"], () => getCouponsList({ page: "total" }, token));
+    await queryClient.prefetchQuery(["coupons"], () => getCouponsList({ q: "total" }, token));
 
     return {
       props: {

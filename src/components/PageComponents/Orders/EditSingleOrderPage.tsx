@@ -65,7 +65,7 @@ export const EditSingleOrderPage: React.FC = () => {
     },
     refetch: refetchStocks,
   }: any = useQuery(["stocks"], () => admin().get("/stock/select"));
-  const { data: coupons } = useQuery(["coupons"], () => getCouponsList({ page: "total" }));
+  const { data: coupons } = useQuery(["coupons"], () => getCouponsList({ q: "total" }));
 
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 

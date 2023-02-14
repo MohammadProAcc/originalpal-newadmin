@@ -16,7 +16,7 @@ interface ITagFormProps {
 export function TagForm(props: ITagFormProps) {
   const [loading, setLoading] = useState(false);
 
-  const tagsQuery = useQuery(["tags"], () => getTagsList({ page: "total" }));
+  const tagsQuery = useQuery(["tags"], () => getTagsList({ q: "total" }));
   const tagTypes: string[] = Array.from(new Set(tagsQuery?.data?.data?.data?.map((tag: Tag) => tag.type)));
 
   const { register, handleSubmit, reset, control } = useForm(

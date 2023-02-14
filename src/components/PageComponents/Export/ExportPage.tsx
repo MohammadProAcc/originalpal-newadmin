@@ -31,7 +31,7 @@ export function ExportPage() {
   const [result, setResult] = useState<any>(null);
   const [loadingList, toggleLoading] = useLoading();
 
-  const brandsQuery = useQuery(["brands"], () => getBrandsList({ page: "total" }));
+  const brandsQuery = useQuery(["brands"], () => getBrandsList({ q: "total" }));
 
   const [exportType, setExportType] = useState(exportTypeOptions[0]);
   function exportTypeHandler(e: any) {
