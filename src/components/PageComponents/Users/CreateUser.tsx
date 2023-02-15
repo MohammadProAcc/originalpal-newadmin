@@ -13,8 +13,8 @@ export function CreateUser() {
   const [loading, setLoading] = useState(false);
 
   const roles = useQuery(["roles"], () =>
-    $_get_roles_list({}, Cookies.get(process.env.TOKEN!)).then((res: any) => {
-      return res?.data?.map((_role: any) => ({
+    $_get_roles_list({ q: "total" }, Cookies.get(process.env.TOKEN!)).then((res: any) => {
+      return res?.map((_role: any) => ({
         label: _role.name,
         value: _role.id,
       }));
@@ -55,6 +55,16 @@ export function CreateUser() {
         <InputGroup className="col" fullWidth>
           <label>ایمیل</label>
           <input type="email" {...register("email", { required: true })} placeholder="ایمیل" />
+        </InputGroup>
+
+        <InputGroup className="col" fullWidth>
+          <label>شماره ثابت</label>
+          <input type="tel" {...register("tel", { required: true, minLength: 8 })} placeholder="شماره ثابت" />
+        </InputGroup>
+
+        <InputGroup className="col" fullWidth>
+          <label>شماره همراه</label>
+          <input type="tel" {...register("phone_number")} placeholder="شماره همراه" />
         </InputGroup>
 
         <InputGroup className="col" fullWidth>

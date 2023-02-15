@@ -1,5 +1,6 @@
-import { Alert, Divider, Flex, Text } from "@mantine/core";
+import { Alert, Divider, Flex, MultiSelect, Space, Text } from "@mantine/core";
 import { Button, Card, CardBody, CardHeader, InputGroup } from "@paljs/ui";
+import { useQuery } from "@tanstack/react-query";
 import { Editor } from "components";
 import Cookies from "js-cookie";
 import Layout from "Layouts";
@@ -9,14 +10,27 @@ import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import styled from "styled-components";
-import { PostLink } from "types";
-import { createBlog, search_in, uploadBlogImage, uploadBlogVideo } from "utils";
+import { BlogCategory, PostLink } from "types";
+import { $_get_categories, createBlog, search_in, uploadBlogImage, uploadBlogVideo } from "utils";
 import { handlePostLink, postLinkOptions } from "./handlePostLink";
 
 export function CreateBlog() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [postLinkToAdd, setPostLinkToAdd] = useState<PostLink | null>(null);
+
+  const categoriesQuery = useQuery(["categories"], () =>
+    $_get_categories({
+      params: {
+        q: "total",
+      },
+    }).then((res) => res.data),
+  );
+
+  const categoryOptions = categoriesQuery.data?.data?.map((category: BlogCategory) => ({
+    label: category.title,
+    value: category.id,
+  }));
 
   const { register, handleSubmit, control, getValues, setValue, watch } = useForm();
 
@@ -140,10 +154,19 @@ export function CreateBlog() {
           <input {...register("labels")} placeholder="برچسب ها" />
         </InputGroup>
 
-        <InputGroup className="col" fullWidth>
-          <label>دسته بندی ها</label>
-          <input {...register("show_categories")} placeholder="دسته بندی ها" />
-        </InputGroup>
+        <Divider my="md" />
+
+        <Text>دسته بندی ها</Text>
+        <Space my="md" />
+        <Controller
+          name="categories"
+          control={control}
+          render={({ field }) => <MultiSelect data={categoryOptions ?? []} {...field} />}
+        />
+
+        <Divider my="md" />
+
+        <Divider variant="dashed" my="md" />
 
         <InputGroup className="col" fullWidth>
           <label>تصویر بنر</label>

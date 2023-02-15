@@ -1,4 +1,4 @@
-import { Alert, Divider, Flex, LoadingOverlay, Text } from "@mantine/core";
+import { Alert, Divider, Flex, LoadingOverlay, MultiSelect, Space, Text } from "@mantine/core";
 import { Card, CardBody, CardHeader, Checkbox, InputGroup, Modal } from "@paljs/ui";
 import { useQuery } from "@tanstack/react-query";
 import { Button, Editor, FlexContainer, handlePostLink, HeaderButton, ModalBox, postLinkOptions } from "components";
@@ -11,8 +11,9 @@ import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import styled from "styled-components";
-import { PostLink } from "types";
+import { BlogCategory, PostLink } from "types";
 import {
+  $_get_categories,
   $_remove_blog_video,
   coerce,
   deleteBlog,
@@ -27,9 +28,22 @@ import {
 export const EditBlogPage: React.FC = () => {
   const router = useRouter();
 
-  const blogQuery = useQuery(["blog", router.query], () =>
+  const blogQuery = useQuery(["blog"], () =>
     getSingleBlog(router.query?.blog_id as string, Cookies.get(process.env["TOKEN"]!)),
   );
+
+  const categoriesQuery = useQuery(["categories"], () =>
+    $_get_categories({
+      params: {
+        q: "total",
+      },
+    }).then((res) => res.data),
+  );
+
+  const categoryOptions = categoriesQuery.data?.data?.map((category: BlogCategory) => ({
+    label: category.title,
+    value: category.id,
+  }));
 
   const [postLinkToAddName, setPostLinkToAddName] = useState<string | null>(null);
   const [postLinkToAddHref, setPostLinkToAddHref] = useState<string | null>(null);
@@ -47,7 +61,10 @@ export const EditBlogPage: React.FC = () => {
     setValue,
     watch,
   } = useForm({
-    defaultValues: blogQuery?.data?.data,
+    defaultValues: {
+      ...blogQuery?.data?.data,
+      categories: blogQuery?.data?.data?.categories?.map((category: BlogCategory) => category.id),
+    },
   });
 
   const onSubmit = async (form: any) => {
@@ -283,10 +300,17 @@ export const EditBlogPage: React.FC = () => {
           <input {...register("labels")} placeholder="برچسب ها" />
         </InputGroup>
 
-        <InputGroup className="col" fullWidth>
-          <label>دسته بندی ها</label>
-          <input {...register("show_categories")} placeholder="دسته بندی ها" />
-        </InputGroup>
+        <Divider my="md" />
+
+        <Text>دسته بندی ها</Text>
+        <Space my="md" />
+        <Controller
+          name="categories"
+          control={control}
+          render={({ field }) => <MultiSelect data={categoryOptions ?? []} {...field} />}
+        />
+
+        <Divider my="md" />
 
         <Divider variant="dashed" my="md" />
 
