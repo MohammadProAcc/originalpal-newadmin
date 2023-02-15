@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import styled from "styled-components";
 import { ProductBrand } from "types";
 import {
+  $_get_categories,
   getAddressList,
   getBrandsList,
   getCouponsList,
@@ -143,9 +144,38 @@ export function ExportPage() {
         break;
 
       case "stock":
-        response = await getStocksList();
+        const stockBrandId = getValues("brandToGet")?.value;
+        console.log(stockBrandId);
+        if (stockBrandId) {
+          response = await search_in(
+            "stock",
+            { key: "brand_id", type: "contain", value: String(brandId) },
+            { page: 1 },
+          );
+        } else {
+          response = await getStocksList();
+        }
         if (response && response.data) {
-          const allData = await useFetchAll(response.data.last_page, getStocksList);
+          const allData = await useFetchAll(
+            response.data.last_page,
+            brandId
+              ? ({ page }: any) =>
+                  search_in(
+                    "stock",
+                    {
+                      key: "brand_id",
+                      type: "contain",
+                      value: String(brandId),
+                    },
+                    { page },
+                  )
+              : getStocksList,
+          );
+          allData.forEach((data) => {
+            if (data.brand) {
+              data.brand = data.brand.name;
+            }
+          });
           setResult(allData);
         } else {
           toast.warn("گرفتن خروجی موفقیت آمیز نبود");
@@ -227,7 +257,7 @@ export function ExportPage() {
         ))}
       </FieldsList>
       {/* TODO: add this for stock too */}
-      {entityToExport.value === "product" && (
+      {(entityToExport.value === "product" || entityToExport.value === "stock") && (
         <Group>
           <Controller
             name="brandToGet"
@@ -235,7 +265,7 @@ export function ExportPage() {
             render={({ field }) => (
               <Select
                 isClearable
-                options={brandsQuery.data?.data?.data?.map((brand: ProductBrand) => ({
+                options={brandsQuery.data?.data?.map((brand: ProductBrand) => ({
                   label: brand?.name,
                   value: brand?.id?.toString(),
                 }))}
