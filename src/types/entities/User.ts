@@ -3,6 +3,7 @@ import { Address, IOrder } from "types";
 export interface User {
   id: number;
   phone: string;
+  tel: string;
   name: string;
   lastname: string;
   email: string;
@@ -15,20 +16,21 @@ export interface User {
 }
 
 export interface UserDetails extends User {
-  orders: IOrder[],
-  addresses: Address[]
+  orders: IOrder[];
+  addresses: Address[];
 }
 
 export const initialUser = {
   id: 0,
-  phone: '',
-  name: '',
-  lastname: '',
-  email: '',
+  phone: "",
+  tel: "",
+  name: "",
+  lastname: "",
+  email: "",
   status: 0,
   points: 0,
-  created_at: '',
-  updated_at: '',
-  role: [''],
-  last_login_at: '',
+  created_at: "",
+  updated_at: "",
+  role: [""],
+  last_login_at: "",
 };

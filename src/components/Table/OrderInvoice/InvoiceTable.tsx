@@ -75,7 +75,11 @@ export const InvoiceTable: React.FC<IInvoiceTableProps> = ({ order, mode }) => {
 
             <Row>
               <Column>
-                <Strong>تلفن : </Strong> {order?.user?.phone}
+                <Strong>همراه : </Strong> {order?.user?.phone.length > 0 ? order?.user?.phone : "-"}
+              </Column>
+
+              <Column>
+                <Strong>تلفن : </Strong> {order?.user?.tel.length > 0 ? order?.user?.tel : "-"}
               </Column>
 
               <Column>

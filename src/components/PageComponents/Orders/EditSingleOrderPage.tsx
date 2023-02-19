@@ -581,6 +581,24 @@ export const EditSingleOrderPage: React.FC = () => {
                 پرینت پشت فاکتور
               </Button>
             </Link>
+
+            <Link href="">
+              <Button status="Info" appearance="hero" className="ml-1 mb-1">
+                فاکتور ارسال
+              </Button>
+            </Link>
+
+            <Link href="">
+              <Button status="Info" appearance="hero" className="ml-1 mb-1">
+                فاکتور برگشت
+              </Button>
+            </Link>
+
+            <Link href="/orders/return-form">
+              <Button status="Info" appearance="hero" className="ml-1 mb-1">
+                پرینت پشت فاکتور
+              </Button>
+            </Link>
           </Container>
 
           {/* <Container>
