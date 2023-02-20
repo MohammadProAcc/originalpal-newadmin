@@ -57,12 +57,16 @@ const Section = (props: ISectionProps) => (
     <Divider variant="dashed" mt="xl" mb="md" />
 
     <Flex direction="column" gap="md">
-      <Text>{props.return ? "گیرنده" : "فرستنده"}: همدان - اورجینال پَل</Text>
-      <Text>آدرس صندوق پستی: 65155-1519</Text>
-      <Text>تلفن {props.return ? "گیرنده" : "فرستنده"}: 081 38263633 - 021 26322348</Text>
-      <Text>موبایل: 09120387302</Text>
+      <Text fw="bolder" className="thin">{props.return ? "گیرنده" : "فرستنده"}: همدان - اورجینال پَل</Text>
+      <Text fw="bolder" className="thin">آدرس صندوق پستی: 65155-1519</Text>
+      <Text fw="bolder" className="thin">تلفن {props.return ? "گیرنده" : "فرستنده"}: 081 38263633 - 021 26322348</Text>
+      <Text fw="bolder" className="thin">موبایل: 09120387302</Text>
     </Flex>
   </$_Section>
 );
 
-const $_Section = styled.div``;
+const $_Section = styled.div`
+  .thin {
+    font-size: 0.875rem;
+  }
+`;
