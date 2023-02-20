@@ -20,12 +20,11 @@ export function SendInvoice(props: ISendInvoiceProps) {
 }
 
 const $ = styled.div`
-  .section {
-  }
+  width: 148mm;
+  height: 210mm;
 
-  @media print {
-    width: 148mm;
-    height: 210mm;
+  * {
+    text-align: right;
   }
 `;
 
