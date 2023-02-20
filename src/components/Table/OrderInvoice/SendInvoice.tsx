@@ -40,19 +40,19 @@ interface ISectionProps {
 const Section = (props: ISectionProps) => (
   <$_Section>
     <Text fw="bolder">
-      {props.return ? "فرستنده" : "گیرنده"}: {props.reciever_name ?? "-"}
+      {props.return ? "فرستنده" : "گیرنده"}: {props.reciever_name?.length > 0 ? props.reciever_name : "-"}
     </Text>
     <Space my="md" />
 
-    <Text fw="bolder">آدرس: {props.address ?? "-"}</Text>
+    <Text fw="bolder">آدرس: {props.address?.length > 0 ? props.address : "-"}</Text>
     <Space my="md" />
 
     <Flex gap="md">
-      <Text fw="bolder">کد پستی: {props.postalcode ?? "-"}</Text>
+      <Text fw="bolder">کد پستی: {props.postalcode?.length > 0 ? props.postalcode : "-"}</Text>
 
-      <Text fw="bolder">تلفن: {props.tel ?? "-"}</Text>
+      <Text fw="bolder">موبایل: {props.phone?.length > 0 ? props.phone : "-"}</Text>
 
-      <Text fw="bolder">موبایل: {props.phone ?? "-"}</Text>
+      <Text fw="bolder">تلفن: {props.tel?.length > 0 ? props.tel : "-"}</Text>
     </Flex>
 
     <Divider variant="dashed" mt="xl" mb="md" />

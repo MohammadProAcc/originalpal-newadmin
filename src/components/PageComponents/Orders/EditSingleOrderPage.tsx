@@ -576,27 +576,46 @@ export const EditSingleOrderPage: React.FC = () => {
               پرینت فاکتور سفارش
             </Button>
 
-            <Link href="/orders/return-form">
+            <Link href="/orders/back-invoice">
               <Button status="Info" appearance="hero" className="ml-1 mb-1">
                 پرینت پشت فاکتور
               </Button>
             </Link>
 
-            <Link href="">
+            <Link
+              href={{
+                pathname: "/orders/send-invoice",
+                query: {
+                  address: order?.address?.address,
+                  phone: order?.user?.phone,
+                  postalcode: order?.address?.postalcode,
+                  reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
+                  tel: order?.user?.tel,
+                },
+              }}
+              target="_blank"
+            >
               <Button status="Info" appearance="hero" className="ml-1 mb-1">
                 فاکتور ارسال
               </Button>
             </Link>
 
-            <Link href="">
+            <Link
+              href={{
+                pathname: "/orders/send-invoice",
+                query: {
+                  isReturn: true,
+                  address: order?.address?.address,
+                  phone: order?.user?.phone,
+                  postalcode: order?.address?.postalcode,
+                  reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
+                  tel: order?.user?.tel,
+                },
+              }}
+              target="_blank"
+            >
               <Button status="Info" appearance="hero" className="ml-1 mb-1">
                 فاکتور برگشت
-              </Button>
-            </Link>
-
-            <Link href="/orders/return-form">
-              <Button status="Info" appearance="hero" className="ml-1 mb-1">
-                پرینت پشت فاکتور
               </Button>
             </Link>
           </Container>
