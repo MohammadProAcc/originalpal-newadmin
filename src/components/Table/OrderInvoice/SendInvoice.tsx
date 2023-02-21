@@ -54,7 +54,7 @@ const Section = (props: ISectionProps) => (
       <Text fw="bolder">تلفن: {props.tel?.length > 0 ? props.tel : "-"}</Text>
     </Flex>
 
-    <Divider variant="dashed" mt="xl" mb="md" />
+    <Divider variant="dashed" my="sm" color="dark" />
 
     <Flex direction="column" gap="md">
       <Text fw="bolder" className="thin">
