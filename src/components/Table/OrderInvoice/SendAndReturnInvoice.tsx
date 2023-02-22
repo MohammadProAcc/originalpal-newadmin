@@ -46,7 +46,7 @@ const $ = styled.div`
   @media print {
     width: 165mm;
     height: 100%;
-    transform: rotate(90deg) translateY(12rem);
+    transform: rotate(90deg) translateY(3rem);
     @page {
       size: A5 landscape;
       margin: 0mm !important;

@@ -33,7 +33,7 @@ export function SendAndReturnInvoiceSection(props: ISendAndReturnInvoiceSectionP
       </Primary>
 
       <Secondary>
-        <Divider variant="dotted" size="lg" mt="4rem" />
+        <Divider variant="dotted" size="lg" mt="4rem" mb="1rem" />
         <p className="light">{props.return ? "گیرنده" : "فرستنده"}: همدان - اورجینال پَل</p>
         <p className="light">آدرس صندوق پستی: 1519_65155</p>
         <p className="light">تلفن {props.return ? "گیرنده" : "فرستنده"}: 38263633 081 - 38283237 081</p>
