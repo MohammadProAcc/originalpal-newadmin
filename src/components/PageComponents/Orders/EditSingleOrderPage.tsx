@@ -12,15 +12,16 @@ import {
   Select,
 } from "@paljs/ui";
 import { useQuery } from "@tanstack/react-query";
-import { Editor, FlexContainer, HeaderButton, ModalBox, SendSmsForm } from "components";
+import { Editor, FlexContainer, HeaderButton, ModalBox, SendInvoice, SendSmsForm } from "components";
 import { WriteOrderDetailsModal } from "components/Modal/derived/WriteOrderDetails";
 import { useNonInitialEffect } from "hooks";
 import Cookies from "js-cookie";
 import Layout from "Layouts";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useReactToPrint } from "react-to-print";
 import { toast } from "react-toastify";
 import styled, { css } from "styled-components";
 import { Coupon, PermissionEnum } from "types";
@@ -248,6 +249,12 @@ export const EditSingleOrderPage: React.FC = () => {
       "حذف سفارش موفقیت آمیز نبود",
     ]);
   };
+
+  const sendInvoiceRef = useRef<HTMLElement>(null);
+  const returnInvoiceRef = useRef<HTMLElement>(null);
+
+  const exportSendInvoiceToPDF = useReactToPrint({ content: () => sendInvoiceRef.current });
+  const exportReturnInvoiceToPDF = useReactToPrint({ content: () => returnInvoiceRef.current });
 
   return (
     <Layout title={`سفارش شماره ${order?.id}`}>
@@ -582,42 +589,36 @@ export const EditSingleOrderPage: React.FC = () => {
               </Button>
             </Link>
 
-            <Link
-              href={{
-                pathname: "/orders/send-invoice",
-                query: {
-                  address: order?.address?.address,
-                  phone: order?.user?.phone,
-                  postalcode: order?.address?.postalcode,
-                  reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
-                  tel: order?.user?.tel,
-                },
-              }}
-              target="_blank"
-            >
-              <Button status="Info" appearance="hero" className="ml-1 mb-1">
-                فاکتور ارسال
-              </Button>
-            </Link>
+            <Button status="Info" appearance="hero" className="ml-1 mb-1" onClick={exportSendInvoiceToPDF}>
+              فاکتور ارسال
+            </Button>
 
-            <Link
-              href={{
-                pathname: "/orders/send-invoice",
-                query: {
-                  isReturn: true,
-                  address: order?.address?.address,
-                  phone: order?.user?.phone,
-                  postalcode: order?.address?.postalcode,
-                  reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
-                  tel: order?.user?.tel,
-                },
-              }}
-              target="_blank"
-            >
-              <Button status="Info" appearance="hero" className="ml-1 mb-1">
-                فاکتور برگشت
-              </Button>
-            </Link>
+            <HiddenContainer>
+              <SendInvoice
+                forwardingRef={sendInvoiceRef}
+                address={order?.address?.address}
+                phone={order?.user?.phone}
+                postalcode={order?.address?.postalcode}
+                reciever_name={`${order?.user?.name} ${order?.user?.lastname}`}
+                tel={order?.user?.tel}
+              />
+            </HiddenContainer>
+
+            <Button status="Info" appearance="hero" className="ml-1 mb-1" onClick={exportReturnInvoiceToPDF}>
+              فاکتور برگشت
+            </Button>
+
+            <HiddenContainer>
+              <SendInvoice
+                forwardingRef={returnInvoiceRef}
+                return={true}
+                address={order?.address?.address}
+                phone={order?.user?.phone}
+                postalcode={order?.address?.postalcode}
+                reciever_name={`${order?.user?.name} ${order?.user?.lastname}`}
+                tel={order?.user?.tel}
+              />
+            </HiddenContainer>
           </Container>
 
           {/* <Container>
@@ -738,4 +739,10 @@ const InputGroup = styled(_InputGroup)`
 
 const CouponsSelect = styled(MantineSelect)`
   margin-top: 1rem;
+`;
+
+const HiddenContainer = styled.div`
+  display: none;
+  opacity: 0;
+  visibility: hidden;
 `;

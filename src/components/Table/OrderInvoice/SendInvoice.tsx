@@ -1,4 +1,5 @@
 import { Divider, Flex, Space, Text } from "@mantine/core";
+import { MutableRefObject } from "react";
 import styled from "styled-components";
 
 interface ISendInvoiceProps {
@@ -8,23 +9,43 @@ interface ISendInvoiceProps {
   tel: string;
   phone: string;
   return?: boolean;
+  forwardingRef: MutableRefObject<any>;
 }
 export function SendInvoice(props: ISendInvoiceProps) {
   return (
-    <$>
+    <$ ref={props.forwardingRef}>
       <Section {...props} />
-      <Divider variant="dashed" my="sm" color="dark" />
+      <Divider variant="dashed" my="xl" color="dark" />
       <Section {...props} />
     </$>
   );
 }
 
 const $ = styled.div`
-  /* width: 148mm;
-  height: 210mm; */
+  width: 148mm;
+  height: 210mm;
+  padding: 1rem;
 
   * {
     text-align: right;
+  }
+
+  /* TODO: implement a proper method */
+  @page {
+    size: 210mm 148mm;
+  }
+
+  transform: translateX(-40%) rotate(90deg);
+  @media print {
+    @page {
+      size: a5 landscape;
+      margin: 0mm !important;
+    }
+    @media all {
+      .pagebreak {
+        overflow: visible;
+      }
+    }
   }
 `;
 
@@ -61,10 +82,10 @@ const Section = (props: ISectionProps) => (
         {props.return ? "گیرنده" : "فرستنده"}: همدان - اورجینال پَل
       </Text>
       <Text fw="bolder" className="thin">
-        آدرس صندوق پستی: 65155-1519
+        آدرس صندوق پستی: 1519-65155
       </Text>
       <Text fw="bolder" className="thin">
-        تلفن {props.return ? "گیرنده" : "فرستنده"}: 081 38263633 - 021 26322348
+        تلفن {props.return ? "گیرنده" : "فرستنده"}: 38263633 081 - 26322348 021
       </Text>
       <Text fw="bolder" className="thin">
         موبایل: 09120387302
@@ -74,7 +95,8 @@ const Section = (props: ISectionProps) => (
 );
 
 const $_Section = styled.div`
+  font-size: 1.25rem;
   .thin {
-    font-size: 0.875rem;
+    font-size: 1rem;
   }
 `;
