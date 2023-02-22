@@ -14,6 +14,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Editor, FlexContainer, HeaderButton, ModalBox, SendInvoice, SendSmsForm } from "components";
 import { WriteOrderDetailsModal } from "components/Modal/derived/WriteOrderDetails";
+import { SendAndReturnInvoice } from "components/Table/OrderInvoice/SendAndReturnInvoice";
 import { useNonInitialEffect } from "hooks";
 import Cookies from "js-cookie";
 import Layout from "Layouts";
@@ -253,7 +254,9 @@ export const EditSingleOrderPage: React.FC = () => {
   const sendInvoiceRef = useRef<HTMLElement>(null);
   const returnInvoiceRef = useRef<HTMLElement>(null);
 
-  const exportSendInvoiceToPDF = useReactToPrint({ content: () => sendInvoiceRef.current });
+  const exportSendInvoiceToPDF = useReactToPrint({
+    content: () => sendInvoiceRef.current,
+  });
   const exportReturnInvoiceToPDF = useReactToPrint({ content: () => returnInvoiceRef.current });
 
   return (
@@ -593,30 +596,34 @@ export const EditSingleOrderPage: React.FC = () => {
               فاکتور ارسال
             </Button>
 
-            <HiddenContainer>
-              <SendInvoice
-                forwardingRef={sendInvoiceRef}
-                address={order?.address?.address}
-                phone={order?.user?.phone}
-                postalcode={order?.address?.postalcode}
-                reciever_name={`${order?.user?.name} ${order?.user?.lastname}`}
-                tel={order?.user?.tel}
-              />
-            </HiddenContainer>
-
             <Button status="Info" appearance="hero" className="ml-1 mb-1" onClick={exportReturnInvoiceToPDF}>
               فاکتور برگشت
             </Button>
 
             <HiddenContainer>
-              <SendInvoice
-                forwardingRef={returnInvoiceRef}
+              <SendAndReturnInvoice
+                forwardingRef={sendInvoiceRef}
+                details={{
+                  address: order?.address?.address,
+                  phone: order?.user?.phone,
+                  postalcode: order?.address?.postalcode,
+                  reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
+                  tel: order?.user?.tel,
+                }}
+              />
+            </HiddenContainer>
+
+            <HiddenContainer>
+              <SendAndReturnInvoice
                 return={true}
-                address={order?.address?.address}
-                phone={order?.user?.phone}
-                postalcode={order?.address?.postalcode}
-                reciever_name={`${order?.user?.name} ${order?.user?.lastname}`}
-                tel={order?.user?.tel}
+                forwardingRef={returnInvoiceRef}
+                details={{
+                  address: order?.address?.address,
+                  phone: order?.user?.phone,
+                  postalcode: order?.address?.postalcode,
+                  reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
+                  tel: order?.user?.tel,
+                }}
               />
             </HiddenContainer>
           </Container>
