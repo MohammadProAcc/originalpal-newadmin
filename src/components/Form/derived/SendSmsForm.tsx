@@ -123,7 +123,7 @@ export function SendSmsForm() {
   );
 }
 
-export const Form = styled.form`
+const Form = styled.form`
   display: flex;
   flex-direction: column;
 

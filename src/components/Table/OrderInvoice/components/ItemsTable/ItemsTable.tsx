@@ -49,6 +49,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({ order, items }) => {
         </TR>
       ))}
       <TR>
+        {/* FIXME: fix it */}
         <TD>جمع کل فاکتور</TD>
         <TD />
         <TD />

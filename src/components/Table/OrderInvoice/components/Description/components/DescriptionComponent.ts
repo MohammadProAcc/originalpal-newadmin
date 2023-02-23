@@ -6,7 +6,8 @@ export const DescriptionComponent = styled.div`
   width: 315mm;
   height: 297mm;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 1rem 0.125rem 0.125rem 0.125rem;
+  border: 1px solid black;
 
   @media print {
     @page {

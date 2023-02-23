@@ -1,6 +1,5 @@
 # Orders
 
-    * fix order-invoice styles
     * server-sent event for new order notification => server work
 
 # Sms
