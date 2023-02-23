@@ -29,24 +29,6 @@ const $ = styled.div`
   * {
     text-align: right;
   }
-
-  /* TODO: implement a proper method */
-  @page {
-    size: 210mm 148mm;
-  }
-
-  transform: translateX(-40%) rotate(90deg);
-  @media print {
-    @page {
-      size: a5 landscape;
-      margin: 0mm !important;
-    }
-    @media all {
-      .pagebreak {
-        overflow: visible;
-      }
-    }
-  }
 `;
 
 interface ISectionProps {

@@ -51,7 +51,7 @@ export const InvoiceTable: React.FC<IInvoiceTableProps> = ({ order, mode }) => {
               صفحه <strong>{index + 1}</strong> از <strong>{orderItemSlices.length}</strong>
             </span>
             <H1>
-              ORIGINALPAL اوریجینال پَل
+              ORIGINALPAL اورجینال پَل
               <Span>فاکتور فروش</Span>
             </H1>
 
@@ -94,7 +94,7 @@ export const InvoiceTable: React.FC<IInvoiceTableProps> = ({ order, mode }) => {
             </Row>
           </Details>
 
-          <Hint>( مبالغ به تومان میباشند )</Hint>
+          <Hint>(مبالغ به تومان میباشند)</Hint>
 
           <ItemsTable order={index} items={orderItems} />
 

@@ -17,10 +17,4 @@ const $ = styled.div`
   width: 100vw;
   height: 100vh;
   background-color: blue;
-
-  @media print {
-    @page {
-      size: A5;
-    }
-  }
 `;

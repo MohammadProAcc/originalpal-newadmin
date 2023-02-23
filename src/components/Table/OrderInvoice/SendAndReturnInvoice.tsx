@@ -44,19 +44,4 @@ const $ = styled.div`
       font-size: 1.125rem;
     }
   }
-
-  @media print {
-    width: 165mm;
-    height: 100%;
-    transform: rotate(90deg) translateY(3rem);
-    @page {
-      size: A5 landscape;
-      margin: 0mm !important;
-    }
-    @media all {
-      .pagebreak {
-        overflow: visible;
-      }
-    }
-  }
 `;

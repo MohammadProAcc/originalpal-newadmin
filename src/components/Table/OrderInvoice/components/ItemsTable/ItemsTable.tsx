@@ -23,7 +23,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({ order, items }) => {
   return (
     <Table>
       <TR>
-        <TH>ردیف</TH>
+        <TH className="index-row">ردیف</TH>
         <TH>کد محصول</TH>
         <TH>نام محصول</TH>
         <TH>تعداد</TH>
@@ -51,8 +51,8 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({ order, items }) => {
       <TR>
         <TD>جمع کل فاکتور</TD>
         <TD />
-        <TD>{totalItems}</TD>
         <TD />
+        <TD>{totalItems}</TD>
         <TD />
         <TD>{numeralize(totalPrice)}</TD>
       </TR>

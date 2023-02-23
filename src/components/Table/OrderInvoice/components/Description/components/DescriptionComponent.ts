@@ -6,8 +6,12 @@ export const DescriptionComponent = styled.div`
   width: 315mm;
   height: 297mm;
   margin: 0 auto;
+  padding: 1rem;
 
   @media print {
+    @page {
+      size: a4;
+    }
     width: auto;
     margin: 0;
   }
