@@ -20,15 +20,17 @@ interface ISendAndReturnInvoiceFormProps {
   buttonTitle: ReactNode;
 }
 export function SendAndReturnInvoiceForm(props: ISendAndReturnInvoiceFormProps) {
-  const [details, setDetails] = useState(props.details);
+  const [details, setDetails] = useState({
+    ...props.details,
+    vendorName: "همدان - اورجینال پَل",
+    vendorAddress: "1519_65155",
+    vendorPhone: "38263633 081 - 38283237 081",
+  });
   const [showEditForm, setShowEditForm] = useState(false);
 
   const form = useForm({
     defaultValues: {
       ...details,
-      vendorName: "همدان - اورجینال پَل",
-      vendorAddress: "1519_65155",
-      vendorPhone: "38263633 081 - 38283237 081",
     },
   });
   function onSubmit(form: typeof details) {

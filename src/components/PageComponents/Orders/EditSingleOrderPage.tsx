@@ -1,4 +1,4 @@
-import { Divider, Flex, Select as MantineSelect } from "@mantine/core";
+import { Divider, Flex, Select as MantineSelect, Title } from "@mantine/core";
 import { Add, Close } from "@material-ui/icons";
 import {
   Alert,
@@ -385,7 +385,9 @@ export const EditSingleOrderPage: React.FC = () => {
         <Controller
           name="notes"
           control={control}
-          render={({ field }) => <Editor callback={field.onChange} content={order?.notes} title="یادداشت ها" />}
+          render={({ field }) => (
+            <Editor callback={field.onChange} content={order?.notes} title={<Title>یادداشت ها</Title>} />
+          )}
         />
         <Button style={{ margin: "1rem 0" }} status="Info" appearance="outline">
           اعمال تغییرات

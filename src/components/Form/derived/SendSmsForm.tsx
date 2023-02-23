@@ -1,10 +1,10 @@
-import { Form, InputGroup as _InputGroup } from "components";
+import { InputGroup as _InputGroup } from "components";
 import styled from "styled-components";
 import { Button, InputGroup as __InputGroup } from "@paljs/ui";
 import { useForm } from "react-hook-form";
 import { useRef, useState } from "react";
-import { Badge as _Badge } from "@mantine/core";
-import _Select from "react-select";
+import { Badge as _Badge, Divider, Flex, Select, Button as MantineButton, Space, LoadingOverlay } from "@mantine/core";
+// import _Select from "react-select";
 import { $_send_sms } from "utils/api/REST/actions/sms";
 import { reqSucceed, translator } from "utils";
 import { toast } from "react-toastify";
@@ -15,14 +15,15 @@ const templateOptions = [
   { label: "بدون قالب", value: "" },
   ...SMS_PATTERNS.map((_pattern: any) => ({
     label: _pattern.title,
-    value: _pattern.code
-  }))
+    value: _pattern.code,
+  })),
 ];
 
 // TODO: test the functionality
 export function SendSmsForm() {
   const [template, setTemplate] = useState("");
   const [phoneNumbers, setPhoneNumbers] = useState<any>([]);
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef<any>();
 
   function onInsertPhoneNumber() {
@@ -34,27 +35,21 @@ export function SendSmsForm() {
   }
 
   function removePhoneNumber(phoneNumber: string) {
-    setPhoneNumbers((_curr: any) =>
-      _curr.filter((_item: any) => _item !== phoneNumber)
-    );
+    setPhoneNumbers((_curr: any) => _curr.filter((_item: any) => _item !== phoneNumber));
   }
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-  } = useForm();
+  const { register, handleSubmit, reset } = useForm();
 
   useNonInitialEffect(() => {
     reset();
-  }, [template])
+  }, [template]);
 
+  // TODO: test send sms & all templates
   async function onSendSms(form: any) {
+    setLoading(true);
     const type: any = template === "" ? "simple" : "template";
-    const content = (!form.content || form.content === "") ? template : form.content;
-    const tokens = form.tokens
-      ? Object.entries(form.tokens).map(([key, value]) => ({ [key]: value }))
-      : []
+    const content = !form.content || form.content === "" ? template : form.content;
+    const tokens = form.tokens ? Object.entries(form.tokens).map(([key, value]) => ({ [key]: value })) : [];
     const finalForm = {
       tokens,
       type,
@@ -70,62 +65,56 @@ export function SendSmsForm() {
     } else {
       toast.error("ارسال پیامک موفقیت آمیز نیود ");
     }
+    setLoading(false);
   }
 
   return (
     <Form onSubmit={handleSubmit(onSendSms)}>
+      <LoadingOverlay visible={loading} />
       <_InputGroup col>
         <label htmlFor="phone-number">شماره ها :</label>
 
         <BadgeList>
-          {phoneNumbers?.length > 0
-            ? phoneNumbers.map((_phoneNumber: any) => (
+          {phoneNumbers?.length > 0 ? (
+            phoneNumbers.map((_phoneNumber: any) => (
               <Badge color="blue">
-                <Cross onClick={() => removePhoneNumber(_phoneNumber)}>
-                  x
-                </Cross>{" "}
-                {_phoneNumber}
+                <Cross onClick={() => removePhoneNumber(_phoneNumber)}>x</Cross> {_phoneNumber}
               </Badge>
             ))
-            : <Badge color="red">شماره ای وارد نشده است</Badge>}
+          ) : (
+            <Badge color="red">شماره ای وارد نشده است</Badge>
+          )}
         </BadgeList>
 
-        <InputGroup>
-          <input
-            id="phone-number"
-            maxLength={11}
-            placeholder="شماره جدید"
-            ref={inputRef}
-          />
-          <Button type="button" status="Success" onClick={onInsertPhoneNumber}>+</Button>
-        </InputGroup>
+        <Flex className="input-group">
+          <MantineButton onClick={onInsertPhoneNumber} size="xs" style={{ height: "2rem" }}>
+            +
+          </MantineButton>
+          <input id="phone-number" placeholder="شماره جدید" ref={inputRef} />
+        </Flex>
       </_InputGroup>
 
-      <InputGroup fullWidth>
-        <Select
-          options={templateOptions}
-          placeholder="قالب پیامک"
-          onChange={(e: any) => setTemplate(e.value)}
-        />
-      </InputGroup>
+      <Space mt="xs" />
+
+      <Flex className="input-group">
+        <Select data={templateOptions} placeholder="قالب پیامک" onChange={(value) => setTemplate(value ?? "")} />
+      </Flex>
+
+      <Divider variant="dashed" my="md" />
 
       {template === "" ? (
         <_InputGroup col fullWidth>
           <label htmlFor="content">متن پیامک</label>
-          <textarea
-            id="content"
-            placeholder="متن پیامک ..."
-            {...register("content", { required: true })}
-          />
+          <textarea id="content" placeholder="متن پیامک ..." {...register("content", { required: true })} />
         </_InputGroup>
-      ) : SMS_PATTERNS.find((_pattern: any) => _pattern.code === template)
-        ?.tokens.map((key: string) => (
-          <InputGroup className="token">
+      ) : (
+        SMS_PATTERNS.find((_pattern: any) => _pattern.code === template)?.tokens.map((key: string) => (
+          <Flex className="token input-group">
             <label>{translator(key)} :</label>
             <input {...register(`tokens.${key}`)} />
-          </InputGroup>
+          </Flex>
         ))
-      }
+      )}
 
       <SubmitButton status="Success" disabled={phoneNumbers.length < 1}>
         ارسال پیامک
@@ -134,7 +123,25 @@ export function SendSmsForm() {
   );
 }
 
-const Badge = styled(_Badge) <{ [key: string]: any }>`
+export const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+
+  position: relative;
+
+  .input-group {
+    input {
+      height: 2rem;
+    }
+  }
+
+  input,
+  textarea {
+    width: 100%;
+  }
+`;
+
+const Badge = styled(_Badge)<{ [key: string]: any }>`
   max-width: 15rem;
   height: 2rem;
   margin-bottom: 1rem;
@@ -148,7 +155,7 @@ const Cross = styled.strong`
   display: inline-block;
 
   font-size: 1.125rem;
-  font-wight: 900;
+  font-weight: 900;
 
   &:hover {
     cursor: pointer;
@@ -159,10 +166,10 @@ const BadgeList = styled.div`
   display: flex;
 `;
 
-const Select = styled(_Select)`
-  min-width: 10rem;
-  margin: 1rem 0;
-`;
+// const Select = styled(_Select)`
+//   min-width: 10rem;
+//   margin: 1rem 0;
+// `;
 
 const SubmitButton = styled(Button).attrs({
   status: "Success",
@@ -172,9 +179,10 @@ const SubmitButton = styled(Button).attrs({
 `;
 
 const InputGroup = styled(__InputGroup)`
+  width: 100%;
   &.token {
     label {
       min-width: 5rem;
     }
   }
-`
+`;
