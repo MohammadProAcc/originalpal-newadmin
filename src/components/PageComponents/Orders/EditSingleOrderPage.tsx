@@ -1,4 +1,4 @@
-import { Flex, Select as MantineSelect } from "@mantine/core";
+import { Divider, Flex, Select as MantineSelect } from "@mantine/core";
 import { Add, Close } from "@material-ui/icons";
 import {
   Alert,
@@ -15,7 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Editor, FlexContainer, HeaderButton, ModalBox, SendInvoice, SendSmsForm } from "components";
 import { WriteOrderDetailsModal } from "components/Modal/derived/WriteOrderDetails";
 import { SendAndReturnInvoice } from "components/Table/OrderInvoice/SendAndReturnInvoice";
-import { useNonInitialEffect } from "hooks";
+import { useGetImage, useNonInitialEffect } from "hooks";
 import Cookies from "js-cookie";
 import Layout from "Layouts";
 import Link from "next/link";
@@ -44,6 +44,7 @@ import {
   useStore,
   useUserStore,
 } from "utils";
+import { SendAndReturnInvoiceForm } from "./components/SendAndReturnInvoiceForm";
 
 const statusOptions = [
   { label: "در انتظار پرداخت", value: "waiting" },
@@ -253,6 +254,9 @@ export const EditSingleOrderPage: React.FC = () => {
 
   const sendInvoiceRef = useRef<HTMLElement>(null);
   const returnInvoiceRef = useRef<HTMLElement>(null);
+
+  const getSendInvoice = useGetImage(sendInvoiceRef);
+  const getReturnInvoice = useGetImage(returnInvoiceRef);
 
   const exportSendInvoiceToPDF = useReactToPrint({
     content: () => sendInvoiceRef.current,
@@ -592,16 +596,12 @@ export const EditSingleOrderPage: React.FC = () => {
               </Button>
             </Link>
 
-            <Button status="Info" appearance="hero" className="ml-1 mb-1" onClick={exportSendInvoiceToPDF}>
-              فاکتور ارسال
-            </Button>
+            <Divider variant="dashed" my="md" />
 
-            <Button status="Info" appearance="hero" className="ml-1 mb-1" onClick={exportReturnInvoiceToPDF}>
-              فاکتور برگشت
-            </Button>
-
-            <HiddenContainer>
-              <SendAndReturnInvoice
+            <Flex justify="space-between">
+              <SendAndReturnInvoiceForm
+                buttonTitle="فاکتور ارسال"
+                callback={getSendInvoice}
                 forwardingRef={sendInvoiceRef}
                 details={{
                   address: order?.address?.address,
@@ -611,11 +611,11 @@ export const EditSingleOrderPage: React.FC = () => {
                   tel: order?.user?.tel,
                 }}
               />
-            </HiddenContainer>
 
-            <HiddenContainer>
-              <SendAndReturnInvoice
+              <SendAndReturnInvoiceForm
                 return={true}
+                buttonTitle="فاکتور برگشت"
+                callback={getReturnInvoice}
                 forwardingRef={returnInvoiceRef}
                 details={{
                   address: order?.address?.address,
@@ -625,7 +625,7 @@ export const EditSingleOrderPage: React.FC = () => {
                   tel: order?.user?.tel,
                 }}
               />
-            </HiddenContainer>
+            </Flex>
           </Container>
 
           {/* <Container>
@@ -749,7 +749,7 @@ const CouponsSelect = styled(MantineSelect)`
 `;
 
 const HiddenContainer = styled.div`
-  display: none;
+  /* display: none;
   opacity: 0;
-  visibility: hidden;
+  visibility: hidden; */
 `;

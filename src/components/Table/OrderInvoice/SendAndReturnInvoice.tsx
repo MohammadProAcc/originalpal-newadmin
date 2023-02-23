@@ -10,6 +10,9 @@ interface ISendInvoiceProps {
     postalcode: string;
     tel: string;
     phone: string;
+    vendorName?: string;
+    vendorAddress?: string;
+    vendorPhone?: string;
   };
   return?: boolean;
   forwardingRef: MutableRefObject<any>;
@@ -25,10 +28,9 @@ export function SendAndReturnInvoice(props: ISendInvoiceProps) {
 }
 
 const $ = styled.div`
-  /* width: 148mm; */
-  /* min-height: 210mm; */
-  /* width: 100%; */
-  /* padding: 0.75rem; */
+  width: 148mm;
+  min-height: 210mm;
+  padding: 0.5rem;
 
   display: flex;
   flex-direction: column;
