@@ -9,14 +9,16 @@ interface ISendAndReturnInvoiceSectionProps {
     postalcode: string;
     tel: string;
     phone: string;
-    vendorName?: string;
-    vendorAddress?: string;
-    vendorPhone?: string;
+    vendor_name?: string;
+    vendor_address?: string;
+    vendor_tel?: string;
+    vendor_phone?: string;
   };
   return?: boolean;
   forwardingRef: MutableRefObject<any>;
 }
 export function SendAndReturnInvoiceSection(props: ISendAndReturnInvoiceSectionProps) {
+  console.log(props);
   return (
     <$>
       <Primary>
@@ -38,11 +40,11 @@ export function SendAndReturnInvoiceSection(props: ISendAndReturnInvoiceSectionP
       <Secondary>
         <Divider variant="dotted" size="lg" mt="4rem" mb="1rem" />
         <p className="light">
-          {props.return ? "گیرنده" : "فرستنده"}: {props.details.vendorName}
+          {props.return ? "گیرنده" : "فرستنده"}: {props.details.vendor_name}
         </p>
-        <p className="light">آدرس صندوق پستی: {props.details.vendorAddress}</p>
+        <p className="light">آدرس صندوق پستی: {props.details.vendor_address}</p>
         <p className="light">
-          تلفن {props.return ? "گیرنده" : "فرستنده"}: {props.details.vendorPhone}
+          تلفن {props.return ? "گیرنده" : "فرستنده"}: {props.details.vendor_tel} موبایل: {props.details.vendor_phone}
         </p>
       </Secondary>
     </$>
@@ -55,6 +57,10 @@ const $ = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  * {
+    color: black;
+  }
 `;
 
 const Primary = styled.div`

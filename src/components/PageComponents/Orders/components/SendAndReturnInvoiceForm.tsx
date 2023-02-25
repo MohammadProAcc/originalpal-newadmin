@@ -16,23 +16,24 @@ interface ISendAndReturnInvoiceFormProps {
   };
   return?: boolean;
   forwardingRef: MutableRefObject<any>;
-  callback: any;
+  callback: (details: any) => void;
   buttonTitle: ReactNode;
 }
 export function SendAndReturnInvoiceForm(props: ISendAndReturnInvoiceFormProps) {
   const [details, setDetails] = useState({
     ...props.details,
-    vendorName: "همدان - اورجینال پَل",
-    vendorAddress: "1519_65155",
-    vendorPhone: "38263633 081 - 38283237 081",
+    return: !!props.return,
+    vendor_name: "همدان - اورجینال پَل",
+    vendor_address: "1519_65155",
+    vendor_tel: "38263633 081 - 38283237 081",
+    vendor_phone: "09120387302",
   });
   const [showEditForm, setShowEditForm] = useState(false);
 
   const form = useForm({
-    defaultValues: {
-      ...details,
-    },
+    defaultValues: details,
   });
+
   function onSubmit(form: typeof details) {
     setDetails(form);
   }
@@ -40,7 +41,7 @@ export function SendAndReturnInvoiceForm(props: ISendAndReturnInvoiceFormProps) 
   return (
     <Flex direction="column">
       <Flex gap="md" mb="md">
-        <Button type="button" status="Info" appearance="hero" onClick={props.callback}>
+        <Button type="button" status="Info" appearance="hero" onClick={() => props.callback(details)}>
           {props.buttonTitle}
         </Button>
         <Button type="button" appearance="hero" onClick={() => setShowEditForm((o) => !o)}>
@@ -97,18 +98,23 @@ function Form(props: { formMethods: UseFormReturn<any>; onSubmit: any }) {
           <Divider variant="dashed" my="md" />
 
           <Flex className="form-group">
-            <label htmlFor="vendorName">نام فروشنده : </label>
-            <input {...props.formMethods.register("vendorName")} id="vendorName" />
+            <label htmlFor="vendor_name">نام فروشنده : </label>
+            <input {...props.formMethods.register("vendor_name")} id="vendor_name" />
           </Flex>
 
           <Flex className="form-group">
-            <label htmlFor="vendorAddress">آدرس صندوق پستی فروشنده : </label>
-            <input {...props.formMethods.register("vendorAddress")} id="vendorAddress" />
+            <label htmlFor="vendor_address">آدرس صندوق پستی فروشنده : </label>
+            <input {...props.formMethods.register("vendor_address")} id="vendor_address" />
           </Flex>
 
           <Flex className="form-group">
-            <label htmlFor="vendorPhone">تلفن فروشنده : </label>
-            <input {...props.formMethods.register("vendorPhone")} id="vendorPhone" />
+            <label htmlFor="vendor_tel">تلفن فروشنده : </label>
+            <input {...props.formMethods.register("vendor_tel")} id="vendor_tel" />
+          </Flex>
+
+          <Flex className="form-group">
+            <label htmlFor="vendor_phone">موبایل فروشنده : </label>
+            <input {...props.formMethods.register("vendor_phone")} id="vendor_phone" />
           </Flex>
 
           <Button status="Success" appearance="hero" type="submit">

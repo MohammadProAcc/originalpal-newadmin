@@ -592,44 +592,92 @@ export const EditSingleOrderPage: React.FC = () => {
               پرینت فاکتور سفارش
             </Button>
 
-            <Link href="/orders/back-invoice">
+            <Link
+              href={{
+                pathname: "/a5.html",
+                query: {
+                  address: order?.address?.address,
+                  phone: order?.user?.phone,
+                  postalcode: order?.address?.postalcode,
+                  reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
+                  tel: order?.user?.tel,
+                  vendor_name: "همدان - اورجینال پَل",
+                  vendor_address: "1519_65155",
+                  vendor_tel: "38263633 081 - 38283237 081",
+                  vendor_phone: "09120387302",
+                },
+              }}
+            >
               <Button status="Info" appearance="hero" className="ml-1 mb-1">
-                پرینت پشت فاکتور
+                فاکتور بازگشت
               </Button>
             </Link>
-
-            <Divider variant="dashed" my="md" />
-
-            <Flex justify="space-between">
-              <SendAndReturnInvoiceForm
-                buttonTitle="فاکتور ارسال"
-                callback={getSendInvoice}
-                forwardingRef={sendInvoiceRef}
-                details={{
-                  address: order?.address?.address,
-                  phone: order?.user?.phone,
-                  postalcode: order?.address?.postalcode,
-                  reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
-                  tel: order?.user?.tel,
-                }}
-              />
-
-              <SendAndReturnInvoiceForm
-                return={true}
-                buttonTitle="فاکتور برگشت"
-                callback={getReturnInvoice}
-                forwardingRef={returnInvoiceRef}
-                details={{
-                  address: order?.address?.address,
-                  phone: order?.user?.phone,
-                  postalcode: order?.address?.postalcode,
-                  reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
-                  tel: order?.user?.tel,
-                }}
-              />
-            </Flex>
           </Container>
 
+          <Divider variant="dashed" my="md" />
+
+          <Flex justify="space-between">
+            <SendAndReturnInvoiceForm
+              forwardingRef={sendInvoiceRef}
+              details={{
+                address: order?.address?.address,
+                phone: order?.user?.phone,
+                postalcode: order?.address?.postalcode,
+                reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
+                tel: order?.user?.tel,
+              }}
+              buttonTitle="فاکتور ارسال"
+              callback={(details) =>
+                router.push({
+                  pathname: "/a5.html",
+                  query: {
+                    ...details,
+                    // return: true,
+                    // address: order?.address?.address,
+                    // phone: order?.user?.phone,
+                    // postalcode: order?.address?.postalcode,
+                    // reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
+                    // tel: order?.user?.tel,
+                    // vendor_name: "همدان - اورجینال پَل",
+                    // vendor_address: "1519_65155",
+                    // vendor_tel: "38263633 081 - 38283237 081",
+                    // vendor_phone: "09120387302",
+                  },
+                })
+              }
+            />
+
+            <SendAndReturnInvoiceForm
+              return={true}
+              forwardingRef={returnInvoiceRef}
+              details={{
+                address: order?.address?.address,
+                phone: order?.user?.phone,
+                postalcode: order?.address?.postalcode,
+                reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
+                tel: order?.user?.tel,
+              }}
+              buttonTitle="فاکتور برگشت"
+              callback={(details) =>
+                router.push({
+                  pathname: "/a5.html",
+                  query: {
+                    ...details,
+                    return: true,
+                    // address: order?.address?.address,
+                    // phone: order?.user?.phone,
+                    // postalcode: order?.address?.postalcode,
+                    // reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
+                    // tel: order?.user?.tel,
+                    // vendor_name: "همدان - اورجینال پَل",
+                    // vendor_address: "1519_65155",
+                    // vendor_tel: "38263633 081 - 38283237 081",
+                    // vendor_phone: "09120387302",
+                  },
+                })
+              }
+            />
+          </Flex>
           {/* <Container>
             <Button status="Info" appearance="hero" className="ml-1 mb-1">
               پرینت برگه ارسال ( A5 )
