@@ -42,8 +42,8 @@ export function SendAndReturnInvoiceForm(props: ISendAndReturnInvoiceFormProps) 
     <Flex direction="column">
       <Flex gap="md" mb="md">
         <Tooltip
-          label="پس از رفتن به صفحه پرینت، یکبار صفحه را ریلود کنید"
-          color="indigo"
+          label="پس از رفتن به صفحه پرینت، برای دیدن فاکتور یکبار صفحه را ریلود (f5) کنید"
+          color="pink"
           position="bottom-start"
           withArrow
         >
