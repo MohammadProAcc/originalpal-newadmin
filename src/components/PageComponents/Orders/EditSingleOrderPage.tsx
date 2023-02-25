@@ -630,19 +630,7 @@ export const EditSingleOrderPage: React.FC = () => {
               callback={(details) =>
                 router.push({
                   pathname: "/a5.html",
-                  query: {
-                    ...details,
-                    // return: true,
-                    // address: order?.address?.address,
-                    // phone: order?.user?.phone,
-                    // postalcode: order?.address?.postalcode,
-                    // reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
-                    // tel: order?.user?.tel,
-                    // vendor_name: "همدان - اورجینال پَل",
-                    // vendor_address: "1519_65155",
-                    // vendor_tel: "38263633 081 - 38283237 081",
-                    // vendor_phone: "09120387302",
-                  },
+                  query: details,
                 })
               }
             />
@@ -664,15 +652,6 @@ export const EditSingleOrderPage: React.FC = () => {
                   query: {
                     ...details,
                     return: true,
-                    // address: order?.address?.address,
-                    // phone: order?.user?.phone,
-                    // postalcode: order?.address?.postalcode,
-                    // reciever_name: `${order?.user?.name} ${order?.user?.lastname}`,
-                    // tel: order?.user?.tel,
-                    // vendor_name: "همدان - اورجینال پَل",
-                    // vendor_address: "1519_65155",
-                    // vendor_tel: "38263633 081 - 38283237 081",
-                    // vendor_phone: "09120387302",
                   },
                 })
               }

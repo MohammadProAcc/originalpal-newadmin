@@ -1,5 +1,5 @@
 // TODO: add editting functionality
-import { Divider, Flex, Title } from "@mantine/core";
+import { Divider, Flex, Title, Tooltip } from "@mantine/core";
 import { Button, Card, CardBody, CardHeader } from "@paljs/ui";
 import { SendAndReturnInvoice } from "components/Table/OrderInvoice/SendAndReturnInvoice";
 import { MutableRefObject, ReactNode, useState } from "react";
@@ -41,9 +41,16 @@ export function SendAndReturnInvoiceForm(props: ISendAndReturnInvoiceFormProps) 
   return (
     <Flex direction="column">
       <Flex gap="md" mb="md">
-        <Button type="button" status="Info" appearance="hero" onClick={() => props.callback(details)}>
-          {props.buttonTitle}
-        </Button>
+        <Tooltip
+          label="پس از رفتن به صفحه پرینت، یکبار صفحه را ریلود کنید"
+          color="indigo"
+          position="bottom-start"
+          withArrow
+        >
+          <Button type="button" status="Info" appearance="hero" onClick={() => props.callback(details)}>
+            {props.buttonTitle}
+          </Button>
+        </Tooltip>
         <Button type="button" appearance="hero" onClick={() => setShowEditForm((o) => !o)}>
           ویرایش
         </Button>

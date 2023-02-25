@@ -13,17 +13,16 @@ interface ISendAndReturnInvoiceSectionProps {
     vendor_address?: string;
     vendor_tel?: string;
     vendor_phone?: string;
+    return?: boolean;
   };
-  return?: boolean;
   forwardingRef: MutableRefObject<any>;
 }
 export function SendAndReturnInvoiceSection(props: ISendAndReturnInvoiceSectionProps) {
-  console.log(props);
   return (
     <$>
       <Primary>
         <p>
-          {props.return ? "فرستنده" : "گیرنده"}:{" "}
+          {props.details.return ? "فرستنده" : "گیرنده"}:{" "}
           {props.details.reciever_name?.length > 0 ? props.details.reciever_name : "-"}
         </p>
 
@@ -40,11 +39,12 @@ export function SendAndReturnInvoiceSection(props: ISendAndReturnInvoiceSectionP
       <Secondary>
         <Divider variant="dotted" size="lg" mt="4rem" mb="1rem" />
         <p className="light">
-          {props.return ? "گیرنده" : "فرستنده"}: {props.details.vendor_name}
+          {props.details.return ? "گیرنده" : "فرستنده"}: {props.details.vendor_name}
         </p>
         <p className="light">آدرس صندوق پستی: {props.details.vendor_address}</p>
         <p className="light">
-          تلفن {props.return ? "گیرنده" : "فرستنده"}: {props.details.vendor_tel} موبایل: {props.details.vendor_phone}
+          تلفن {props.details.return ? "گیرنده" : "فرستنده"}: {props.details.vendor_tel} موبایل:{" "}
+          {props.details.vendor_phone}
         </p>
       </Secondary>
     </$>

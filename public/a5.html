@@ -15,11 +15,11 @@
     <style>
       @font-face {
         font-family: IRANSans;
-        src: url("/fonts/IRANSansWeb_Light.woff");
+        src: url("/fonts/IRANSansWeb.woff");
       }
       body {
         font-family: IRANSans !important;
-        font-weight: 300;
+        font-weight: 900;
         direction: ltr;
         background-color: #ffffff;
         margin: 0;
@@ -208,6 +208,10 @@
         margin-bottom: 0px;
         padding-bottom: 0px;
       }
+      .divider {
+        width: 100%;
+        border-bottom: 1px dotted black;
+      }
     </style>
   </head>
 
@@ -215,7 +219,7 @@
     <div style="height: 175px; position: relative">
       <p>
         <strong class="text-small" style="font-size: 1em"
-          >گیرنده: <span class="client-name">میر مهدی موسوی</span>
+          ><span class="client"></span>: <span class="client-name"></span>
         </strong>
       </p>
       <p>
@@ -234,12 +238,12 @@
       </p>
     </div>
     <p>
-      <strong class="text-small"
-        >.............................................................................................................................</strong
-      >
+      <div class="divider"></div>
     </p>
     <p>
-      <strong class="text-small">فرستنده: <span class="vendor-name">همدان - اورجینال پَل</span> </strong>
+      <strong class="text-small"
+        ><span class="vendor"></span>: <span class="vendor-name">همدان - اورجینال پَل</span>
+      </strong>
     </p>
     <p>
       <strong class="text-small">آدرس صندوق پستی: <span class="vendor-postalcode">۱۵۱۹-۶۵۱۵۵</span></strong>
@@ -251,14 +255,12 @@
       >
     </p>
     <p>
-      <strong class="text-small"
-        >.............................................................................................................................</strong
-      >
+      <div class="divider"></div>
     </p>
     <div style="height: 175px; position: relative">
       <p>
         <strong class="text-small" style="font-size: 1em"
-          >گیرنده: <span class="client-name">میر مهدی موسوی</span>
+          ><span class="client"></span>: <span class="client-name">میر مهدی موسوی</span>
         </strong>
       </p>
       <p>
@@ -277,12 +279,12 @@
       </p>
     </div>
     <p>
-      <strong class="text-small"
-        >.............................................................................................................................</strong
-      >
+      <div class="divider"></div>
     </p>
     <p>
-      <strong class="text-small">فرستنده: <span class="vendor-name">همدان - اورجینال پَل</span> </strong>
+      <strong class="text-small"
+        ><span class="vendor"></span>: <span class="vendor-name">همدان - اورجینال پَل</span>
+      </strong>
     </p>
     <p>
       <strong class="text-small">آدرس صندوق پستی: <span class="vendor-postalcode">۱۵۱۹-۶۵۱۵۵</span></strong>
@@ -353,6 +355,14 @@
 
       for (let node of document.querySelectorAll(".vendor-phone")) {
         node.innerText = params.vendor_phone;
+      }
+
+      for (let node of document.querySelectorAll(".vendor")) {
+        node.innerText = params.return === "true" ? "گیرنده" : "فرستنده";
+      }
+
+      for (let node of document.querySelectorAll(".client")) {
+        node.innerText = params.return === "true" ? "فرستنده" : "گیرنده";
       }
     </script>
   </body>
